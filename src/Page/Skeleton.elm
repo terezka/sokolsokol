@@ -22,7 +22,7 @@ view toMsg document =
             [ Css.Global.global styles
             , Html.menu
                 [ Attr.css
-                    [ Css.position Css.sticky
+                    [ Css.position Css.fixed
                     , Css.top Css.zero
                     ]
                 ]
@@ -58,11 +58,6 @@ navItem link linkText =
         [ Attr.css
             [ Css.marginLeft (Css.px 20)
             , Css.fontSize (Css.px 16)
-            , Css.cursor Css.pointer
-            , Css.textDecoration Css.none
-            , Css.color Element.Color.black
-            , Css.hover
-                [ Css.color Element.Color.blue ]
             ]
         , Attr.href link
         ]
@@ -81,18 +76,18 @@ styles =
         , Css.margin Css.zero
         ]
     , Css.Global.menu
-        [ Css.borderTop3 (Css.px 5) Css.solid Element.Color.blue
-        , Css.margin Css.zero
+        [ Css.margin Css.zero
         ]
     , Css.Global.main_
         [ Css.displayFlex
         , Css.padding Css.zero
-        , Css.margin Css.zero
         , Css.alignItems Css.center
         , Css.justifyContent Css.center
         , Css.flexDirection Css.column
+        , Css.marginRight Css.zero
         , Css.marginTop (Css.px 100)
         , Css.marginBottom (Css.px 200)
+        , Css.marginLeft (Css.px 200)
         ]
     , Css.Global.h1
         [ Css.fontWeight (Css.int 500)
@@ -105,5 +100,10 @@ styles =
     , Css.Global.a
         [ Css.fontWeight (Css.int 300)
         , Css.fontSize (Css.px 12)
+        , Css.cursor Css.pointer
+        , Css.textDecoration Css.none
+        , Css.color Element.Color.black
+        , Css.hover
+            [ Css.color Element.Color.blue ]
         ]
     ]
