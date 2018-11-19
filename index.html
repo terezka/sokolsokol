@@ -6142,7 +6142,7 @@ var rtfeldman$elm_css$Css$prop1 = F2(
 var rtfeldman$elm_css$Css$maxWidth = rtfeldman$elm_css$Css$prop1('max-width');
 var rtfeldman$elm_css$Css$Structure$Compatible = {$: 'Compatible'};
 var rtfeldman$elm_css$Css$overline = {textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, value: 'overline'};
-var rtfeldman$elm_css$Css$PxUnits = {$: 'PxUnits'};
+var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
 var elm$core$String$fromFloat = _String_fromNumber;
 var rtfeldman$elm_css$Css$Internal$lengthConverter = F3(
 	function (units, unitLabel, numericValue) {
@@ -6168,8 +6168,11 @@ var rtfeldman$elm_css$Css$Internal$lengthConverter = F3(
 				unitLabel)
 		};
 	});
+var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
+var rtfeldman$elm_css$Css$PxUnits = {$: 'PxUnits'};
 var rtfeldman$elm_css$Css$px = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PxUnits, 'px');
 var rtfeldman$elm_css$Css$textDecoration = rtfeldman$elm_css$Css$prop1('text-decoration');
+var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
 var rtfeldman$elm_css$VirtualDom$Styled$Node = F3(
 	function (a, b, c) {
 		return {$: 'Node', a: a, b: b, c: c};
@@ -6178,6 +6181,8 @@ var rtfeldman$elm_css$VirtualDom$Styled$node = rtfeldman$elm_css$VirtualDom$Styl
 var rtfeldman$elm_css$Html$Styled$node = rtfeldman$elm_css$VirtualDom$Styled$node;
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
 var rtfeldman$elm_css$Html$Styled$h1 = rtfeldman$elm_css$Html$Styled$node('h1');
+var rtfeldman$elm_css$Html$Styled$i = rtfeldman$elm_css$Html$Styled$node('i');
+var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
 var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var rtfeldman$elm_css$VirtualDom$Styled$Unstyled = function (a) {
@@ -7942,6 +7947,24 @@ var rtfeldman$elm_css$Html$Styled$Internal$css = function (styles) {
 	return A3(rtfeldman$elm_css$VirtualDom$Styled$Attribute, classProperty, styles, classname);
 };
 var rtfeldman$elm_css$Html$Styled$Attributes$css = rtfeldman$elm_css$Html$Styled$Internal$css;
+var rtfeldman$elm_css$VirtualDom$Styled$property = F2(
+	function (key, value) {
+		return A3(
+			rtfeldman$elm_css$VirtualDom$Styled$Attribute,
+			A2(elm$virtual_dom$VirtualDom$property, key, value),
+			_List_Nil,
+			'');
+	});
+var rtfeldman$elm_css$Html$Styled$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			rtfeldman$elm_css$VirtualDom$Styled$property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
+	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
+};
 var author$project$Page$Article$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -7954,11 +7977,25 @@ var author$project$Page$Article$view = function (model) {
 						_List_fromArray(
 							[
 								rtfeldman$elm_css$Css$maxWidth(
-								rtfeldman$elm_css$Css$px(700))
+								rtfeldman$elm_css$Css$px(780)),
+								A2(rtfeldman$elm_css$Css$property, 'column-count', '2')
 							]))
 					]),
 				_List_fromArray(
 					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$img,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$src('https://spectrum.ieee.org/image/Mjc5MDM4Nw.jpeg'),
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$width(
+										rtfeldman$elm_css$Css$pct(100))
+									]))
+							]),
+						_List_Nil),
 						A2(
 						rtfeldman$elm_css$Html$Styled$h1,
 						_List_fromArray(
@@ -8042,6 +8079,13 @@ var author$project$Page$Article$view = function (model) {
 						_List_fromArray(
 							[
 								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$i,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('By Tereza Sokol')
 							]))
 					]))
 			]),
@@ -8198,21 +8242,6 @@ var author$project$Page$Skeleton$nav = rtfeldman$elm_css$Html$Styled$nav(
 var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
 var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
 var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
-var rtfeldman$elm_css$VirtualDom$Styled$property = F2(
-	function (key, value) {
-		return A3(
-			rtfeldman$elm_css$VirtualDom$Styled$Attribute,
-			A2(elm$virtual_dom$VirtualDom$property, key, value),
-			_List_Nil,
-			'');
-	});
-var rtfeldman$elm_css$Html$Styled$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			rtfeldman$elm_css$VirtualDom$Styled$property,
-			key,
-			elm$json$Json$Encode$string(string));
-	});
 var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
 	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
 };
