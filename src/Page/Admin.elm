@@ -1,13 +1,13 @@
-port module Page.Admin exposing (Model, Msg, init, update, view, subscriptions)
+port module Page.Admin exposing (Model, Msg, init, subscriptions, update, view)
 
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
+import Json.Decode as Decode
+import Json.Encode as Encode
 import Page.Skeleton as Skeleton
 import Session
-import Json.Encode as Encode
-import Json.Decode as Decode
 
 
 type alias Model =
@@ -34,10 +34,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UpdateEmail email ->
-            ( {model | email = email}, Cmd.none )
+            ( { model | email = email }, Cmd.none )
 
         UpdatePassword password ->
-            ( {model | password = password}, Cmd.none )
+            ( { model | password = password }, Cmd.none )
 
         Submit ->
             ( model
@@ -56,11 +56,6 @@ update msg model =
                     ( { model | message = Just "Logged in!" }, Cmd.none )
 
 
-
-
-
-
-
 view : Model -> Skeleton.Document Msg
 view model =
     { title = "SOKOL SOKOL | The wool pants"
@@ -72,8 +67,11 @@ view model =
             , Html.input [ Attr.value model.password, Attr.type_ "password", Events.onInput UpdatePassword ] []
             , Html.div [ Events.onClick Submit ] [ Html.text "Submit" ]
             , case model.message of
-                Just message -> Html.text message
-                Nothing -> Html.text ""
+                Just message ->
+                    Html.text message
+
+                Nothing ->
+                    Html.text ""
             ]
         ]
     }
@@ -84,9 +82,12 @@ subscriptions model =
     authenticateResponse GotError
 
 
+
 -- PORTS
 
+
 port authenticate : Encode.Value -> Cmd msg
+
 
 port authenticateResponse : (Encode.Value -> msg) -> Sub msg
 
@@ -108,5 +109,3 @@ decodeResponse =
             (Decode.field "code" Decode.string)
             (Decode.field "message" Decode.string)
         ]
-
-

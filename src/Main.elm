@@ -6,9 +6,9 @@ import Css
 import Css.Global
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Page.Admin as Admin
 import Page.Article as Article
 import Page.Design as Design
-import Page.Admin as Admin
 import Page.Skeleton as Skeleton
 import Session
 import Url
@@ -45,7 +45,7 @@ type Page
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-     case model.page of
+    case model.page of
         Admin adminModel ->
             Admin.subscriptions adminModel
                 |> Sub.map AdminMsg
