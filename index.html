@@ -31,7 +31,7 @@
 
     app.ports.authenticate.subscribe(function(data) {
       console.log({data})
-      firebase.auth().createUserWithEmailAndPassword(data.email, data.password).catch(function(error) {
+      firebase.auth().signInWithEmailAndPassword(data.email, data.password).catch(function(error) {
         console.log({error})
         app.ports.authenticateError.send(error);
       });
