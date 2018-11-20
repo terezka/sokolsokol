@@ -94,9 +94,9 @@ encodeUser email password =
         ]
 
 
-decodeError : Decode.Decoder ( Int, String )
+decodeError : Decode.Decoder ( String, String )
 decodeError =
     Decode.map2 Tuple.pair
-        (Decode.field "code" Decode.int)
+        (Decode.field "code" Decode.string)
         (Decode.field "message" Decode.string)
 
