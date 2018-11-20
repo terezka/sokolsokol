@@ -8,6 +8,7 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Page.Article as Article
 import Page.Design as Design
+import Page.Admin as Admin
 import Page.Skeleton as Skeleton
 import Session
 import Url
@@ -35,6 +36,7 @@ type Page
     = NotFound Session.Data
     | Article Article.Model
     | Design Design.Model
+    | Admin Admin.Model
 
 
 
@@ -43,7 +45,13 @@ type Page
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+     case model.page of
+        Admin adminModel ->
+            Admin.subscriptions adminModel
+                |> Sub.map AdminMsg
+
+        _ ->
+            Sub.none
 
 
 
@@ -64,6 +72,9 @@ view model =
 
         Design designModel ->
             Skeleton.view DesignMsg (Design.view designModel)
+
+        Admin adminModel ->
+            Skeleton.view AdminMsg (Admin.view adminModel)
 
 
 
@@ -88,6 +99,7 @@ type Msg
     | UrlChanged Url.Url
     | ArticleMsg Article.Msg
     | DesignMsg Design.Msg
+    | AdminMsg Admin.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -127,6 +139,14 @@ update message model =
                 _ ->
                     ( model, Cmd.none )
 
+        AdminMsg msg ->
+            case model.page of
+                Admin designModel ->
+                    stepAdmin model (Admin.update msg designModel)
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 stepArticle : Model -> ( Article.Model, Cmd Article.Msg ) -> ( Model, Cmd Msg )
 stepArticle model ( articleModel, cmds ) =
@@ -139,6 +159,13 @@ stepDesign : Model -> ( Design.Model, Cmd Design.Msg ) -> ( Model, Cmd Msg )
 stepDesign model ( articleModel, cmds ) =
     ( { model | page = Design articleModel }
     , Cmd.map DesignMsg cmds
+    )
+
+
+stepAdmin : Model -> ( Admin.Model, Cmd Admin.Msg ) -> ( Model, Cmd Msg )
+stepAdmin model ( articleModel, cmds ) =
+    ( { model | page = Admin articleModel }
+    , Cmd.map AdminMsg cmds
     )
 
 
@@ -156,6 +183,9 @@ exit model =
             m.session
 
         Design m ->
+            m.session
+
+        Admin m ->
             m.session
 
 
@@ -177,6 +207,8 @@ stepUrl url model =
                     (stepArticle model (Article.init session))
                 , route (s "designs")
                     (stepDesign model (Design.init session))
+                , route (s "admin")
+                    (stepAdmin model (Admin.init session))
                 ]
     in
     case Parser.parse parser url of

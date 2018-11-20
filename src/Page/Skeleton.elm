@@ -30,7 +30,7 @@ view toMsg document =
                 , nav
                     [ navItem "/articles" "writing"
                     , navItem "/designs" "designs"
-                    , navItem "/moods" "moods"
+                    , navItem "/admin" "admin"
                     ]
                 ]
             , Html.main_ [] (List.map (Html.map toMsg) document.body)

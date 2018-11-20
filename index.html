@@ -6,23 +6,33 @@
     <title>SOKOL SOKOL</title>
     <script src="main.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
-		<script>
-		  var config = {
-		    apiKey: "AIzaSyB-DnVAVH4Sug1ow_5HKz8rXDGZWn22ErM",
-		    authDomain: "sokolsokol-6666.firebaseapp.com",
-		    databaseURL: "https://sokolsokol-6666.firebaseio.com",
-		    projectId: "sokolsokol-6666",
-		    storageBucket: "sokolsokol-6666.appspot.com",
-		    messagingSenderId: "612262023212"
-		  };
-		  firebase.initializeApp(config);
-		</script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-database.js"></script>
+    <script>
+      var config = {
+        apiKey: "AIzaSyB-DnVAVH4Sug1ow_5HKz8rXDGZWn22ErM",
+        authDomain: "sokolsokol-6666.firebaseapp.com",
+        databaseURL: "https://sokolsokol-6666.firebaseio.com",
+        projectId: "sokolsokol-6666",
+        storageBucket: "sokolsokol-6666.appspot.com",
+        messagingSenderId: "612262023212"
+      };
+      firebase.initializeApp(config);
+    </script>
   </head>
   <body>
-  	<div id="elm"></div>
+    <div id="elm"></div>
   </body>
   <script>
-		var el = document.getElementById("elm")
-		var app = Elm.Main.init({ node: el });
-	</script>
+    var el = document.getElementById("elm")
+    var app = Elm.Main.init({ node: el });
+
+    app.ports.authenticate.subscribe(function(data) {
+      console.log({data})
+      firebase.auth().createUserWithEmailAndPassword(data.email, data.password).catch(function(error) {
+        console.log({error})
+        app.ports.authenticateError.send(error);
+      });
+    });
+  </script>
 </html>

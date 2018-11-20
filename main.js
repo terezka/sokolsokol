@@ -4382,6 +4382,9 @@ var author$project$Main$exit = function (model) {
 		case 'Article':
 			var m = _n0.a;
 			return m.session;
+		case 'Design':
+			var m = _n0.a;
+			return m.session;
 		default:
 			var m = _n0.a;
 			return m.session;
@@ -4610,11 +4613,11 @@ var author$project$Main$route = F2(
 	function (parser, handler) {
 		return A2(elm$url$Url$Parser$map, handler, parser);
 	});
-var author$project$Main$Article = function (a) {
-	return {$: 'Article', a: a};
+var author$project$Main$Admin = function (a) {
+	return {$: 'Admin', a: a};
 };
-var author$project$Main$ArticleMsg = function (a) {
-	return {$: 'ArticleMsg', a: a};
+var author$project$Main$AdminMsg = function (a) {
+	return {$: 'AdminMsg', a: a};
 };
 var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$True = {$: 'True'};
@@ -4984,6 +4987,24 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 		}
 	});
 var elm$core$Platform$Cmd$map = _Platform_map;
+var author$project$Main$stepAdmin = F2(
+	function (model, _n0) {
+		var articleModel = _n0.a;
+		var cmds = _n0.b;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					page: author$project$Main$Admin(articleModel)
+				}),
+			A2(elm$core$Platform$Cmd$map, author$project$Main$AdminMsg, cmds));
+	});
+var author$project$Main$Article = function (a) {
+	return {$: 'Article', a: a};
+};
+var author$project$Main$ArticleMsg = function (a) {
+	return {$: 'ArticleMsg', a: a};
+};
 var author$project$Main$stepArticle = F2(
 	function (model, _n0) {
 		var articleModel = _n0.a;
@@ -5014,8 +5035,17 @@ var author$project$Main$stepDesign = F2(
 				}),
 			A2(elm$core$Platform$Cmd$map, author$project$Main$DesignMsg, cmds));
 	});
+var author$project$Page$Admin$Model = F4(
+	function (session, email, password, error) {
+		return {email: email, error: error, password: password, session: session};
+	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
+var author$project$Page$Admin$init = function (session) {
+	return _Utils_Tuple2(
+		A4(author$project$Page$Admin$Model, session, '', '', elm$core$Maybe$Nothing),
+		elm$core$Platform$Cmd$none);
+};
 var author$project$Page$Article$init = function (session) {
 	return _Utils_Tuple2(
 		{session: session},
@@ -5741,7 +5771,14 @@ var author$project$Main$stepUrl = F2(
 					A2(
 						author$project$Main$stepDesign,
 						model,
-						author$project$Page$Design$init(session)))
+						author$project$Page$Design$init(session))),
+					A2(
+					author$project$Main$route,
+					elm$url$Url$Parser$s('admin'),
+					A2(
+						author$project$Main$stepAdmin,
+						model,
+						author$project$Page$Admin$init(session)))
 				]));
 		var _n0 = A2(elm$url$Url$Parser$parse, parser, url);
 		if (_n0.$ === 'Just') {
@@ -5768,11 +5805,118 @@ var author$project$Main$init = F3(
 				page: author$project$Main$NotFound(author$project$Session$empty)
 			});
 	});
+var author$project$Page$Admin$GotError = function (a) {
+	return {$: 'GotError', a: a};
+};
+var elm$json$Json$Decode$value = _Json_decodeValue;
+var author$project$Page$Admin$authenticateError = _Platform_incomingPort('authenticateError', elm$json$Json$Decode$value);
+var author$project$Page$Admin$subscriptions = function (model) {
+	return author$project$Page$Admin$authenticateError(author$project$Page$Admin$GotError);
+};
+var elm$core$Platform$Sub$map = _Platform_map;
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
+	var _n0 = model.page;
+	if (_n0.$ === 'Admin') {
+		var adminModel = _n0.a;
+		return A2(
+			elm$core$Platform$Sub$map,
+			author$project$Main$AdminMsg,
+			author$project$Page$Admin$subscriptions(adminModel));
+	} else {
+		return elm$core$Platform$Sub$none;
+	}
 };
+var author$project$Page$Admin$authenticate = _Platform_outgoingPort('authenticate', elm$core$Basics$identity);
+var elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$int = _Json_decodeInt;
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$Page$Admin$decodeError = A3(
+	elm$json$Json$Decode$map2,
+	elm$core$Tuple$pair,
+	A2(elm$json$Json$Decode$field, 'code', elm$json$Json$Decode$int),
+	A2(elm$json$Json$Decode$field, 'message', elm$json$Json$Decode$string));
+var elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, obj) {
+					var k = _n0.a;
+					var v = _n0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var elm$json$Json$Encode$string = _Json_wrap;
+var author$project$Page$Admin$encodeUser = F2(
+	function (email, password) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'email',
+					elm$json$Json$Encode$string(email)),
+					_Utils_Tuple2(
+					'password',
+					elm$json$Json$Encode$string(password))
+				]));
+	});
+var elm$json$Json$Decode$decodeValue = _Json_run;
+var author$project$Page$Admin$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'UpdateEmail':
+				var email = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{email: email}),
+					elm$core$Platform$Cmd$none);
+			case 'UpdatePassword':
+				var password = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{password: password}),
+					elm$core$Platform$Cmd$none);
+			case 'Submit':
+				return _Utils_Tuple2(
+					model,
+					author$project$Page$Admin$authenticate(
+						A2(author$project$Page$Admin$encodeUser, model.email, model.password)));
+			default:
+				var errorValue = msg.a;
+				var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Page$Admin$decodeError, errorValue);
+				if (_n1.$ === 'Ok') {
+					var _n2 = _n1.a;
+					var code = _n2.a;
+					var message = _n2.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: elm$core$Maybe$Just(message)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: elm$core$Maybe$Just('Could not decode error')
+							}),
+						elm$core$Platform$Cmd$none);
+				}
+		}
+	});
 var author$project$Page$Article$update = F2(
 	function (msg, model) {
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
@@ -5879,7 +6023,6 @@ var elm$core$Task$perform = F2(
 				A2(elm$core$Task$map, toMessage, task)));
 	});
 var elm$json$Json$Decode$map = _Json_map1;
-var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
@@ -6104,7 +6247,7 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'DesignMsg':
 				var msg = message.a;
 				var _n3 = model.page;
 				if (_n3.$ === 'Design') {
@@ -6116,8 +6259,27 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
+			default:
+				var msg = message.a;
+				var _n4 = model.page;
+				if (_n4.$ === 'Admin') {
+					var designModel = _n4.a;
+					return A2(
+						author$project$Main$stepAdmin,
+						model,
+						A2(author$project$Page$Admin$update, msg, designModel));
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
 		}
 	});
+var author$project$Page$Admin$Submit = {$: 'Submit'};
+var author$project$Page$Admin$UpdateEmail = function (a) {
+	return {$: 'UpdateEmail', a: a};
+};
+var author$project$Page$Admin$UpdatePassword = function (a) {
+	return {$: 'UpdatePassword', a: a};
+};
 var rtfeldman$elm_css$Css$Preprocess$AppendProperty = function (a) {
 	return {$: 'AppendProperty', a: a};
 };
@@ -6132,7 +6294,7 @@ var rtfeldman$elm_css$Css$prop1 = F2(
 var rtfeldman$elm_css$Css$maxWidth = rtfeldman$elm_css$Css$prop1('max-width');
 var rtfeldman$elm_css$Css$Structure$Compatible = {$: 'Compatible'};
 var rtfeldman$elm_css$Css$overline = {textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, value: 'overline'};
-var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
+var rtfeldman$elm_css$Css$PxUnits = {$: 'PxUnits'};
 var elm$core$String$fromFloat = _String_fromNumber;
 var rtfeldman$elm_css$Css$Internal$lengthConverter = F3(
 	function (units, unitLabel, numericValue) {
@@ -6158,22 +6320,18 @@ var rtfeldman$elm_css$Css$Internal$lengthConverter = F3(
 				unitLabel)
 		};
 	});
-var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
-var rtfeldman$elm_css$Css$PxUnits = {$: 'PxUnits'};
 var rtfeldman$elm_css$Css$px = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PxUnits, 'px');
 var rtfeldman$elm_css$Css$textDecoration = rtfeldman$elm_css$Css$prop1('text-decoration');
-var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
 var rtfeldman$elm_css$VirtualDom$Styled$Node = F3(
 	function (a, b, c) {
 		return {$: 'Node', a: a, b: b, c: c};
 	});
 var rtfeldman$elm_css$VirtualDom$Styled$node = rtfeldman$elm_css$VirtualDom$Styled$Node;
 var rtfeldman$elm_css$Html$Styled$node = rtfeldman$elm_css$VirtualDom$Styled$node;
-var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
+var rtfeldman$elm_css$Html$Styled$div = rtfeldman$elm_css$Html$Styled$node('div');
+var rtfeldman$elm_css$Html$Styled$form = rtfeldman$elm_css$Html$Styled$node('form');
 var rtfeldman$elm_css$Html$Styled$h1 = rtfeldman$elm_css$Html$Styled$node('h1');
-var rtfeldman$elm_css$Html$Styled$i = rtfeldman$elm_css$Html$Styled$node('i');
-var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
-var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
+var rtfeldman$elm_css$Html$Styled$input = rtfeldman$elm_css$Html$Styled$node('input');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var rtfeldman$elm_css$VirtualDom$Styled$Unstyled = function (a) {
 	return {$: 'Unstyled', a: a};
@@ -6183,7 +6341,6 @@ var rtfeldman$elm_css$VirtualDom$Styled$text = function (str) {
 		elm$virtual_dom$VirtualDom$text(str));
 };
 var rtfeldman$elm_css$Html$Styled$text = rtfeldman$elm_css$VirtualDom$Styled$text;
-var elm$json$Json$Encode$string = _Json_wrap;
 var elm$virtual_dom$VirtualDom$property = F2(
 	function (key, value) {
 		return A2(
@@ -7952,6 +8109,144 @@ var rtfeldman$elm_css$Html$Styled$Attributes$stringProperty = F2(
 			key,
 			elm$json$Json$Encode$string(string));
 	});
+var rtfeldman$elm_css$Html$Styled$Attributes$type_ = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('type');
+var rtfeldman$elm_css$Html$Styled$Attributes$value = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('value');
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var rtfeldman$elm_css$VirtualDom$Styled$on = F2(
+	function (eventName, handler) {
+		return A3(
+			rtfeldman$elm_css$VirtualDom$Styled$Attribute,
+			A2(elm$virtual_dom$VirtualDom$on, eventName, handler),
+			_List_Nil,
+			'');
+	});
+var rtfeldman$elm_css$Html$Styled$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			rtfeldman$elm_css$VirtualDom$Styled$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var rtfeldman$elm_css$Html$Styled$Events$onClick = function (msg) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var rtfeldman$elm_css$Html$Styled$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var rtfeldman$elm_css$Html$Styled$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			rtfeldman$elm_css$VirtualDom$Styled$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var rtfeldman$elm_css$Html$Styled$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var rtfeldman$elm_css$Html$Styled$Events$onInput = function (tagger) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			rtfeldman$elm_css$Html$Styled$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, rtfeldman$elm_css$Html$Styled$Events$targetValue)));
+};
+var author$project$Page$Admin$view = function (model) {
+	return {
+		body: _List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$form,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$maxWidth(
+								rtfeldman$elm_css$Css$px(700))
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$h1,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+									]))
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Sign in')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$input,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$value(model.email),
+								rtfeldman$elm_css$Html$Styled$Attributes$type_('email'),
+								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Admin$UpdateEmail)
+							]),
+						_List_Nil),
+						A2(
+						rtfeldman$elm_css$Html$Styled$input,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$value(model.password),
+								rtfeldman$elm_css$Html$Styled$Attributes$type_('password'),
+								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Admin$UpdatePassword)
+							]),
+						_List_Nil),
+						A2(
+						rtfeldman$elm_css$Html$Styled$div,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Admin$Submit)
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Submit')
+							])),
+						function () {
+						var _n0 = model.error;
+						if (_n0.$ === 'Just') {
+							var error = _n0.a;
+							return rtfeldman$elm_css$Html$Styled$text(error);
+						} else {
+							return rtfeldman$elm_css$Html$Styled$text('');
+						}
+					}()
+					]))
+			]),
+		title: 'SOKOL SOKOL | The wool pants'
+	};
+};
+var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
+var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
+var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
+var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
+var rtfeldman$elm_css$Html$Styled$i = rtfeldman$elm_css$Html$Styled$node('i');
+var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
+var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
 var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
 	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
 };
@@ -9492,7 +9787,7 @@ var author$project$Page$Skeleton$view = F2(
 									[
 										A2(author$project$Page$Skeleton$navItem, '/articles', 'writing'),
 										A2(author$project$Page$Skeleton$navItem, '/designs', 'designs'),
-										A2(author$project$Page$Skeleton$navItem, '/moods', 'moods')
+										A2(author$project$Page$Skeleton$navItem, '/admin', 'admin')
 									]))
 							])),
 						A2(
@@ -9526,12 +9821,18 @@ var author$project$Main$view = function (model) {
 				author$project$Page$Skeleton$view,
 				author$project$Main$ArticleMsg,
 				author$project$Page$Article$view(articleModel));
-		default:
+		case 'Design':
 			var designModel = _n0.a;
 			return A2(
 				author$project$Page$Skeleton$view,
 				author$project$Main$DesignMsg,
 				author$project$Page$Design$view(designModel));
+		default:
+			var adminModel = _n0.a;
+			return A2(
+				author$project$Page$Skeleton$view,
+				author$project$Main$AdminMsg,
+				author$project$Page$Admin$view(adminModel));
 	}
 };
 var elm$browser$Browser$application = _Browser_application;
