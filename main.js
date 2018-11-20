@@ -5036,8 +5036,8 @@ var author$project$Main$stepDesign = F2(
 			A2(elm$core$Platform$Cmd$map, author$project$Main$DesignMsg, cmds));
 	});
 var author$project$Page$Admin$Model = F4(
-	function (session, email, password, error) {
-		return {email: email, error: error, password: password, session: session};
+	function (session, email, password, message) {
+		return {email: email, message: message, password: password, session: session};
 	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5809,9 +5809,9 @@ var author$project$Page$Admin$GotError = function (a) {
 	return {$: 'GotError', a: a};
 };
 var elm$json$Json$Decode$value = _Json_decodeValue;
-var author$project$Page$Admin$authenticateError = _Platform_incomingPort('authenticateError', elm$json$Json$Decode$value);
+var author$project$Page$Admin$authenticateResponse = _Platform_incomingPort('authenticateResponse', elm$json$Json$Decode$value);
 var author$project$Page$Admin$subscriptions = function (model) {
-	return author$project$Page$Admin$authenticateError(author$project$Page$Admin$GotError);
+	return author$project$Page$Admin$authenticateResponse(author$project$Page$Admin$GotError);
 };
 var elm$core$Platform$Sub$map = _Platform_map;
 var elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5829,19 +5829,29 @@ var author$project$Main$subscriptions = function (model) {
 	}
 };
 var author$project$Page$Admin$authenticate = _Platform_outgoingPort('authenticate', elm$core$Basics$identity);
-var elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
+var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$field = _Json_decodeField;
-var elm$json$Json$Decode$int = _Json_decodeInt;
+var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$json$Json$Decode$oneOf = _Json_oneOf;
 var elm$json$Json$Decode$string = _Json_decodeString;
-var author$project$Page$Admin$decodeError = A3(
-	elm$json$Json$Decode$map2,
-	elm$core$Tuple$pair,
-	A2(elm$json$Json$Decode$field, 'code', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'message', elm$json$Json$Decode$string));
+var author$project$Page$Admin$decodeResponse = elm$json$Json$Decode$oneOf(
+	_List_fromArray(
+		[
+			A2(
+			elm$json$Json$Decode$map,
+			elm$core$Result$Ok,
+			A2(elm$json$Json$Decode$field, 'success', elm$json$Json$Decode$bool)),
+			A3(
+			elm$json$Json$Decode$map2,
+			F2(
+				function (c, m) {
+					return elm$core$Result$Err(
+						_Utils_Tuple2(c, m));
+				}),
+			A2(elm$json$Json$Decode$field, 'code', elm$json$Json$Decode$string),
+			A2(elm$json$Json$Decode$field, 'message', elm$json$Json$Decode$string))
+		]));
 var elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -5893,27 +5903,37 @@ var author$project$Page$Admin$update = F2(
 					author$project$Page$Admin$authenticate(
 						A2(author$project$Page$Admin$encodeUser, model.email, model.password)));
 			default:
-				var errorValue = msg.a;
-				var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Page$Admin$decodeError, errorValue);
-				if (_n1.$ === 'Ok') {
-					var _n2 = _n1.a;
-					var code = _n2.a;
-					var message = _n2.b;
+				var messageValue = msg.a;
+				var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Page$Admin$decodeResponse, messageValue);
+				if (_n1.$ === 'Err') {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								error: elm$core$Maybe$Just(message)
+								message: elm$core$Maybe$Just('Could not decode error')
 							}),
 						elm$core$Platform$Cmd$none);
 				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								error: elm$core$Maybe$Just('Could not decode error')
-							}),
-						elm$core$Platform$Cmd$none);
+					if (_n1.a.$ === 'Err') {
+						var _n2 = _n1.a.a;
+						var code = _n2.a;
+						var message = _n2.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									message: elm$core$Maybe$Just(message)
+								}),
+							elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									message: elm$core$Maybe$Just('Logged in!')
+								}),
+							elm$core$Platform$Cmd$none);
+					}
 				}
 		}
 	});
@@ -6022,7 +6042,6 @@ var elm$core$Task$perform = F2(
 			elm$core$Task$Perform(
 				A2(elm$core$Task$map, toMessage, task)));
 	});
-var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
@@ -8227,10 +8246,10 @@ var author$project$Page$Admin$view = function (model) {
 								rtfeldman$elm_css$Html$Styled$text('Submit')
 							])),
 						function () {
-						var _n0 = model.error;
+						var _n0 = model.message;
 						if (_n0.$ === 'Just') {
-							var error = _n0.a;
-							return rtfeldman$elm_css$Html$Styled$text(error);
+							var message = _n0.a;
+							return rtfeldman$elm_css$Html$Styled$text(message);
 						} else {
 							return rtfeldman$elm_css$Html$Styled$text('');
 						}

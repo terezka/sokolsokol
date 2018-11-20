@@ -14,7 +14,7 @@ type alias Model =
     { session : Session.Data
     , email : String
     , password : String
-    , error : Maybe String
+    , message : Maybe String
     }
 
 
@@ -44,13 +44,18 @@ update msg model =
             , authenticate (encodeUser model.email model.password)
             )
 
-        GotError errorValue ->
-            case Decode.decodeValue decodeError errorValue of
-                Ok ( code, message ) ->
-                    ( { model | error = Just message }, Cmd.none )
-
+        GotError messageValue ->
+            case Decode.decodeValue decodeResponse messageValue of
                 Err _ ->
-                    ( { model | error = Just "Could not decode error" }, Cmd.none )
+                    ( { model | message = Just "Could not decode error" }, Cmd.none )
+
+                Ok (Err ( code, message )) ->
+                    ( { model | message = Just message }, Cmd.none )
+
+                Ok (Ok _) ->
+                    ( { model | message = Just "Logged in!" }, Cmd.none )
+
+
 
 
 
@@ -66,8 +71,8 @@ view model =
             , Html.input [ Attr.value model.email, Attr.type_ "email", Events.onInput UpdateEmail ] []
             , Html.input [ Attr.value model.password, Attr.type_ "password", Events.onInput UpdatePassword ] []
             , Html.div [ Events.onClick Submit ] [ Html.text "Submit" ]
-            , case model.error of
-                Just error -> Html.text error
+            , case model.message of
+                Just message -> Html.text message
                 Nothing -> Html.text ""
             ]
         ]
@@ -76,14 +81,14 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    authenticateError GotError
+    authenticateResponse GotError
 
 
 -- PORTS
 
 port authenticate : Encode.Value -> Cmd msg
 
-port authenticateError : (Encode.Value -> msg) -> Sub msg
+port authenticateResponse : (Encode.Value -> msg) -> Sub msg
 
 
 encodeUser : String -> String -> Encode.Value
@@ -94,9 +99,14 @@ encodeUser email password =
         ]
 
 
-decodeError : Decode.Decoder ( String, String )
-decodeError =
-    Decode.map2 Tuple.pair
-        (Decode.field "code" Decode.string)
-        (Decode.field "message" Decode.string)
+decodeResponse : Decode.Decoder (Result ( String, String ) Bool)
+decodeResponse =
+    Decode.oneOf
+        [ Decode.map Ok
+            (Decode.field "success" Decode.bool)
+        , Decode.map2 (\c m -> Err ( c, m ))
+            (Decode.field "code" Decode.string)
+            (Decode.field "message" Decode.string)
+        ]
+
 

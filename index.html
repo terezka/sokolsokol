@@ -30,10 +30,10 @@
     var app = Elm.Main.init({ node: el });
 
     app.ports.authenticate.subscribe(function(data) {
-      console.log({data})
-      firebase.auth().signInWithEmailAndPassword(data.email, data.password).catch(function(error) {
-        console.log({error})
-        app.ports.authenticateError.send(error);
+      firebase.auth().signInWithEmailAndPassword(data.email, data.password).then(function () {
+        app.ports.authenticateResponse.send({ success: true });
+      }).catch(function(error) {
+        app.ports.authenticateResponse.send(error);
       });
     });
   </script>
