@@ -9974,9 +9974,9 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 				rtfeldman$elm_css$Css$vw(100)),
 				rtfeldman$elm_css$Css$margin(rtfeldman$elm_css$Css$zero),
 				rtfeldman$elm_css$Css$marginTop(
-				rtfeldman$elm_css$Css$px(200)),
+				rtfeldman$elm_css$Css$px(100)),
 				rtfeldman$elm_css$Css$marginBottom(
-				rtfeldman$elm_css$Css$px(200)),
+				rtfeldman$elm_css$Css$px(100)),
 				rtfeldman$elm_css$Css$marginLeft(
 				rtfeldman$elm_css$Css$px(120))
 			])),

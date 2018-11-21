@@ -81,8 +81,8 @@ styles =
         , Css.flexDirection Css.column
         , Css.width (Css.vw 100)
         , Css.margin Css.zero
-        , Css.marginTop (Css.px 200)
-        , Css.marginBottom (Css.px 200)
+        , Css.marginTop (Css.px 100)
+        , Css.marginBottom (Css.px 100)
         , Css.marginLeft (Css.px 120)
         ]
     , Css.Global.h1
