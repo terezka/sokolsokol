@@ -3,6 +3,7 @@ module Session exposing
     , User(..)
     , State
     , setUser
+    , toggleEditing
     , empty
     )
 
@@ -36,3 +37,13 @@ setUser maybeUser data =
 
         Nothing ->
             { data | user = Anonymous }
+
+
+toggleEditing : Data -> Data
+toggleEditing data =
+    case data.user of
+        LoggedIn state ->
+            { data | user = LoggedIn { state | editing = not state.editing } }
+
+        Anonymous ->
+            data

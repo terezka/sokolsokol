@@ -14,14 +14,13 @@ import Session
 
 
 type alias Model =
-    { editing : Bool
-    , article : Maybe Article.Article
+    { article : Maybe Article.Article
     }
 
 
 init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { editing = False, article = Nothing }
+    ( { article = Nothing }
     , Ports.fetchArticles (Encode.object [ ( "id", Encode.string id ) ])
     , session
     )
@@ -46,17 +45,19 @@ update session msg model =
         Toggle ->
             case model.article of
                 Just article ->
-                    let
-                        isEditing =
-                            not model.editing
-                    in
-                    ( { model | editing = isEditing }
-                    , if isEditing then
-                        Cmd.none
+                    ( model
+                    , case session.user of
+                        Session.LoggedIn state ->
+                            if state.editing then
+                                Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
 
-                      else
-                        Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
-                    , session
+                            else
+                                Cmd.none
+
+                        Session.Anonymous ->
+                            Cmd.none
+
+                    , Session.toggleEditing session
                     )
 
                 Nothing ->

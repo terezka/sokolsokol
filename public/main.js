@@ -5052,7 +5052,7 @@ var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Article$init = F2(
 	function (session, id) {
 		return _Utils_Tuple3(
-			{article: elm$core$Maybe$Nothing, editing: false},
+			{article: elm$core$Maybe$Nothing},
 			author$project$Ports$fetchArticles(
 				elm$json$Json$Encode$object(
 					_List_fromArray(
@@ -6050,7 +6050,26 @@ var author$project$Data$Article$decodeOne = A4(
 	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
 var author$project$Ports$fetchEditedArticle = _Platform_outgoingPort('fetchEditedArticle', elm$core$Basics$identity);
+var author$project$Session$LoggedIn = function (a) {
+	return {$: 'LoggedIn', a: a};
+};
 var elm$core$Basics$not = _Basics_not;
+var author$project$Session$toggleEditing = function (data) {
+	var _n0 = data.user;
+	if (_n0.$ === 'LoggedIn') {
+		var state = _n0.a;
+		return _Utils_update(
+			data,
+			{
+				user: author$project$Session$LoggedIn(
+					_Utils_update(
+						state,
+						{editing: !state.editing}))
+			});
+	} else {
+		return data;
+	}
+};
 var author$project$Page$Article$update = F3(
 	function (session, msg, model) {
 		if (msg.$ === 'GotArticle') {
@@ -6073,20 +6092,25 @@ var author$project$Page$Article$update = F3(
 			var _n2 = model.article;
 			if (_n2.$ === 'Just') {
 				var article = _n2.a;
-				var isEditing = !model.editing;
 				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{editing: isEditing}),
-					isEditing ? elm$core$Platform$Cmd$none : author$project$Ports$fetchEditedArticle(
-						elm$json$Json$Encode$object(
-							_List_fromArray(
-								[
-									_Utils_Tuple2(
-									'id',
-									elm$json$Json$Encode$string(article.id))
-								]))),
-					session);
+					model,
+					function () {
+						var _n3 = session.user;
+						if (_n3.$ === 'LoggedIn') {
+							var state = _n3.a;
+							return state.editing ? author$project$Ports$fetchEditedArticle(
+								elm$json$Json$Encode$object(
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											'id',
+											elm$json$Json$Encode$string(article.id))
+										]))) : elm$core$Platform$Cmd$none;
+						} else {
+							return elm$core$Platform$Cmd$none;
+						}
+					}(),
+					author$project$Session$toggleEditing(session));
 			} else {
 				return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 			}
@@ -6110,9 +6134,6 @@ var author$project$Page$Articles$update = F3(
 			return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 		}
 	});
-var author$project$Session$LoggedIn = function (a) {
-	return {$: 'LoggedIn', a: a};
-};
 var author$project$Session$setUser = F2(
 	function (maybeUser, data) {
 		if (maybeUser.$ === 'Just') {
