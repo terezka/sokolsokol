@@ -32,7 +32,6 @@ update session msg model =
     ( model, Cmd.none, session )
 
 
-
 view : Session.Data -> Model -> Skeleton.Document Msg
 view session model =
     { title = "SOKOL SOKOL | Articles"

@@ -17,7 +17,7 @@ type alias Model =
     }
 
 
-init : Session.Data -> ( Model, Cmd Msg, Session.Data)
+init : Session.Data -> ( Model, Cmd Msg, Session.Data )
 init session =
     ( Model "" "" Nothing, Cmd.none, session )
 
@@ -36,7 +36,7 @@ update session msg model =
             ( { model | email = email }, Cmd.none, session )
 
         UpdatePassword password ->
-            ( { model | password = password }, Cmd.none, session  )
+            ( { model | password = password }, Cmd.none, session )
 
         Submit ->
             ( model
@@ -47,13 +47,13 @@ update session msg model =
         GotError messageValue ->
             case Decode.decodeValue decodeResponse messageValue of
                 Err _ ->
-                    ( { model | message = Just "Could not decode error" }, Cmd.none, session  )
+                    ( { model | message = Just "Could not decode error" }, Cmd.none, session )
 
                 Ok (Err ( code, message )) ->
-                    ( { model | message = Just message }, Cmd.none, session  )
+                    ( { model | message = Just message }, Cmd.none, session )
 
                 Ok (Ok _) ->
-                    ( { model | message = Just "Logged in!" }, Cmd.none, session  )
+                    ( { model | message = Just "Logged in!" }, Cmd.none, session )
 
 
 view : Session.Data -> Model -> Skeleton.Document Msg

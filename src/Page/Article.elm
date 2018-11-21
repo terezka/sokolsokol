@@ -14,36 +14,27 @@ import Session
 
 
 type alias Model =
-    { article : Maybe Article.Article
+    { id : Article.Id
     }
 
 
 init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { article = Nothing }
-    , Ports.fetchArticles (Encode.object [ ( "id", Encode.string id ) ])
+    ( { id = id }
+    , Cmd.none
     , session
     )
 
 
 type Msg
-    = GotArticle Encode.Value
-    | Toggle
+    = Toggle
 
 
 update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
 update session msg model =
     case msg of
-        GotArticle value ->
-            case Decode.decodeValue Article.decodeOne value of
-                Ok article ->
-                    ( { model | article = Just article }, Cmd.none, session )
-
-                Err _ ->
-                    ( model, Cmd.none, session )
-
         Toggle ->
-            case model.article of
+            case Session.getArticle model.id session of
                 Just article ->
                     ( model
                     , case session.user of
@@ -56,7 +47,6 @@ update session msg model =
 
                         Session.Anonymous ->
                             Cmd.none
-
                     , Session.toggleEditing session
                     )
 
@@ -68,7 +58,7 @@ view : Session.Data -> Model -> Skeleton.Document Msg
 view session model =
     { title = "SOKOL SOKOL | Articles"
     , body =
-        case model.article of
+        case Session.getArticle model.id session of
             Just article ->
                 case session.user of
                     Session.LoggedIn state ->
@@ -79,7 +69,7 @@ view session model =
                             [ viewArticleEditable article ]
 
                     Session.Anonymous ->
-                            [ viewArticle article ]
+                        [ viewArticle article ]
 
             Nothing ->
                 [ Html.text "loading" ]
@@ -94,7 +84,6 @@ viewArticle article =
         , Html.div []
             (paragraphs article)
         ]
-
 
 
 viewArticleEditable : Article.Article -> Html.Html Msg
@@ -170,6 +159,4 @@ paragraphs article =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Ports.receiveArticle GotArticle
-        ]
+    Sub.none

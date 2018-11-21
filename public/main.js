@@ -5034,33 +5034,11 @@ var author$project$Page$Admin$init = function (session) {
 		elm$core$Platform$Cmd$none,
 		session);
 };
-var author$project$Ports$fetchArticles = _Platform_outgoingPort('fetchArticles', elm$core$Basics$identity);
-var elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			elm$core$List$foldl,
-			F2(
-				function (_n0, obj) {
-					var k = _n0.a;
-					var v = _n0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Article$init = F2(
 	function (session, id) {
 		return _Utils_Tuple3(
-			{article: elm$core$Maybe$Nothing},
-			author$project$Ports$fetchArticles(
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'id',
-							elm$json$Json$Encode$string(id))
-						]))),
+			{id: id},
+			elm$core$Platform$Cmd$none,
 			session);
 	});
 var author$project$Page$Articles$init = function (session) {
@@ -5855,6 +5833,7 @@ var author$project$Main$stepUrl = F2(
 				elm$core$Platform$Cmd$none);
 		}
 	});
+var author$project$Ports$fetchArticles = _Platform_outgoingPort('fetchArticles', elm$core$Basics$identity);
 var author$project$Session$Anonymous = {$: 'Anonymous'};
 var author$project$Session$empty = {articles: elm$core$Dict$empty, user: author$project$Session$Anonymous};
 var elm$json$Json$Encode$null = _Json_encodeNull;
@@ -5889,19 +5868,11 @@ var author$project$Page$Admin$authenticateResponse = _Platform_incomingPort('aut
 var author$project$Page$Admin$subscriptions = function (model) {
 	return author$project$Page$Admin$authenticateResponse(author$project$Page$Admin$GotError);
 };
-var author$project$Page$Article$GotArticle = function (a) {
-	return {$: 'GotArticle', a: a};
-};
-var author$project$Ports$receiveArticle = _Platform_incomingPort('receiveArticle', elm$json$Json$Decode$value);
 var elm$core$Platform$Sub$batch = _Platform_batch;
-var author$project$Page$Article$subscriptions = function (model) {
-	return elm$core$Platform$Sub$batch(
-		_List_fromArray(
-			[
-				author$project$Ports$receiveArticle(author$project$Page$Article$GotArticle)
-			]));
-};
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
+var author$project$Page$Article$subscriptions = function (model) {
+	return elm$core$Platform$Sub$none;
+};
 var author$project$Page$Articles$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
@@ -5985,6 +5956,20 @@ var author$project$Page$Admin$decodeResponse = elm$json$Json$Decode$oneOf(
 			A2(elm$json$Json$Decode$field, 'code', elm$json$Json$Decode$string),
 			A2(elm$json$Json$Decode$field, 'message', elm$json$Json$Decode$string))
 		]));
+var elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, obj) {
+					var k = _n0.a;
+					var v = _n0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Admin$encodeUser = F2(
 	function (email, password) {
 		return elm$json$Json$Encode$object(
@@ -6063,6 +6048,10 @@ var author$project$Page$Admin$update = F3(
 		}
 	});
 var author$project$Ports$fetchEditedArticle = _Platform_outgoingPort('fetchEditedArticle', elm$core$Basics$identity);
+var author$project$Session$getArticle = F2(
+	function (id, data) {
+		return A2(elm$core$Dict$get, id, data.articles);
+	});
 var author$project$Session$LoggedIn = function (a) {
 	return {$: 'LoggedIn', a: a};
 };
@@ -6085,48 +6074,30 @@ var author$project$Session$toggleEditing = function (data) {
 };
 var author$project$Page$Article$update = F3(
 	function (session, msg, model) {
-		if (msg.$ === 'GotArticle') {
-			var value = msg.a;
-			var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
-			if (_n1.$ === 'Ok') {
-				var article = _n1.a;
-				return _Utils_Tuple3(
-					_Utils_update(
-						model,
-						{
-							article: elm$core$Maybe$Just(article)
-						}),
-					elm$core$Platform$Cmd$none,
-					session);
-			} else {
-				return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-			}
+		var _n1 = A2(author$project$Session$getArticle, model.id, session);
+		if (_n1.$ === 'Just') {
+			var article = _n1.a;
+			return _Utils_Tuple3(
+				model,
+				function () {
+					var _n2 = session.user;
+					if (_n2.$ === 'LoggedIn') {
+						var state = _n2.a;
+						return state.editing ? author$project$Ports$fetchEditedArticle(
+							elm$json$Json$Encode$object(
+								_List_fromArray(
+									[
+										_Utils_Tuple2(
+										'id',
+										elm$json$Json$Encode$string(article.id))
+									]))) : elm$core$Platform$Cmd$none;
+					} else {
+						return elm$core$Platform$Cmd$none;
+					}
+				}(),
+				author$project$Session$toggleEditing(session));
 		} else {
-			var _n2 = model.article;
-			if (_n2.$ === 'Just') {
-				var article = _n2.a;
-				return _Utils_Tuple3(
-					model,
-					function () {
-						var _n3 = session.user;
-						if (_n3.$ === 'LoggedIn') {
-							var state = _n3.a;
-							return state.editing ? author$project$Ports$fetchEditedArticle(
-								elm$json$Json$Encode$object(
-									_List_fromArray(
-										[
-											_Utils_Tuple2(
-											'id',
-											elm$json$Json$Encode$string(article.id))
-										]))) : elm$core$Platform$Cmd$none;
-						} else {
-							return elm$core$Platform$Cmd$none;
-						}
-					}(),
-					author$project$Session$toggleEditing(session));
-			} else {
-				return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-			}
+			return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 		}
 	});
 var author$project$Page$Articles$update = F3(
@@ -9182,7 +9153,7 @@ var author$project$Page$Article$view = F2(
 	function (session, model) {
 		return {
 			body: function () {
-				var _n0 = model.article;
+				var _n0 = A2(author$project$Session$getArticle, model.id, session);
 				if (_n0.$ === 'Just') {
 					var article = _n0.a;
 					var _n1 = session.user;

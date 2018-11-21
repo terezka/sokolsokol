@@ -1,6 +1,5 @@
 module Data.User exposing (User, decodeOne)
 
-
 import Json.Decode as Decode
 import Json.Encode as Encode
 

@@ -57,23 +57,15 @@
 
     // ARTICLES
     app.ports.fetchArticles.subscribe(function(data) {
-      if (data) {
-        database.ref('/articles/' + data.id).once('value').then(function(snapshot) {
-          var article = snapshot.val();
-          article.id = data.id;
-          app.ports.receiveArticle.send(article);
-        });
-      } else {
-        database.ref('/articles').once('value').then(function(snapshot) {
-          var values = snapshot.val();
-          var articles = Object.keys(values).map(function(key) {
-            var article = values[key];
-            article.id = key;
-            return article;
-          })
-          app.ports.receiveArticles.send(articles);
-        });
-      }
+      database.ref('/articles').once('value').then(function(snapshot) {
+        var values = snapshot.val();
+        var articles = Object.keys(values).map(function(key) {
+          var article = values[key];
+          article.id = key;
+          return article;
+        })
+        app.ports.receiveArticles.send(articles);
+      });
     });
 
     app.ports.fetchEditedArticle.subscribe(function(data) {

@@ -1,17 +1,17 @@
 module Session exposing
     ( Data
-    , User(..)
     , State
-    , getArticles
+    , User(..)
+    , empty
     , getArticle
+    , getArticles
     , setArticles
     , setUser
     , toggleEditing
-    , empty
     )
 
-import Data.User as User
 import Data.Article as Article
+import Data.User as User
 import Dict
 
 
@@ -39,17 +39,17 @@ empty =
     }
 
 
-
 setArticles : List Article.Article -> Data -> Data
 setArticles articles data =
-    ( { data | articles =
+    { data
+        | articles =
             articles
                 |> List.map (\a -> ( a.id, a ))
                 |> Dict.fromList
-    })
+    }
 
 
-getArticles :  Data -> List Article.Article
+getArticles : Data -> List Article.Article
 getArticles data =
     Dict.values data.articles
 
@@ -63,7 +63,7 @@ setUser : Maybe User.User -> Data -> Data
 setUser maybeUser data =
     case maybeUser of
         Just user ->
-            { data | user = LoggedIn {user = user, editing = False} }
+            { data | user = LoggedIn { user = user, editing = False } }
 
         Nothing ->
             { data | user = Anonymous }

@@ -4,6 +4,8 @@ import Browser
 import Browser.Navigation as Nav
 import Css
 import Css.Global
+import Data.Article as Article
+import Data.User as User
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Json.Decode as Decode
@@ -12,12 +14,11 @@ import Page.Admin as Admin
 import Page.Article as Article
 import Page.Articles as Articles
 import Page.Skeleton as Skeleton
+import Ports
 import Session
-import Data.User as User
-import Data.Article as Article
 import Url
 import Url.Parser as Parser exposing ((</>), Parser, custom, fragment, map, oneOf, s, string, top)
-import Ports
+
 
 main =
     Browser.application
@@ -51,9 +52,9 @@ type Page
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-    [ Ports.authenticationState OnAuthChange
-    , Ports.receiveArticles GotArticles
-    , case model.page of
+        [ Ports.authenticationState OnAuthChange
+        , Ports.receiveArticles GotArticles
+        , case model.page of
             Admin adminModel ->
                 Admin.subscriptions adminModel
                     |> Sub.map AdminMsg
@@ -67,7 +68,8 @@ subscriptions model =
                     |> Sub.map ArticleMsg
 
             _ ->
-                Sub.none]
+                Sub.none
+        ]
 
 
 
@@ -78,7 +80,8 @@ view : Model -> Browser.Document Msg
 view model =
     case model.page of
         NotFound ->
-            Skeleton.view never model.session
+            Skeleton.view never
+                model.session
                 { title = "SOKOL SOKOL | Not found."
                 , body = [ Html.text "Not found." ]
                 }
@@ -107,7 +110,7 @@ init _ url key =
                 , session = Session.empty
                 }
     in
-    ( model, Cmd.batch [ Ports.fetchArticles Encode.null, cmd ])
+    ( model, Cmd.batch [ Ports.fetchArticles Encode.null, cmd ] )
 
 
 
@@ -203,7 +206,6 @@ stepArticle model ( articleModel, cmds, session ) =
     ( { model | page = Article articleModel, session = session }
     , Cmd.map ArticleMsg cmds
     )
-
 
 
 stepAdmin : Model -> ( Admin.Model, Cmd Admin.Msg, Session.Data ) -> ( Model, Cmd Msg )
