@@ -3,6 +3,7 @@ module Page.Article exposing (Model, Msg, init, subscriptions, update, view)
 import Css
 import Data.Article as Article
 import Element.Color as Color
+import File
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
@@ -11,6 +12,7 @@ import Json.Encode as Encode
 import Page.Skeleton as Skeleton
 import Ports
 import Session
+import Task
 
 
 type alias Model =
@@ -28,11 +30,51 @@ init session id =
 
 type Msg
     = Toggle
+    | GotFiles (List File.File)
+    | GotFileUrl String String
+    | GotFileDownloadUrl Encode.Value
 
 
 update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
 update session msg model =
     case msg of
+        GotFiles files ->
+            case List.head files of
+                Just file ->
+                    ( model
+                    , Task.perform (GotFileUrl (File.name file)) (File.toUrl file)
+                    , session
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none, session )
+
+        GotFileUrl name url ->
+            ( model
+            , Ports.uploadImage <|
+                Encode.object
+                    [ ( "name", Encode.string name )
+                    , ( "url", Encode.string url )
+                    ]
+            , session
+            )
+
+        GotFileDownloadUrl value ->
+            case Session.getArticle model.id session of
+                Just article ->
+                    case Decode.decodeValue (Decode.field "url" Decode.string) value of
+                        Ok url ->
+                            ( model
+                            , Ports.saveEditedArticle (Article.encodeOne (Article.setCover url article))
+                            , session
+                            )
+
+                        Err _ ->
+                            ( model, Cmd.none, session )
+
+                Nothing ->
+                    ( model, Cmd.none, session )
+
         Toggle ->
             case Session.getArticle model.id session of
                 Just article ->
@@ -40,7 +82,7 @@ update session msg model =
                     , case session.user of
                         Session.LoggedIn state ->
                             if state.editing then
-                                Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
+                                Ports.saveEditedArticle (Article.encodeOne article)
 
                             else
                                 Cmd.none
@@ -80,7 +122,20 @@ viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
+        [ case article.cover of
+            Just url ->
+                Html.img
+                    [ Attr.css
+                        [ Css.property "width" "calc(100% - 8px)"
+                        , Css.marginBottom (Css.px 8)
+                        ]
+                    , Attr.src url
+                    ]
+                    []
+
+            Nothing ->
+                Html.text ""
+        , Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
         , Html.div []
             (paragraphs article)
         ]
@@ -90,7 +145,20 @@ viewArticleEditable : Article.Article -> Html.Html Msg
 viewArticleEditable article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Html.h1
+        [ case article.cover of
+            Just url ->
+                Html.img
+                    [ Attr.css
+                        [ Css.property "width" "calc(100% - 8px)"
+                        , Css.marginBottom (Css.px 8)
+                        ]
+                    , Attr.src url
+                    ]
+                    []
+
+            Nothing ->
+                Html.text ""
+        , Html.h1
             [ Attr.css [ Css.textDecoration Css.overline, Css.marginTop Css.zero ] ]
             [ Html.text article.title ]
         , Html.div []
@@ -106,6 +174,11 @@ viewArticleEditable article =
         ]
 
 
+filesDecoder : Decode.Decoder (List File.File)
+filesDecoder =
+    Decode.at [ "target", "files" ] (Decode.list File.decoder)
+
+
 viewArticleEditing : Article.Article -> Html.Html Msg
 viewArticleEditing article =
     Html.div
@@ -115,7 +188,23 @@ viewArticleEditing article =
                 [ Css.width (Css.px 780)
                 ]
             ]
-            [ Html.div
+            [ Html.input
+                [ Attr.type_ "file"
+                , Events.on "change" (Decode.map GotFiles filesDecoder)
+                ]
+                []
+            , case article.cover of
+                Just url ->
+                    Html.img
+                        [ Attr.css
+                            [ Css.width (Css.px 100), Css.marginBottom (Css.px 8) ]
+                        , Attr.src url
+                        ]
+                        []
+
+                Nothing ->
+                    Html.text ""
+            , Html.div
                 [ Attr.css
                     [ Css.textDecoration Css.overline
                     , Css.border (Css.px 0)
@@ -161,4 +250,4 @@ paragraphs article =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Ports.uploadedImage GotFileDownloadUrl

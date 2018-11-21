@@ -2331,6 +2331,151 @@ function _Url_percentDecode(string)
 }
 
 
+// DECODER
+
+var _File_decoder = _Json_decodePrim(function(value) {
+	// NOTE: checks if `File` exists in case this is run on node
+	return (typeof File === 'function' && value instanceof File)
+		? elm$core$Result$Ok(value)
+		: _Json_expecting('a FILE', value);
+});
+
+
+// METADATA
+
+function _File_name(file) { return file.name; }
+function _File_mime(file) { return file.type; }
+function _File_size(file) { return file.size; }
+
+function _File_lastModified(file)
+{
+	return elm$time$Time$millisToPosix(file.lastModified);
+}
+
+
+// DOWNLOAD
+
+var _File_downloadNode;
+
+function _File_getDownloadNode()
+{
+	return _File_downloadNode || (_File_downloadNode = document.createElementNS('http://www.w3.org/1999/xhtml', 'a'));
+}
+
+var _File_download = F3(function(name, mime, content)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var blob = new Blob([content], {type: mime});
+
+		// for IE10+
+		if (navigator.msSaveOrOpenBlob)
+		{
+			navigator.msSaveOrOpenBlob(blob, name);
+			return;
+		}
+
+		// for HTML5
+		var node = _File_getDownloadNode();
+		var objectUrl = URL.createObjectURL(blob);
+		node.setAttribute('href', objectUrl);
+		node.setAttribute('download', name);
+		node.dispatchEvent(new MouseEvent('click'));
+		URL.revokeObjectURL(objectUrl);
+	});
+});
+
+function _File_downloadUrl(href)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var node = _File_getDownloadNode();
+		node.setAttribute('href', href);
+		node.setAttribute('download', '');
+		node.dispatchEvent(new MouseEvent('click'));
+	});
+}
+
+
+// UPLOAD
+
+function _File_uploadOne(mimes)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var node = document.createElementNS('http://www.w3.org/1999/xhtml', 'input');
+		node.setAttribute('type', 'file');
+		node.setAttribute('accept', A2(elm$core$String$join, ',', mimes));
+		node.addEventListener('change', function(event)
+		{
+			callback(_Scheduler_succeed(event.target.files[0]));
+		});
+		node.dispatchEvent(new MouseEvent('click'));
+	});
+}
+
+function _File_uploadOneOrMore(mimes)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var node = document.createElementNS('http://www.w3.org/1999/xhtml', 'input');
+		node.setAttribute('type', 'file');
+		node.setAttribute('accept', A2(elm$core$String$join, ',', mimes));
+		node.setAttribute('multiple', '');
+		node.addEventListener('change', function(event)
+		{
+			var elmFiles = _List_fromArray(event.target.files);
+			callback(_Scheduler_succeed(_Utils_Tuple2(elmFiles.a, elmFiles.b)));
+		});
+		node.dispatchEvent(new MouseEvent('click'));
+	});
+}
+
+
+// CONTENT
+
+function _File_toString(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(reader.result));
+		});
+		reader.readAsText(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+function _File_toBytes(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(new DataView(reader.result)));
+		});
+		reader.readAsArrayBuffer(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+function _File_toUrl(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(reader.result));
+		});
+		reader.readAsDataURL(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+
+
+
 
 // HELPERS
 
@@ -5871,11 +6016,15 @@ var author$project$Page$Admin$authenticateResponse = _Platform_incomingPort('aut
 var author$project$Page$Admin$subscriptions = function (model) {
 	return author$project$Page$Admin$authenticateResponse(author$project$Page$Admin$GotError);
 };
+var author$project$Page$Article$GotFileDownloadUrl = function (a) {
+	return {$: 'GotFileDownloadUrl', a: a};
+};
+var author$project$Ports$uploadedImage = _Platform_incomingPort('uploadedImage', elm$json$Json$Decode$value);
+var author$project$Page$Article$subscriptions = function (model) {
+	return author$project$Ports$uploadedImage(author$project$Page$Article$GotFileDownloadUrl);
+};
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Page$Article$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
-};
 var author$project$Page$Articles$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
@@ -5917,17 +6066,30 @@ var author$project$Main$subscriptions = function (model) {
 			}()
 			]));
 };
-var author$project$Data$Article$Article = F3(
-	function (id, title, body) {
-		return {body: body, id: id, title: title};
+var author$project$Data$Article$Article = F4(
+	function (id, cover, title, body) {
+		return {body: body, cover: cover, id: id, title: title};
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
-var elm$json$Json$Decode$map3 = _Json_map3;
+var elm$json$Json$Decode$map4 = _Json_map4;
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$oneOf = _Json_oneOf;
+var elm$json$Json$Decode$succeed = _Json_succeed;
+var elm$json$Json$Decode$maybe = function (decoder) {
+	return elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder),
+				elm$json$Json$Decode$succeed(elm$core$Maybe$Nothing)
+			]));
+};
 var elm$json$Json$Decode$string = _Json_decodeString;
-var author$project$Data$Article$decodeOne = A4(
-	elm$json$Json$Decode$map3,
+var author$project$Data$Article$decodeOne = A5(
+	elm$json$Json$Decode$map4,
 	author$project$Data$Article$Article,
 	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
+	elm$json$Json$Decode$maybe(
+		A2(elm$json$Json$Decode$field, 'cover', elm$json$Json$Decode$string)),
 	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
 var elm$json$Json$Decode$list = _Json_decodeList;
@@ -5935,7 +6097,6 @@ var author$project$Data$Article$decodeMany = elm$json$Json$Decode$list(author$pr
 var author$project$Data$User$User = function (email) {
 	return {email: email};
 };
-var elm$json$Json$Decode$map = _Json_map1;
 var author$project$Data$User$decodeOne = A2(
 	elm$json$Json$Decode$map,
 	author$project$Data$User$User,
@@ -5943,7 +6104,6 @@ var author$project$Data$User$decodeOne = A2(
 var author$project$Page$Admin$authenticate = _Platform_outgoingPort('authenticate', elm$core$Basics$identity);
 var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$json$Json$Decode$oneOf = _Json_oneOf;
 var author$project$Page$Admin$decodeResponse = elm$json$Json$Decode$oneOf(
 	_List_fromArray(
 		[
@@ -6052,7 +6212,46 @@ var author$project$Page$Admin$update = F3(
 				}
 		}
 	});
-var author$project$Ports$fetchEditedArticle = _Platform_outgoingPort('fetchEditedArticle', elm$core$Basics$identity);
+var author$project$Data$Article$encodeOne = function (article) {
+	return elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'id',
+				elm$json$Json$Encode$string(article.id)),
+				_Utils_Tuple2(
+				'cover',
+				function () {
+					var _n0 = article.cover;
+					if (_n0.$ === 'Just') {
+						var url = _n0.a;
+						return elm$json$Json$Encode$string(url);
+					} else {
+						return elm$json$Json$Encode$null;
+					}
+				}()),
+				_Utils_Tuple2(
+				'title',
+				elm$json$Json$Encode$string(article.title)),
+				_Utils_Tuple2(
+				'body',
+				elm$json$Json$Encode$string(article.body))
+			]));
+};
+var author$project$Data$Article$setCover = F2(
+	function (url, article) {
+		return _Utils_update(
+			article,
+			{
+				cover: elm$core$Maybe$Just(url)
+			});
+	});
+var author$project$Page$Article$GotFileUrl = F2(
+	function (a, b) {
+		return {$: 'GotFileUrl', a: a, b: b};
+	});
+var author$project$Ports$saveEditedArticle = _Platform_outgoingPort('saveEditedArticle', elm$core$Basics$identity);
+var author$project$Ports$uploadImage = _Platform_outgoingPort('uploadImage', elm$core$Basics$identity);
 var author$project$Session$getArticle = F2(
 	function (id, data) {
 		return A2(elm$core$Dict$get, id, data.articles);
@@ -6077,104 +6276,13 @@ var author$project$Session$toggleEditing = function (data) {
 		return data;
 	}
 };
-var author$project$Page$Article$update = F3(
-	function (session, msg, model) {
-		var _n1 = A2(author$project$Session$getArticle, model.id, session);
-		if (_n1.$ === 'Just') {
-			var article = _n1.a;
-			return _Utils_Tuple3(
-				model,
-				function () {
-					var _n2 = session.user;
-					if (_n2.$ === 'LoggedIn') {
-						var state = _n2.a;
-						return state.editing ? author$project$Ports$fetchEditedArticle(
-							elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'id',
-										elm$json$Json$Encode$string(article.id))
-									]))) : elm$core$Platform$Cmd$none;
-					} else {
-						return elm$core$Platform$Cmd$none;
-					}
-				}(),
-				author$project$Session$toggleEditing(session));
-		} else {
-			return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-		}
-	});
-var author$project$Page$Articles$update = F3(
-	function (session, msg, model) {
-		return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-	});
-var author$project$Session$setArticle = F2(
-	function (article, data) {
-		return _Utils_update(
-			data,
-			{
-				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
-			});
-	});
-var elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		elm$core$List$foldl,
-		F2(
-			function (_n0, dict) {
-				var key = _n0.a;
-				var value = _n0.b;
-				return A3(elm$core$Dict$insert, key, value, dict);
-			}),
-		elm$core$Dict$empty,
-		assocs);
-};
-var author$project$Session$setArticles = F2(
-	function (articles, data) {
-		return _Utils_update(
-			data,
-			{
-				articles: elm$core$Dict$fromList(
-					A2(
-						elm$core$List$map,
-						function (a) {
-							return _Utils_Tuple2(a.id, a);
-						},
-						articles))
-			});
-	});
-var author$project$Session$setUser = F2(
-	function (maybeUser, data) {
-		if (maybeUser.$ === 'Just') {
-			var user = maybeUser.a;
-			return _Utils_update(
-				data,
-				{
-					user: author$project$Session$LoggedIn(
-						{editing: false, user: user})
-				});
-		} else {
-			return _Utils_update(
-				data,
-				{user: author$project$Session$Anonymous});
-		}
-	});
-var elm$browser$Browser$External = function (a) {
-	return {$: 'External', a: a};
-};
-var elm$browser$Browser$Internal = function (a) {
-	return {$: 'Internal', a: a};
-};
-var elm$browser$Browser$Dom$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0.a;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
+var elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(x);
+	} else {
+		return elm$core$Maybe$Nothing;
 	}
 };
 var elm$core$Task$Perform = function (a) {
@@ -6256,7 +6364,165 @@ var elm$core$Task$perform = F2(
 			elm$core$Task$Perform(
 				A2(elm$core$Task$map, toMessage, task)));
 	});
-var elm$json$Json$Decode$succeed = _Json_succeed;
+var elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var elm$time$Time$millisToPosix = elm$time$Time$Posix;
+var elm$file$File$name = _File_name;
+var elm$file$File$toUrl = _File_toUrl;
+var author$project$Page$Article$update = F3(
+	function (session, msg, model) {
+		switch (msg.$) {
+			case 'GotFiles':
+				var files = msg.a;
+				var _n1 = elm$core$List$head(files);
+				if (_n1.$ === 'Just') {
+					var file = _n1.a;
+					return _Utils_Tuple3(
+						model,
+						A2(
+							elm$core$Task$perform,
+							author$project$Page$Article$GotFileUrl(
+								elm$file$File$name(file)),
+							elm$file$File$toUrl(file)),
+						session);
+				} else {
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+				}
+			case 'GotFileUrl':
+				var name = msg.a;
+				var url = msg.b;
+				return _Utils_Tuple3(
+					model,
+					author$project$Ports$uploadImage(
+						elm$json$Json$Encode$object(
+							_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'name',
+									elm$json$Json$Encode$string(name)),
+									_Utils_Tuple2(
+									'url',
+									elm$json$Json$Encode$string(url))
+								]))),
+					session);
+			case 'GotFileDownloadUrl':
+				var value = msg.a;
+				var _n2 = A2(author$project$Session$getArticle, model.id, session);
+				if (_n2.$ === 'Just') {
+					var article = _n2.a;
+					var _n3 = A2(
+						elm$json$Json$Decode$decodeValue,
+						A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string),
+						value);
+					if (_n3.$ === 'Ok') {
+						var url = _n3.a;
+						return _Utils_Tuple3(
+							model,
+							author$project$Ports$saveEditedArticle(
+								author$project$Data$Article$encodeOne(
+									A2(author$project$Data$Article$setCover, url, article))),
+							session);
+					} else {
+						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+					}
+				} else {
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+				}
+			default:
+				var _n4 = A2(author$project$Session$getArticle, model.id, session);
+				if (_n4.$ === 'Just') {
+					var article = _n4.a;
+					return _Utils_Tuple3(
+						model,
+						function () {
+							var _n5 = session.user;
+							if (_n5.$ === 'LoggedIn') {
+								var state = _n5.a;
+								return state.editing ? author$project$Ports$saveEditedArticle(
+									author$project$Data$Article$encodeOne(article)) : elm$core$Platform$Cmd$none;
+							} else {
+								return elm$core$Platform$Cmd$none;
+							}
+						}(),
+						author$project$Session$toggleEditing(session));
+				} else {
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+				}
+		}
+	});
+var author$project$Page$Articles$update = F3(
+	function (session, msg, model) {
+		return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+	});
+var author$project$Session$setArticle = F2(
+	function (article, data) {
+		return _Utils_update(
+			data,
+			{
+				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
+			});
+	});
+var elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		elm$core$List$foldl,
+		F2(
+			function (_n0, dict) {
+				var key = _n0.a;
+				var value = _n0.b;
+				return A3(elm$core$Dict$insert, key, value, dict);
+			}),
+		elm$core$Dict$empty,
+		assocs);
+};
+var author$project$Session$setArticles = F2(
+	function (articles, data) {
+		return _Utils_update(
+			data,
+			{
+				articles: elm$core$Dict$fromList(
+					A2(
+						elm$core$List$map,
+						function (a) {
+							return _Utils_Tuple2(a.id, a);
+						},
+						articles))
+			});
+	});
+var author$project$Session$setUser = F2(
+	function (maybeUser, data) {
+		if (maybeUser.$ === 'Just') {
+			var user = maybeUser.a;
+			return _Utils_update(
+				data,
+				{
+					user: author$project$Session$LoggedIn(
+						{editing: false, user: user})
+				});
+		} else {
+			return _Utils_update(
+				data,
+				{user: author$project$Session$Anonymous});
+		}
+	});
+var elm$browser$Browser$External = function (a) {
+	return {$: 'External', a: a};
+};
+var elm$browser$Browser$Internal = function (a) {
+	return {$: 'Internal', a: a};
+};
+var elm$browser$Browser$Dom$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
+};
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0.a;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
 		case 'Normal':
@@ -6731,15 +6997,6 @@ var rtfeldman$elm_css$Css$Preprocess$stylesheet = function (snippets) {
 var rtfeldman$elm_css$Css$Preprocess$unwrapSnippet = function (_n0) {
 	var declarations = _n0.a;
 	return declarations;
-};
-var elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(x);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
 };
 var elm$core$List$tail = function (list) {
 	if (list.b) {
@@ -8537,7 +8794,12 @@ var author$project$Page$Article$paragraphs = function (article) {
 			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
 			A2(elm$core$String$split, '\n', article.body)));
 };
+var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
+var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
+var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
+	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
+};
 var author$project$Page$Article$viewArticle = function (article) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$article,
@@ -8553,6 +8815,28 @@ var author$project$Page$Article$viewArticle = function (article) {
 			]),
 		_List_fromArray(
 			[
+				function () {
+				var _n0 = article.cover;
+				if (_n0.$ === 'Just') {
+					var url = _n0.a;
+					return A2(
+						rtfeldman$elm_css$Html$Styled$img,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
+										rtfeldman$elm_css$Css$marginBottom(
+										rtfeldman$elm_css$Css$px(8))
+									])),
+								rtfeldman$elm_css$Html$Styled$Attributes$src(url)
+							]),
+						_List_Nil);
+				} else {
+					return rtfeldman$elm_css$Html$Styled$text('');
+				}
+			}(),
 				A2(
 				rtfeldman$elm_css$Html$Styled$h1,
 				_List_fromArray(
@@ -9020,6 +9304,28 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 			]),
 		_List_fromArray(
 			[
+				function () {
+				var _n0 = article.cover;
+				if (_n0.$ === 'Just') {
+					var url = _n0.a;
+					return A2(
+						rtfeldman$elm_css$Html$Styled$img,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
+										rtfeldman$elm_css$Css$marginBottom(
+										rtfeldman$elm_css$Css$px(8))
+									])),
+								rtfeldman$elm_css$Html$Styled$Attributes$src(url)
+							]),
+						_List_Nil);
+				} else {
+					return rtfeldman$elm_css$Html$Styled$text('');
+				}
+			}(),
 				A2(
 				rtfeldman$elm_css$Html$Styled$h1,
 				_List_fromArray(
@@ -9061,6 +9367,15 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 					]))
 			]));
 };
+var author$project$Page$Article$GotFiles = function (a) {
+	return {$: 'GotFiles', a: a};
+};
+var elm$file$File$decoder = _File_decoder;
+var author$project$Page$Article$filesDecoder = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'files']),
+	elm$json$Json$Decode$list(elm$file$File$decoder));
 var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
 var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
 var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
@@ -9113,6 +9428,40 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 					]),
 				_List_fromArray(
 					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$input,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$type_('file'),
+								A2(
+								rtfeldman$elm_css$Html$Styled$Events$on,
+								'change',
+								A2(elm$json$Json$Decode$map, author$project$Page$Article$GotFiles, author$project$Page$Article$filesDecoder))
+							]),
+						_List_Nil),
+						function () {
+						var _n0 = article.cover;
+						if (_n0.$ === 'Just') {
+							var url = _n0.a;
+							return A2(
+								rtfeldman$elm_css$Html$Styled$img,
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Html$Styled$Attributes$css(
+										_List_fromArray(
+											[
+												rtfeldman$elm_css$Css$width(
+												rtfeldman$elm_css$Css$px(100)),
+												rtfeldman$elm_css$Css$marginBottom(
+												rtfeldman$elm_css$Css$px(8))
+											])),
+										rtfeldman$elm_css$Html$Styled$Attributes$src(url)
+									]),
+								_List_Nil);
+						} else {
+							return rtfeldman$elm_css$Html$Styled$text('');
+						}
+					}(),
 						A2(
 						rtfeldman$elm_css$Html$Styled$div,
 						_List_fromArray(
@@ -9426,7 +9775,6 @@ var author$project$Page$Articles$view = F2(
 			title: 'SOKOL SOKOL | Articles'
 		};
 	});
-var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
 var author$project$Page$Skeleton$logo = A2(
 	rtfeldman$elm_css$Html$Styled$h1,
 	_List_fromArray(

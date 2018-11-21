@@ -4,10 +4,11 @@
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>SOKOL SOKOL</title>
-    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-storage.js"></script>
     <script src="/public/main.js"></script>
   </head>
   <body>
@@ -24,6 +25,10 @@
       messagingSenderId: "612262023212"
     };
     firebase.initializeApp(config);
+
+    // FIREBASE | STORAGE
+    var storage = firebase.storage();
+    var storageRef = storage.ref();
 
     // FIREBASE | DATABASE
     var database = firebase.database();
@@ -68,22 +73,33 @@
       });
     });
 
-    app.ports.fetchEditedArticle.subscribe(function(data) {
+    app.ports.saveEditedArticle.subscribe(function(data) {
       var titleEl = document.getElementById("title");
       var bodyEl = document.getElementById("body");
 
       var article =
-        { title: titleEl.outerText,
-          body : bodyEl.outerText
+        { cover: data.cover,
+          title: titleEl ? titleEl.outerText : data.title,
+          body : bodyEl ? bodyEl.outerText : data.body
         };
 
       database.ref('articles/' + data.id).set(article);
 
       app.ports.receiveArticle.send({
         id: data.id,
+        cover: data.cover,
         title: article.title,
         body: article.body
       });
+    });
+
+    app.ports.uploadImage.subscribe(function(data) {
+      var articleRef = storageRef.child("images/" + data.name);
+      articleRef.putString(data.url, 'data_url').then(function(snapshot) {
+        snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          app.ports.uploadedImage.send({ url: downloadURL });
+        });
+      })
     });
   </script>
 </html>
