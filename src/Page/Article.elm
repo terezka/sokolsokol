@@ -4,6 +4,7 @@ import Css
 import Data.Article as Article
 import Element.Color as Color
 import File
+import File.Select as Select
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
@@ -30,7 +31,8 @@ init session id =
 
 type Msg
     = Toggle
-    | GotFiles (List File.File)
+    | Pick
+    | GotFiles File.File (List File.File)
     | GotFileUrl String String
     | GotFileDownloadUrl Encode.Value
 
@@ -38,16 +40,14 @@ type Msg
 update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
 update session msg model =
     case msg of
-        GotFiles files ->
-            case List.head files of
-                Just file ->
-                    ( model
-                    , Task.perform (GotFileUrl (File.name file)) (File.toUrl file)
-                    , session
-                    )
+        Pick ->
+            ( model, Select.files ["image/*"] GotFiles, session )
 
-                Nothing ->
-                    ( model, Cmd.none, session )
+        GotFiles file files ->
+            ( model
+            , Task.perform (GotFileUrl (Debug.log "here" <| File.name file)) (File.toUrl file)
+            , session
+            )
 
         GotFileUrl name url ->
             ( model
@@ -183,28 +183,36 @@ viewArticleEditing : Article.Article -> Html.Html Msg
 viewArticleEditing article =
     Html.div
         []
-        [ Html.article
+        [ case article.cover of
+            Just url ->
+                Html.img
+                    [ Attr.css
+                        [ Css.width (Css.px 100)
+                        , Css.marginRight (Css.px 8)
+                        ]
+                    , Attr.src url
+                    , Events.onClick Pick
+                    ]
+                    []
+
+            Nothing ->
+                Html.div
+                    [ Attr.css
+                        [ Css.width (Css.px 100)
+                        , Css.height (Css.px 100)
+                        , Css.marginRight (Css.px 8)
+                        , Css.backgroundColor Color.blue
+                        ]
+                    , Events.onClick Pick
+                    ]
+                    []
+
+        , Html.article
             [ Attr.css
                 [ Css.width (Css.px 780)
                 ]
             ]
-            [ Html.input
-                [ Attr.type_ "file"
-                , Events.on "change" (Decode.map GotFiles filesDecoder)
-                ]
-                []
-            , case article.cover of
-                Just url ->
-                    Html.img
-                        [ Attr.css
-                            [ Css.width (Css.px 100), Css.marginBottom (Css.px 8) ]
-                        , Attr.src url
-                        ]
-                        []
-
-                Nothing ->
-                    Html.text ""
-            , Html.div
+            [ Html.div
                 [ Attr.css
                     [ Css.textDecoration Css.overline
                     , Css.border (Css.px 0)

@@ -74,6 +74,7 @@
     });
 
     app.ports.saveEditedArticle.subscribe(function(data) {
+      console.log(data)
       var titleEl = document.getElementById("title");
       var bodyEl = document.getElementById("body");
 
