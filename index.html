@@ -33,11 +33,16 @@
     var app = Elm.Main.init({ node: el });
 
     app.ports.authenticate.subscribe(function(data) {
-      firebase.auth().signInWithEmailAndPassword(data.email, data.password).then(function () {
-        app.ports.authenticateResponse.send({ success: true });
-      }).catch(function(error) {
-        app.ports.authenticateResponse.send(error);
-      });
+      firebase.auth()
+        .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        .then(function() {
+          return firebase.auth().signInWithEmailAndPassword(data.email, data.password);
+        })
+        .then(function () {
+          app.ports.authenticateResponse.send({ success: true });
+        }).catch(function(error) {
+          app.ports.authenticateResponse.send(error);
+        });
     });
 
     app.ports.fetchArticles.subscribe(function(data) {
