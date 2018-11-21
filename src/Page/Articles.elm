@@ -3,6 +3,8 @@ module Page.Articles exposing (Model, Msg, init, subscriptions, update, view)
 import Css
 import Data.Article as Article
 import Html.Styled as Html
+import Element.Text as Text
+import Element.Color as Color
 import Html.Styled.Attributes as Attr
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -44,17 +46,37 @@ view session model =
             , Html.div
                 [ Attr.css []
                 ]
-                (List.map viewArticle <|
-                    case session.user of
+                (case session.user of
                         Session.LoggedIn _ ->
-                            Article.placeholder :: Session.getArticles session
+                            viewPlaceholder :: List.map viewArticle (Session.getArticles session)
 
                         Session.Anonymous ->
-                            Session.getArticles session
+                            List.map viewArticle (Session.getArticles session)
                 )
             ]
         ]
     }
+
+
+viewPlaceholder : Html.Html Msg
+viewPlaceholder =
+    Html.a
+        [ Attr.href "/articles/new"
+        , Attr.css
+            [ Css.width (Css.pct 30)
+            , Css.height (Css.px 200)
+            , Css.display Css.inlineBlock
+            , Css.verticalAlign Css.top
+            , Css.marginTop (Css.px 24)
+            , Css.marginRight (Css.px 24)
+            , Css.border3 (Css.px 1) Css.dotted Color.black
+            , Css.display Css.inlineFlex
+            , Css.justifyContent Css.center
+            , Css.alignItems Css.center
+            ]
+        ]
+        [ Text.body [] [ Html.text "Add new?" ]
+        ]
 
 
 viewArticle : Article.Article -> Html.Html Msg

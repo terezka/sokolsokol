@@ -9876,6 +9876,46 @@ var author$project$Page$Articles$viewArticle = function (article) {
 					]))
 			]));
 };
+var rtfeldman$elm_css$Css$dotted = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'dotted'};
+var rtfeldman$elm_css$Css$inlineFlex = {display: rtfeldman$elm_css$Css$Structure$Compatible, value: 'inline-flex'};
+var author$project$Page$Articles$viewPlaceholder = A2(
+	rtfeldman$elm_css$Html$Styled$a,
+	_List_fromArray(
+		[
+			rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/new'),
+			rtfeldman$elm_css$Html$Styled$Attributes$css(
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Css$width(
+					rtfeldman$elm_css$Css$pct(30)),
+					rtfeldman$elm_css$Css$height(
+					rtfeldman$elm_css$Css$px(200)),
+					rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock),
+					rtfeldman$elm_css$Css$verticalAlign(rtfeldman$elm_css$Css$top),
+					rtfeldman$elm_css$Css$marginTop(
+					rtfeldman$elm_css$Css$px(24)),
+					rtfeldman$elm_css$Css$marginRight(
+					rtfeldman$elm_css$Css$px(24)),
+					A3(
+					rtfeldman$elm_css$Css$border3,
+					rtfeldman$elm_css$Css$px(1),
+					rtfeldman$elm_css$Css$dotted,
+					author$project$Element$Color$black),
+					rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineFlex),
+					rtfeldman$elm_css$Css$justifyContent(rtfeldman$elm_css$Css$center),
+					rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center)
+				]))
+		]),
+	_List_fromArray(
+		[
+			A2(
+			author$project$Element$Text$body,
+			_List_Nil,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$text('Add new?')
+				]))
+		]));
 var elm$core$Dict$values = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,
@@ -9930,20 +9970,23 @@ var author$project$Page$Articles$view = F2(
 								[
 									rtfeldman$elm_css$Html$Styled$Attributes$css(_List_Nil)
 								]),
-							A2(
-								elm$core$List$map,
-								author$project$Page$Articles$viewArticle,
-								function () {
-									var _n0 = session.user;
-									if (_n0.$ === 'LoggedIn') {
-										return A2(
-											elm$core$List$cons,
-											author$project$Data$Article$placeholder,
-											author$project$Session$getArticles(session));
-									} else {
-										return author$project$Session$getArticles(session);
-									}
-								}()))
+							function () {
+								var _n0 = session.user;
+								if (_n0.$ === 'LoggedIn') {
+									return A2(
+										elm$core$List$cons,
+										author$project$Page$Articles$viewPlaceholder,
+										A2(
+											elm$core$List$map,
+											author$project$Page$Articles$viewArticle,
+											author$project$Session$getArticles(session)));
+								} else {
+									return A2(
+										elm$core$List$map,
+										author$project$Page$Articles$viewArticle,
+										author$project$Session$getArticles(session));
+								}
+							}())
 						]))
 				]),
 			title: 'SOKOL SOKOL | Articles'
