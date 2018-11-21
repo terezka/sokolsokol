@@ -5854,6 +5854,9 @@ var author$project$Main$init = F3(
 						cmd
 					])));
 	});
+var author$project$Main$GotArticle = function (a) {
+	return {$: 'GotArticle', a: a};
+};
 var author$project$Main$GotArticles = function (a) {
 	return {$: 'GotArticles', a: a};
 };
@@ -5877,6 +5880,7 @@ var author$project$Page$Articles$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
 var author$project$Ports$authenticationState = _Platform_incomingPort('authenticationState', elm$json$Json$Decode$value);
+var author$project$Ports$receiveArticle = _Platform_incomingPort('receiveArticle', elm$json$Json$Decode$value);
 var author$project$Ports$receiveArticles = _Platform_incomingPort('receiveArticles', elm$json$Json$Decode$value);
 var elm$core$Platform$Sub$map = _Platform_map;
 var author$project$Main$subscriptions = function (model) {
@@ -5885,6 +5889,7 @@ var author$project$Main$subscriptions = function (model) {
 			[
 				author$project$Ports$authenticationState(author$project$Main$OnAuthChange),
 				author$project$Ports$receiveArticles(author$project$Main$GotArticles),
+				author$project$Ports$receiveArticle(author$project$Main$GotArticle),
 				function () {
 				var _n0 = model.page;
 				switch (_n0.$) {
@@ -6103,6 +6108,14 @@ var author$project$Page$Article$update = F3(
 var author$project$Page$Articles$update = F3(
 	function (session, msg, model) {
 		return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+	});
+var author$project$Session$setArticle = F2(
+	function (article, data) {
+		return _Utils_update(
+			data,
+			{
+				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
+			});
 	});
 var elm$core$Dict$fromList = function (assocs) {
 	return A3(
@@ -6494,11 +6507,26 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
+			case 'GotArticle':
+				var value = message.a;
+				var _n4 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
+				if (_n4.$ === 'Ok') {
+					var article = _n4.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								session: A2(author$project$Session$setArticle, article, model.session)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
 			case 'ArticlesMsg':
 				var msg = message.a;
-				var _n4 = model.page;
-				if (_n4.$ === 'Articles') {
-					var article2Model = _n4.a;
+				var _n5 = model.page;
+				if (_n5.$ === 'Articles') {
+					var article2Model = _n5.a;
 					return A2(
 						author$project$Main$stepArticles,
 						model,
@@ -6508,9 +6536,9 @@ var author$project$Main$update = F2(
 				}
 			case 'ArticleMsg':
 				var msg = message.a;
-				var _n5 = model.page;
-				if (_n5.$ === 'Article') {
-					var articleModel = _n5.a;
+				var _n6 = model.page;
+				if (_n6.$ === 'Article') {
+					var articleModel = _n6.a;
 					return A2(
 						author$project$Main$stepArticle,
 						model,
@@ -6520,9 +6548,9 @@ var author$project$Main$update = F2(
 				}
 			default:
 				var msg = message.a;
-				var _n6 = model.page;
-				if (_n6.$ === 'Admin') {
-					var designModel = _n6.a;
+				var _n7 = model.page;
+				if (_n7.$ === 'Admin') {
+					var designModel = _n7.a;
 					return A2(
 						author$project$Main$stepAdmin,
 						model,
@@ -8972,7 +9000,10 @@ var rtfeldman$elm_css$Css$prop3 = F4(
 					[argA.value, argB.value, argC.value])));
 	});
 var rtfeldman$elm_css$Css$border3 = rtfeldman$elm_css$Css$prop3('border');
+var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
+var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
+var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
 var author$project$Page$Article$viewArticleEditable = function (article) {
 	return A2(
@@ -8996,7 +9027,8 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 						rtfeldman$elm_css$Html$Styled$Attributes$css(
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
+								rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
 							]))
 					]),
 				_List_fromArray(
@@ -9035,7 +9067,6 @@ var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
 	var value = _n0.value;
 	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
 };
-var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
 var rtfeldman$elm_css$Css$int = function (val) {
 	return {
 		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
@@ -9050,9 +9081,9 @@ var rtfeldman$elm_css$Css$int = function (val) {
 		value: elm$core$String$fromInt(val)
 	};
 };
-var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
 var rtfeldman$elm_css$Css$outline = rtfeldman$elm_css$Css$prop1('outline');
+var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
 var elm$json$Json$Encode$bool = _Json_wrap;
 var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -9076,7 +9107,7 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 						rtfeldman$elm_css$Html$Styled$Attributes$css(
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Css$maxWidth(
+								rtfeldman$elm_css$Css$width(
 								rtfeldman$elm_css$Css$px(780))
 							]))
 					]),
@@ -9182,96 +9213,24 @@ var author$project$Page$Article$view = F2(
 			title: 'SOKOL SOKOL | Articles'
 		};
 	});
-var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
-var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
-	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
-};
-var author$project$Page$Articles$viewArticle = function (article) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$article,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Css$maxWidth(
-						rtfeldman$elm_css$Css$px(300))
-					]))
-			]),
-		_List_fromArray(
-			[
-				A2(
-				rtfeldman$elm_css$Html$Styled$a,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						rtfeldman$elm_css$Html$Styled$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-									]))
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text(article.title)
-							]))
-					])),
-				A2(
-				rtfeldman$elm_css$Html$Styled$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(article.body)
-					]))
-			]));
-};
-var elm$core$Dict$values = function (dict) {
-	return A3(
-		elm$core$Dict$foldr,
-		F3(
-			function (key, value, valueList) {
-				return A2(elm$core$List$cons, value, valueList);
-			}),
-		_List_Nil,
-		dict);
-};
-var author$project$Session$getArticles = function (data) {
-	return elm$core$Dict$values(data.articles);
-};
-var author$project$Page$Articles$view = F2(
-	function (session, model) {
-		return {
-			body: A2(
-				elm$core$List$map,
-				author$project$Page$Articles$viewArticle,
-				author$project$Session$getArticles(session)),
-			title: 'SOKOL SOKOL | Articles'
-		};
+var rtfeldman$elm_css$Css$display = rtfeldman$elm_css$Css$prop1('display');
+var rtfeldman$elm_css$Css$inlineBlock = {display: rtfeldman$elm_css$Css$Structure$Compatible, value: 'inline-block'};
+var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
+	function (a, b) {
+		return {$: 'ExtendSelector', a: a, b: b};
 	});
-var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
-var author$project$Page$Skeleton$logo = A2(
-	rtfeldman$elm_css$Html$Styled$h1,
-	_List_fromArray(
-		[
-			rtfeldman$elm_css$Html$Styled$Attributes$css(
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Css$marginBottom(
-					rtfeldman$elm_css$Css$px(8))
-				]))
-		]),
-	_List_fromArray(
-		[
-			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
-		]));
-var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
+var rtfeldman$elm_css$Css$Structure$PseudoClassSelector = function (a) {
+	return {$: 'PseudoClassSelector', a: a};
+};
+var rtfeldman$elm_css$Css$pseudoClass = function (_class) {
+	return rtfeldman$elm_css$Css$Preprocess$ExtendSelector(
+		rtfeldman$elm_css$Css$Structure$PseudoClassSelector(_class));
+};
+var rtfeldman$elm_css$Css$lastChild = rtfeldman$elm_css$Css$pseudoClass('last-child');
+var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
+var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
+var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
+var rtfeldman$elm_css$Css$top = rtfeldman$elm_css$Css$prop1('top');
 var rtfeldman$elm_css$Css$Internal$property = F2(
 	function (key, value) {
 		return rtfeldman$elm_css$Css$Preprocess$AppendProperty(key + (':' + value));
@@ -9337,6 +9296,153 @@ var rtfeldman$elm_css$Css$Internal$getOverloadedProperty = F3(
 	});
 var rtfeldman$elm_css$Css$Internal$IncompatibleUnits = {$: 'IncompatibleUnits'};
 var rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty = A3(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$Internal$IncompatibleUnits, '', 0);
+var rtfeldman$elm_css$Css$verticalAlign = function (fn) {
+	return A3(
+		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
+		'verticalAlign',
+		'vertical-align',
+		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
+};
+var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
+var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
+	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
+};
+var author$project$Page$Articles$viewArticle = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$article,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Css$width(
+						rtfeldman$elm_css$Css$pct(33)),
+						rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock),
+						rtfeldman$elm_css$Css$verticalAlign(rtfeldman$elm_css$Css$top),
+						rtfeldman$elm_css$Css$marginRight(
+						rtfeldman$elm_css$Css$px(8)),
+						rtfeldman$elm_css$Css$lastChild(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$marginRight(
+								rtfeldman$elm_css$Css$pct(0))
+							]))
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$a,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$h1,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+									]))
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text(article.title)
+							]))
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text(
+						A2(elm$core$String$left, 300, article.body) + '...')
+					]))
+			]));
+};
+var elm$core$Dict$values = function (dict) {
+	return A3(
+		elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2(elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
+var author$project$Session$getArticles = function (data) {
+	return elm$core$Dict$values(data.articles);
+};
+var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
+var author$project$Page$Articles$view = F2(
+	function (session, model) {
+		return {
+			body: _List_fromArray(
+				[
+					A2(
+					rtfeldman$elm_css$Html$Styled$div,
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$maxWidth(
+									rtfeldman$elm_css$Css$px(1100))
+								]))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							rtfeldman$elm_css$Html$Styled$h2,
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$Attributes$css(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$maxWidth(
+											rtfeldman$elm_css$Css$px(700))
+										]))
+								]),
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+								])),
+							A2(
+							rtfeldman$elm_css$Html$Styled$div,
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$Attributes$css(_List_Nil)
+								]),
+							A2(
+								elm$core$List$map,
+								author$project$Page$Articles$viewArticle,
+								author$project$Session$getArticles(session)))
+						]))
+				]),
+			title: 'SOKOL SOKOL | Articles'
+		};
+	});
+var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
+var author$project$Page$Skeleton$logo = A2(
+	rtfeldman$elm_css$Html$Styled$h1,
+	_List_fromArray(
+		[
+			rtfeldman$elm_css$Html$Styled$Attributes$css(
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Css$marginBottom(
+					rtfeldman$elm_css$Css$px(8))
+				]))
+		]),
+	_List_fromArray(
+		[
+			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
+		]));
+var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
 var rtfeldman$elm_css$Css$alignItems = function (fn) {
 	return A3(
 		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
@@ -9355,17 +9461,6 @@ var rtfeldman$elm_css$Css$column = _Utils_update(
 var rtfeldman$elm_css$Css$cursor = rtfeldman$elm_css$Css$prop1('cursor');
 var rtfeldman$elm_css$Css$displayFlex = A2(rtfeldman$elm_css$Css$property, 'display', 'flex');
 var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-direction');
-var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
-	function (a, b) {
-		return {$: 'ExtendSelector', a: a, b: b};
-	});
-var rtfeldman$elm_css$Css$Structure$PseudoClassSelector = function (a) {
-	return {$: 'PseudoClassSelector', a: a};
-};
-var rtfeldman$elm_css$Css$pseudoClass = function (_class) {
-	return rtfeldman$elm_css$Css$Preprocess$ExtendSelector(
-		rtfeldman$elm_css$Css$Structure$PseudoClassSelector(_class));
-};
 var rtfeldman$elm_css$Css$hover = rtfeldman$elm_css$Css$pseudoClass('hover');
 var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 	return A3(
@@ -9375,11 +9470,10 @@ var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
 };
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
-var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
-var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
 var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
-var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
+var rtfeldman$elm_css$Css$VwUnits = {$: 'VwUnits'};
+var rtfeldman$elm_css$Css$vw = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$VwUnits, 'vw');
 var rtfeldman$elm_css$Css$Structure$TypeSelector = function (a) {
 	return {$: 'TypeSelector', a: a};
 };
@@ -9425,12 +9519,12 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 				rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center),
 				rtfeldman$elm_css$Css$justifyContent(rtfeldman$elm_css$Css$center),
 				rtfeldman$elm_css$Css$flexDirection(rtfeldman$elm_css$Css$column),
-				rtfeldman$elm_css$Css$marginRight(rtfeldman$elm_css$Css$zero),
+				rtfeldman$elm_css$Css$width(
+				rtfeldman$elm_css$Css$vw(100)),
+				rtfeldman$elm_css$Css$margin(rtfeldman$elm_css$Css$zero),
 				rtfeldman$elm_css$Css$marginTop(
 				rtfeldman$elm_css$Css$px(200)),
 				rtfeldman$elm_css$Css$marginBottom(
-				rtfeldman$elm_css$Css$px(200)),
-				rtfeldman$elm_css$Css$marginLeft(
 				rtfeldman$elm_css$Css$px(200))
 			])),
 		rtfeldman$elm_css$Css$Global$h1(
@@ -9468,7 +9562,6 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 	]);
 var rtfeldman$elm_css$Css$fixed = {backgroundAttachment: rtfeldman$elm_css$Css$Structure$Compatible, position: rtfeldman$elm_css$Css$Structure$Compatible, tableLayout: rtfeldman$elm_css$Css$Structure$Compatible, value: 'fixed'};
 var rtfeldman$elm_css$Css$position = rtfeldman$elm_css$Css$prop1('position');
-var rtfeldman$elm_css$Css$top = rtfeldman$elm_css$Css$prop1('top');
 var elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));

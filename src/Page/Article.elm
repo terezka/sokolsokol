@@ -90,7 +90,9 @@ viewArticleEditable : Article.Article -> Html.Html Msg
 viewArticleEditable article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
+        [ Html.h1
+            [ Attr.css [ Css.textDecoration Css.overline, Css.marginTop Css.zero ] ]
+            [ Html.text article.title ]
         , Html.div []
             (paragraphs article)
         , Html.button
@@ -110,7 +112,7 @@ viewArticleEditing article =
         []
         [ Html.article
             [ Attr.css
-                [ Css.maxWidth (Css.px 780)
+                [ Css.width (Css.px 780)
                 ]
             ]
             [ Html.div

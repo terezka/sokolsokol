@@ -54,6 +54,7 @@ subscriptions model =
     Sub.batch
         [ Ports.authenticationState OnAuthChange
         , Ports.receiveArticles GotArticles
+        , Ports.receiveArticle GotArticle
         , case model.page of
             Admin adminModel ->
                 Admin.subscriptions adminModel
@@ -123,6 +124,7 @@ type Msg
     | UrlChanged Url.Url
     | OnAuthChange Encode.Value
     | GotArticles Encode.Value
+    | GotArticle Encode.Value
     | ArticlesMsg Articles.Msg
     | ArticleMsg Article.Msg
     | AdminMsg Admin.Msg
@@ -165,6 +167,14 @@ update message model =
             case Decode.decodeValue Article.decodeMany value of
                 Ok articles ->
                     ( { model | session = Session.setArticles articles model.session }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        GotArticle value ->
+            case Decode.decodeValue Article.decodeOne value of
+                Ok article ->
+                    ( { model | session = Session.setArticle article model.session }, Cmd.none )
 
                 Err _ ->
                     ( model, Cmd.none )

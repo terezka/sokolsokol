@@ -79,10 +79,10 @@ styles =
         , Css.alignItems Css.center
         , Css.justifyContent Css.center
         , Css.flexDirection Css.column
-        , Css.marginRight Css.zero
+        , Css.width (Css.vw 100)
+        , Css.margin Css.zero
         , Css.marginTop (Css.px 200)
         , Css.marginBottom (Css.px 200)
-        , Css.marginLeft (Css.px 200)
         ]
     , Css.Global.h1
         [ Css.fontWeight (Css.int 500)

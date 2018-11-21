@@ -5,6 +5,7 @@ module Session exposing
     , empty
     , getArticle
     , getArticles
+    , setArticle
     , setArticles
     , setUser
     , toggleEditing
@@ -47,6 +48,11 @@ setArticles articles data =
                 |> List.map (\a -> ( a.id, a ))
                 |> Dict.fromList
     }
+
+
+setArticle : Article.Article -> Data -> Data
+setArticle article data =
+    { data | articles = Dict.insert article.id article data.articles }
 
 
 getArticles : Data -> List Article.Article
