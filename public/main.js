@@ -9805,8 +9805,7 @@ var author$project$Page$Skeleton$view = F2(
 								_List_fromArray(
 									[
 										A2(author$project$Page$Skeleton$navItem, '/articles', 'writing'),
-										A2(author$project$Page$Skeleton$navItem, '/designs', 'designs'),
-										A2(author$project$Page$Skeleton$navItem, '/admin', 'admin')
+										A2(author$project$Page$Skeleton$navItem, '/designs', 'designs')
 									]))
 							])),
 						A2(
