@@ -46,8 +46,15 @@ update msg model =
         Toggle ->
             case model.article of
                 Just article ->
-                    ( { model | editing = not model.editing }
-                    , if not model.editing then Cmd.none else Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
+                    let
+                        isEditing =
+                            not model.editing
+                    in
+                    ( { model | editing = isEditing }
+                    , if isEditing then
+                            Cmd.none
+                        else
+                            Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
                     )
 
                 Nothing ->
@@ -74,18 +81,13 @@ view model =
 
 viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
-    let
-        paragraphs =
-            article.body
-                |> String.split "\n"
-                |> List.map (List.singleton << Html.text)
-                |> List.map (Html.p [])
-    in
+
 
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
         [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
-        , Html.div [] paragraphs
+        , Html.div []
+                (paragraphs article)
         , Html.button
             [ Attr.css
                 [ Css.backgroundColor Color.transparent
@@ -98,13 +100,7 @@ viewArticle article =
 
 viewArticleEditable : Article.Article -> Html.Html Msg
 viewArticleEditable article =
-    let
-        paragraphs =
-            article.body
-                |> String.split "\n"
-                |> List.map (List.singleton << Html.text)
-                |> List.map (Html.p [])
-    in
+
     Html.div
         [ Attr.css
             [ Css.border3 (Css.px 1) Css.dotted Color.black
@@ -139,7 +135,7 @@ viewArticleEditable article =
                 , Attr.contenteditable True
                 , Attr.id "body"
                 ]
-                paragraphs
+                (paragraphs article)
             ]
         , Html.button
             [ Attr.css
@@ -149,6 +145,14 @@ viewArticleEditable article =
             , Events.onClick Toggle ]
             [ Html.text "Save" ]
         ]
+
+
+paragraphs : Article.Article -> List (Html.Html msg)
+paragraphs article=
+    article.body
+                |> String.split "\n"
+                |> List.map (List.singleton << Html.text)
+                |> List.map (Html.p [])
 
 
 subscriptions : Model -> Sub Msg

@@ -64,10 +64,17 @@
       var titleEl = document.getElementById("title");
       var bodyEl = document.getElementById("body");
 
+      var article =
+        { title: titleEl.outerText,
+          body : bodyEl.outerText
+        };
+
+      database.ref('articles/' + data.id).set(article);
+
       app.ports.receiveArticle.send({
         id: data.id,
-        title: titleEl.outerText,
-        body: bodyEl.outerText
+        title: article.title,
+        body: article.body
       });
     });
   </script>

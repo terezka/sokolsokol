@@ -6096,11 +6096,12 @@ var author$project$Page$Article$update = F2(
 			var _n2 = model.article;
 			if (_n2.$ === 'Just') {
 				var article = _n2.a;
+				var isEditing = !model.editing;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{editing: !model.editing}),
-					(!model.editing) ? elm$core$Platform$Cmd$none : author$project$Ports$fetchEditedArticle(
+						{editing: isEditing}),
+					isEditing ? elm$core$Platform$Cmd$none : author$project$Ports$fetchEditedArticle(
 						elm$json$Json$Encode$object(
 							_List_fromArray(
 								[
@@ -8871,6 +8872,16 @@ var rtfeldman$elm_css$Css$rgba = F4(
 	});
 var author$project$Element$Color$transparent = A4(rtfeldman$elm_css$Css$rgba, 0, 0, 0, 0);
 var author$project$Page$Article$Toggle = {$: 'Toggle'};
+var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
+var author$project$Page$Article$paragraphs = function (article) {
+	return A2(
+		elm$core$List$map,
+		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
+		A2(
+			elm$core$List$map,
+			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
+			A2(elm$core$String$split, '\n', article.body)));
+};
 var rtfeldman$elm_css$Css$backgroundColor = function (c) {
 	return A2(rtfeldman$elm_css$Css$property, 'background-color', c.value);
 };
@@ -8889,15 +8900,7 @@ var rtfeldman$elm_css$Css$border3 = rtfeldman$elm_css$Css$prop3('border');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
-var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
 var author$project$Page$Article$viewArticle = function (article) {
-	var paragraphs = A2(
-		elm$core$List$map,
-		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
-		A2(
-			elm$core$List$map,
-			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
-			A2(elm$core$String$split, '\n', article.body)));
 	return A2(
 		rtfeldman$elm_css$Html$Styled$article,
 		_List_fromArray(
@@ -8926,7 +8929,10 @@ var author$project$Page$Article$viewArticle = function (article) {
 					[
 						rtfeldman$elm_css$Html$Styled$text(article.title)
 					])),
-				A2(rtfeldman$elm_css$Html$Styled$div, _List_Nil, paragraphs),
+				A2(
+				rtfeldman$elm_css$Html$Styled$div,
+				_List_Nil,
+				author$project$Page$Article$paragraphs(article)),
 				A2(
 				rtfeldman$elm_css$Html$Styled$button,
 				_List_fromArray(
@@ -8986,13 +8992,6 @@ var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
 var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
 var author$project$Page$Article$viewArticleEditable = function (article) {
-	var paragraphs = A2(
-		elm$core$List$map,
-		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
-		A2(
-			elm$core$List$map,
-			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
-			A2(elm$core$String$split, '\n', article.body)));
 	return A2(
 		rtfeldman$elm_css$Html$Styled$div,
 		_List_fromArray(
@@ -9067,7 +9066,7 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
 								rtfeldman$elm_css$Html$Styled$Attributes$id('body')
 							]),
-						paragraphs)
+						author$project$Page$Article$paragraphs(article))
 					])),
 				A2(
 				rtfeldman$elm_css$Html$Styled$button,
