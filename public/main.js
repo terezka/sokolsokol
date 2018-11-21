@@ -8281,8 +8281,8 @@ var author$project$Page$Article$view = function (model) {
 						_List_fromArray(
 							[
 								rtfeldman$elm_css$Css$maxWidth(
-								rtfeldman$elm_css$Css$px(780)),
-								A2(rtfeldman$elm_css$Css$property, 'column-count', '2')
+								rtfeldman$elm_css$Css$px(1080)),
+								A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
 							]))
 					]),
 				_List_fromArray(
@@ -8518,58 +8518,6 @@ var author$project$Page$Skeleton$logo = A2(
 		[
 			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
 		]));
-var rtfeldman$elm_css$Css$prop2 = F3(
-	function (key, argA, argB) {
-		return A2(
-			rtfeldman$elm_css$Css$property,
-			key,
-			A2(
-				elm$core$String$join,
-				' ',
-				_List_fromArray(
-					[argA.value, argB.value])));
-	});
-var rtfeldman$elm_css$Css$margin2 = rtfeldman$elm_css$Css$prop2('margin');
-var rtfeldman$elm_css$Html$Styled$nav = rtfeldman$elm_css$Html$Styled$node('nav');
-var author$project$Page$Skeleton$nav = rtfeldman$elm_css$Html$Styled$nav(
-	_List_fromArray(
-		[
-			rtfeldman$elm_css$Html$Styled$Attributes$css(
-			_List_fromArray(
-				[
-					A2(
-					rtfeldman$elm_css$Css$margin2,
-					rtfeldman$elm_css$Css$px(0),
-					rtfeldman$elm_css$Css$px(12))
-				]))
-		]));
-var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
-var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
-var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
-var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
-	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
-};
-var author$project$Page$Skeleton$navItem = F2(
-	function (link, linkText) {
-		return A2(
-			rtfeldman$elm_css$Html$Styled$a,
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Html$Styled$Attributes$css(
-					_List_fromArray(
-						[
-							rtfeldman$elm_css$Css$marginLeft(
-							rtfeldman$elm_css$Css$px(20)),
-							rtfeldman$elm_css$Css$fontSize(
-							rtfeldman$elm_css$Css$px(16))
-						])),
-					rtfeldman$elm_css$Html$Styled$Attributes$href(link)
-				]),
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Html$Styled$text(linkText)
-				]));
-	});
 var elm$core$String$foldr = _String_foldr;
 var elm$core$String$toList = function (string) {
 	return A3(elm$core$String$foldr, elm$core$List$cons, _List_Nil, string);
@@ -9037,6 +8985,7 @@ var rtfeldman$elm_css$Css$column = _Utils_update(
 var rtfeldman$elm_css$Css$cursor = rtfeldman$elm_css$Css$prop1('cursor');
 var rtfeldman$elm_css$Css$displayFlex = A2(rtfeldman$elm_css$Css$property, 'display', 'flex');
 var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-direction');
+var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
 var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
 	var value = _n0.value;
 	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
@@ -9076,6 +9025,7 @@ var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
 };
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
+var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
 var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
 var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
@@ -9799,15 +9749,7 @@ var author$project$Page$Skeleton$view = F2(
 									]))
 							]),
 						_List_fromArray(
-							[
-								author$project$Page$Skeleton$logo,
-								author$project$Page$Skeleton$nav(
-								_List_fromArray(
-									[
-										A2(author$project$Page$Skeleton$navItem, '/articles', 'writing'),
-										A2(author$project$Page$Skeleton$navItem, '/designs', 'designs')
-									]))
-							])),
+							[author$project$Page$Skeleton$logo])),
 						A2(
 						rtfeldman$elm_css$Html$Styled$main_,
 						_List_Nil,

@@ -26,12 +26,7 @@ view toMsg document =
                     , Css.top Css.zero
                     ]
                 ]
-                [ logo
-                , nav
-                    [ navItem "/articles" "writing"
-                    , navItem "/designs" "designs"
-                    ]
-                ]
+                [ logo ]
             , Html.main_ [] (List.map (Html.map toMsg) document.body)
             ]
     }
