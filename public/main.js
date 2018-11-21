@@ -8817,7 +8817,22 @@ var author$project$Page$Article$paragraphs = function (article) {
 			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
 			A2(elm$core$String$split, '\n', article.body)));
 };
+var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
+	function (a, b) {
+		return {$: 'ExtendSelector', a: a, b: b};
+	});
+var rtfeldman$elm_css$Css$Structure$PseudoClassSelector = function (a) {
+	return {$: 'PseudoClassSelector', a: a};
+};
+var rtfeldman$elm_css$Css$pseudoClass = function (_class) {
+	return rtfeldman$elm_css$Css$Preprocess$ExtendSelector(
+		rtfeldman$elm_css$Css$Structure$PseudoClassSelector(_class));
+};
+var rtfeldman$elm_css$Css$firstChild = rtfeldman$elm_css$Css$pseudoClass('first-child');
 var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
+var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
+var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
+var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
 var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
 var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
@@ -8867,7 +8882,12 @@ var author$project$Page$Article$viewArticle = function (article) {
 						rtfeldman$elm_css$Html$Styled$Attributes$css(
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
+								rtfeldman$elm_css$Css$firstChild(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
+									]))
 							]))
 					]),
 				_List_fromArray(
@@ -9307,10 +9327,7 @@ var rtfeldman$elm_css$Css$prop3 = F4(
 					[argA.value, argB.value, argC.value])));
 	});
 var rtfeldman$elm_css$Css$border3 = rtfeldman$elm_css$Css$prop3('border');
-var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
-var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
-var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
 var author$project$Page$Article$viewArticleEditable = function (article) {
 	return A2(
@@ -9357,7 +9374,11 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 						_List_fromArray(
 							[
 								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
-								rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
+								rtfeldman$elm_css$Css$firstChild(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
+									]))
 							]))
 					]),
 				_List_fromArray(
@@ -9589,17 +9610,6 @@ var author$project$Page$Article$view = F2(
 	});
 var rtfeldman$elm_css$Css$display = rtfeldman$elm_css$Css$prop1('display');
 var rtfeldman$elm_css$Css$inlineBlock = {display: rtfeldman$elm_css$Css$Structure$Compatible, value: 'inline-block'};
-var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
-	function (a, b) {
-		return {$: 'ExtendSelector', a: a, b: b};
-	});
-var rtfeldman$elm_css$Css$Structure$PseudoClassSelector = function (a) {
-	return {$: 'PseudoClassSelector', a: a};
-};
-var rtfeldman$elm_css$Css$pseudoClass = function (_class) {
-	return rtfeldman$elm_css$Css$Preprocess$ExtendSelector(
-		rtfeldman$elm_css$Css$Structure$PseudoClassSelector(_class));
-};
 var rtfeldman$elm_css$Css$lastChild = rtfeldman$elm_css$Css$pseudoClass('last-child');
 var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
 var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');

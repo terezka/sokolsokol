@@ -135,7 +135,12 @@ viewArticle article =
 
             Nothing ->
                 Html.text ""
-        , Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
+        , Html.h1
+            [ Attr.css
+                [ Css.textDecoration Css.overline
+                , Css.firstChild [ Css.marginTop Css.zero ]
+                ]
+            ] [ Html.text article.title ]
         , Html.div []
             (paragraphs article)
         ]
@@ -159,7 +164,11 @@ viewArticleEditable article =
             Nothing ->
                 Html.text ""
         , Html.h1
-            [ Attr.css [ Css.textDecoration Css.overline, Css.marginTop Css.zero ] ]
+            [ Attr.css
+                [ Css.textDecoration Css.overline
+                , Css.firstChild [ Css.marginTop Css.zero ]
+                ]
+            ]
             [ Html.text article.title ]
         , Html.div []
             (paragraphs article)
