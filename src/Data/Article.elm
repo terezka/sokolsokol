@@ -16,9 +16,9 @@ type alias Id =
     String
 
 
-setCover : String -> Article -> Article
+setCover : Maybe String -> Article -> Article
 setCover url article =
-    { article | cover = Just url }
+    { article | cover = url }
 
 
 decodeOne : Decode.Decoder Article

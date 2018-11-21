@@ -1,4 +1,4 @@
-module Element.Color exposing (black, white, blue, transparent)
+module Element.Color exposing (black, white, gray, blue, transparent)
 
 import Css
 
@@ -11,6 +11,11 @@ blue =
 black : Css.Color
 black =
     Css.hex "000000"
+
+
+gray : Css.Color
+gray =
+    Css.hex "f5f5f5"
 
 
 white : Css.Color

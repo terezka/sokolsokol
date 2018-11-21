@@ -5,6 +5,8 @@ import Data.Article as Article
 import Element.Color as Color
 import Element.Text as Text
 import Element.Button as Button
+import Element.Image as Image
+import Element.Util as Util
 import File
 import File.Select as Select
 import Html.Styled as Html
@@ -34,6 +36,7 @@ init session id =
 type Msg
     = Toggle
     | Pick
+    | Remove
     | GotFiles File.File (List File.File)
     | GotFileUrl String String
     | GotFileDownloadUrl Encode.Value
@@ -44,6 +47,17 @@ update session msg model =
     case msg of
         Pick ->
             ( model, Select.files [ "image/*" ] GotFiles, session )
+
+        Remove ->
+            case Session.getArticle model.id session of
+                Just article ->
+                    ( model
+                    , Cmd.none
+                    , Session.setArticle (Article.setCover Nothing article) session
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none, session )
 
         GotFiles file files ->
             ( model
@@ -67,7 +81,7 @@ update session msg model =
                     case Decode.decodeValue (Decode.field "url" Decode.string) value of
                         Ok url ->
                             ( model
-                            , Ports.saveEditedArticle (Article.encodeOne (Article.setCover url article))
+                            , Ports.saveEditedArticle (Article.encodeOne (Article.setCover (Just url) article))
                             , session
                             )
 
@@ -124,22 +138,9 @@ viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ case article.cover of
-            Just url ->
-                Html.img
-                    [ Attr.css
-                        [ Css.property "width" "calc(100% - 8px)"
-                        , Css.marginBottom (Css.px 8)
-                        ]
-                    , Attr.src url
-                    ]
-                    []
-
-            Nothing ->
-                Html.text ""
+        [ Util.maybe article.cover Image.single
         , Text.h1 [] article.title
-        , Html.div []
-            (paragraphs article)
+        , Html.div [] (paragraphs article)
         ]
 
 
@@ -147,22 +148,9 @@ viewArticleEditable : Article.Article -> Html.Html Msg
 viewArticleEditable article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ case article.cover of
-            Just url ->
-                Html.img
-                    [ Attr.css
-                        [ Css.property "width" "calc(100% - 8px)"
-                        , Css.marginBottom (Css.px 8)
-                        ]
-                    , Attr.src url
-                    ]
-                    []
-
-            Nothing ->
-                Html.text ""
+        [ Util.maybe article.cover Image.single
         , Text.h1 [] article.title
-        , Html.div []
-            (paragraphs article)
+        , Html.div [] (paragraphs article)
         , Button.button Toggle "Edit"
         ]
 
@@ -176,32 +164,11 @@ viewArticleEditing : Article.Article -> Html.Html Msg
 viewArticleEditing article =
     Html.div
         []
-        [ case article.cover of
-            Just url ->
-                Html.img
-                    [ Attr.css
-                        [ Css.width (Css.px 100)
-                        , Css.marginRight (Css.px 8)
-                        ]
-                    , Attr.src url
-                    , Events.onClick Pick
-                    ]
-                    []
-
-            Nothing ->
-                Html.div
-                    [ Attr.css
-                        [ Css.width (Css.px 100)
-                        , Css.height (Css.px 100)
-                        , Css.marginRight (Css.px 8)
-                        , Css.backgroundColor Color.blue
-                        ]
-                    , Events.onClick Pick
-                    ]
-                    []
+        [ Image.editable { select = Pick, remove = Remove } article.cover
         , Html.article
             [ Attr.css
                 [ Css.width (Css.px 780)
+                , Css.display Css.inlineBlock
                 ]
             ]
             [ Text.h1
@@ -215,7 +182,13 @@ viewArticleEditing article =
                 ]
                 (paragraphs article)
             ]
-        , Button.button Toggle "Save"
+        , Html.div
+            [ Attr.css
+                [ Css.width (Css.pct 100)
+                , Css.textAlign Css.right
+                ]
+            ]
+            [ Button.button Toggle "Save" ]
         ]
 
 

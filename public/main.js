@@ -6242,9 +6242,7 @@ var author$project$Data$Article$setCover = F2(
 	function (url, article) {
 		return _Utils_update(
 			article,
-			{
-				cover: elm$core$Maybe$Just(url)
-			});
+			{cover: url});
 	});
 var author$project$Page$Article$GotFileUrl = F2(
 	function (a, b) {
@@ -6259,6 +6257,14 @@ var author$project$Ports$uploadImage = _Platform_outgoingPort('uploadImage', elm
 var author$project$Session$getArticle = F2(
 	function (id, data) {
 		return A2(elm$core$Dict$get, id, data.articles);
+	});
+var author$project$Session$setArticle = F2(
+	function (article, data) {
+		return _Utils_update(
+			data,
+			{
+				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
+			});
 	});
 var author$project$Session$LoggedIn = function (a) {
 	return {$: 'LoggedIn', a: a};
@@ -6388,6 +6394,20 @@ var author$project$Page$Article$update = F3(
 							['image/*']),
 						author$project$Page$Article$GotFiles),
 					session);
+			case 'Remove':
+				var _n1 = A2(author$project$Session$getArticle, model.id, session);
+				if (_n1.$ === 'Just') {
+					var article = _n1.a;
+					return _Utils_Tuple3(
+						model,
+						elm$core$Platform$Cmd$none,
+						A2(
+							author$project$Session$setArticle,
+							A2(author$project$Data$Article$setCover, elm$core$Maybe$Nothing, article),
+							session));
+				} else {
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+				}
 			case 'GotFiles':
 				var file = msg.a;
 				var files = msg.b;
@@ -6418,20 +6438,23 @@ var author$project$Page$Article$update = F3(
 					session);
 			case 'GotFileDownloadUrl':
 				var value = msg.a;
-				var _n1 = A2(author$project$Session$getArticle, model.id, session);
-				if (_n1.$ === 'Just') {
-					var article = _n1.a;
-					var _n2 = A2(
+				var _n2 = A2(author$project$Session$getArticle, model.id, session);
+				if (_n2.$ === 'Just') {
+					var article = _n2.a;
+					var _n3 = A2(
 						elm$json$Json$Decode$decodeValue,
 						A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string),
 						value);
-					if (_n2.$ === 'Ok') {
-						var url = _n2.a;
+					if (_n3.$ === 'Ok') {
+						var url = _n3.a;
 						return _Utils_Tuple3(
 							model,
 							author$project$Ports$saveEditedArticle(
 								author$project$Data$Article$encodeOne(
-									A2(author$project$Data$Article$setCover, url, article))),
+									A2(
+										author$project$Data$Article$setCover,
+										elm$core$Maybe$Just(url),
+										article))),
 							session);
 					} else {
 						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
@@ -6440,15 +6463,15 @@ var author$project$Page$Article$update = F3(
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
 			default:
-				var _n3 = A2(author$project$Session$getArticle, model.id, session);
-				if (_n3.$ === 'Just') {
-					var article = _n3.a;
+				var _n4 = A2(author$project$Session$getArticle, model.id, session);
+				if (_n4.$ === 'Just') {
+					var article = _n4.a;
 					return _Utils_Tuple3(
 						model,
 						function () {
-							var _n4 = session.user;
-							if (_n4.$ === 'LoggedIn') {
-								var state = _n4.a;
+							var _n5 = session.user;
+							if (_n5.$ === 'LoggedIn') {
+								var state = _n5.a;
 								return state.editing ? author$project$Ports$saveEditedArticle(
 									author$project$Data$Article$encodeOne(article)) : elm$core$Platform$Cmd$none;
 							} else {
@@ -6464,14 +6487,6 @@ var author$project$Page$Article$update = F3(
 var author$project$Page$Articles$update = F3(
 	function (session, msg, model) {
 		return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-	});
-var author$project$Session$setArticle = F2(
-	function (article, data) {
-		return _Utils_update(
-			data,
-			{
-				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
-			});
 	});
 var elm$core$Dict$fromList = function (assocs) {
 	return A3(
@@ -8803,6 +8818,27 @@ var author$project$Page$Admin$view = F2(
 			title: 'SOKOL SOKOL | The wool pants'
 		};
 	});
+var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
+var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
+var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
+	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
+};
+var author$project$Element$Image$single = function (url) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$img,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
+						rtfeldman$elm_css$Css$marginBottom(
+						rtfeldman$elm_css$Css$px(8))
+					])),
+				rtfeldman$elm_css$Html$Styled$Attributes$src(url)
+			]),
+		_List_Nil);
+};
 var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
 var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
 	function (a, b) {
@@ -8877,6 +8913,15 @@ var author$project$Element$Text$h1 = F2(
 					rtfeldman$elm_css$Html$Styled$text(content)
 				]));
 	});
+var author$project$Element$Util$maybe = F2(
+	function (maybeThing, view) {
+		if (maybeThing.$ === 'Just') {
+			var thing = maybeThing.a;
+			return view(thing);
+		} else {
+			return rtfeldman$elm_css$Html$Styled$text('');
+		}
+	});
 var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
 var author$project$Page$Article$paragraphs = function (article) {
 	return A2(
@@ -8887,12 +8932,7 @@ var author$project$Page$Article$paragraphs = function (article) {
 			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
 			A2(elm$core$String$split, '\n', article.body)));
 };
-var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
-var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
-var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
-	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
-};
 var author$project$Page$Article$viewArticle = function (article) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$article,
@@ -8908,28 +8948,7 @@ var author$project$Page$Article$viewArticle = function (article) {
 			]),
 		_List_fromArray(
 			[
-				function () {
-				var _n0 = article.cover;
-				if (_n0.$ === 'Just') {
-					var url = _n0.a;
-					return A2(
-						rtfeldman$elm_css$Html$Styled$img,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
-										rtfeldman$elm_css$Css$marginBottom(
-										rtfeldman$elm_css$Css$px(8))
-									])),
-								rtfeldman$elm_css$Html$Styled$Attributes$src(url)
-							]),
-						_List_Nil);
-				} else {
-					return rtfeldman$elm_css$Html$Styled$text('');
-				}
-			}(),
+				A2(author$project$Element$Util$maybe, article.cover, author$project$Element$Image$single),
 				A2(author$project$Element$Text$h1, _List_Nil, article.title),
 				A2(
 				rtfeldman$elm_css$Html$Styled$div,
@@ -9320,34 +9339,6 @@ var rtfeldman$elm_css$Css$hex = function (str) {
 	return rtfeldman$elm_css$Css$erroneousHex(str);
 };
 var author$project$Element$Color$black = rtfeldman$elm_css$Css$hex('000000');
-var rtfeldman$elm_css$Css$cssFunction = F2(
-	function (funcName, args) {
-		return funcName + ('(' + (A2(elm$core$String$join, ', ', args) + ')'));
-	});
-var rtfeldman$elm_css$Css$rgba = F4(
-	function (r, g, b, alpha) {
-		return {
-			alpha: alpha,
-			blue: b,
-			color: rtfeldman$elm_css$Css$Structure$Compatible,
-			green: g,
-			red: r,
-			value: A2(
-				rtfeldman$elm_css$Css$cssFunction,
-				'rgba',
-				_Utils_ap(
-					A2(
-						elm$core$List$map,
-						elm$core$String$fromInt,
-						_List_fromArray(
-							[r, g, b])),
-					_List_fromArray(
-						[
-							elm$core$String$fromFloat(alpha)
-						])))
-		};
-	});
-var author$project$Element$Color$transparent = A4(rtfeldman$elm_css$Css$rgba, 0, 0, 0, 0);
 var author$project$Element$Color$white = rtfeldman$elm_css$Css$hex('ffffff');
 var rtfeldman$elm_css$Css$backgroundColor = function (c) {
 	return A2(rtfeldman$elm_css$Css$property, 'background-color', c.value);
@@ -9368,6 +9359,7 @@ var rtfeldman$elm_css$Css$color = function (c) {
 	return A2(rtfeldman$elm_css$Css$property, 'color', c.value);
 };
 var rtfeldman$elm_css$Css$hover = rtfeldman$elm_css$Css$pseudoClass('hover');
+var rtfeldman$elm_css$Css$lastChild = rtfeldman$elm_css$Css$pseudoClass('last-child');
 var rtfeldman$elm_css$Css$prop2 = F3(
 	function (key, argA, argB) {
 		return A2(
@@ -9379,6 +9371,9 @@ var rtfeldman$elm_css$Css$prop2 = F3(
 				_List_fromArray(
 					[argA.value, argB.value])));
 	});
+var rtfeldman$elm_css$Css$margin2 = rtfeldman$elm_css$Css$prop2('margin');
+var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
+var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
 var rtfeldman$elm_css$Css$padding2 = rtfeldman$elm_css$Css$prop2('padding');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
@@ -9391,7 +9386,7 @@ var author$project$Element$Button$button = F2(
 					rtfeldman$elm_css$Html$Styled$Attributes$css(
 					_List_fromArray(
 						[
-							rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$transparent),
+							rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$white),
 							A3(
 							rtfeldman$elm_css$Css$border3,
 							rtfeldman$elm_css$Css$px(1),
@@ -9402,6 +9397,20 @@ var author$project$Element$Button$button = F2(
 							rtfeldman$elm_css$Css$px(4),
 							rtfeldman$elm_css$Css$px(8)),
 							rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none),
+							A2(
+							rtfeldman$elm_css$Css$margin2,
+							rtfeldman$elm_css$Css$px(0),
+							rtfeldman$elm_css$Css$px(8)),
+							rtfeldman$elm_css$Css$firstChild(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$marginLeft(rtfeldman$elm_css$Css$zero)
+								])),
+							rtfeldman$elm_css$Css$lastChild(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$marginRight(rtfeldman$elm_css$Css$zero)
+								])),
 							rtfeldman$elm_css$Css$hover(
 							_List_fromArray(
 								[
@@ -9432,28 +9441,7 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 			]),
 		_List_fromArray(
 			[
-				function () {
-				var _n0 = article.cover;
-				if (_n0.$ === 'Just') {
-					var url = _n0.a;
-					return A2(
-						rtfeldman$elm_css$Html$Styled$img,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
-										rtfeldman$elm_css$Css$marginBottom(
-										rtfeldman$elm_css$Css$px(8))
-									])),
-								rtfeldman$elm_css$Html$Styled$Attributes$src(url)
-							]),
-						_List_Nil);
-				} else {
-					return rtfeldman$elm_css$Html$Styled$text('');
-				}
-			}(),
+				A2(author$project$Element$Util$maybe, article.cover, author$project$Element$Image$single),
 				A2(author$project$Element$Text$h1, _List_Nil, article.title),
 				A2(
 				rtfeldman$elm_css$Html$Styled$div,
@@ -9462,159 +9450,7 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 				A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Edit')
 			]));
 };
-var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
-var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
-var author$project$Element$Text$body = F2(
-	function (attrs, content) {
-		return A4(
-			rtfeldman$elm_css$Html$Styled$styled,
-			rtfeldman$elm_css$Html$Styled$h2,
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Css$border(
-					rtfeldman$elm_css$Css$px(0)),
-					rtfeldman$elm_css$Css$fontWeight(
-					rtfeldman$elm_css$Css$int(400)),
-					rtfeldman$elm_css$Css$fontSize(
-					rtfeldman$elm_css$Css$px(16)),
-					rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none)
-				]),
-			attrs,
-			content);
-	});
-var author$project$Page$Article$Pick = {$: 'Pick'};
-var rtfeldman$elm_css$Css$height = rtfeldman$elm_css$Css$prop1('height');
-var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
-var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
-var elm$json$Json$Encode$bool = _Json_wrap;
-var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			rtfeldman$elm_css$VirtualDom$Styled$property,
-			key,
-			elm$json$Json$Encode$bool(bool));
-	});
-var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
-var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
-var author$project$Page$Article$viewArticleEditing = function (article) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				function () {
-				var _n0 = article.cover;
-				if (_n0.$ === 'Just') {
-					var url = _n0.a;
-					return A2(
-						rtfeldman$elm_css$Html$Styled$img,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$width(
-										rtfeldman$elm_css$Css$px(100)),
-										rtfeldman$elm_css$Css$marginRight(
-										rtfeldman$elm_css$Css$px(8))
-									])),
-								rtfeldman$elm_css$Html$Styled$Attributes$src(url),
-								rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Article$Pick)
-							]),
-						_List_Nil);
-				} else {
-					return A2(
-						rtfeldman$elm_css$Html$Styled$div,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$width(
-										rtfeldman$elm_css$Css$px(100)),
-										rtfeldman$elm_css$Css$height(
-										rtfeldman$elm_css$Css$px(100)),
-										rtfeldman$elm_css$Css$marginRight(
-										rtfeldman$elm_css$Css$px(8)),
-										rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$blue)
-									])),
-								rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Article$Pick)
-							]),
-						_List_Nil);
-				}
-			}(),
-				A2(
-				rtfeldman$elm_css$Html$Styled$article,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$width(
-								rtfeldman$elm_css$Css$px(780))
-							]))
-					]),
-				_List_fromArray(
-					[
-						A2(
-						author$project$Element$Text$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
-								rtfeldman$elm_css$Html$Styled$Attributes$id('title')
-							]),
-						article.title),
-						A2(
-						author$project$Element$Text$body,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
-								rtfeldman$elm_css$Html$Styled$Attributes$id('body')
-							]),
-						author$project$Page$Article$paragraphs(article))
-					])),
-				A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Save')
-			]));
-};
-var author$project$Page$Article$view = F2(
-	function (session, model) {
-		return {
-			body: function () {
-				var _n0 = A2(author$project$Session$getArticle, model.id, session);
-				if (_n0.$ === 'Just') {
-					var article = _n0.a;
-					var _n1 = session.user;
-					if (_n1.$ === 'LoggedIn') {
-						var state = _n1.a;
-						return state.editing ? _List_fromArray(
-							[
-								author$project$Page$Article$viewArticleEditing(article)
-							]) : _List_fromArray(
-							[
-								author$project$Page$Article$viewArticleEditable(article)
-							]);
-					} else {
-						return _List_fromArray(
-							[
-								author$project$Page$Article$viewArticle(article)
-							]);
-					}
-				} else {
-					return _List_fromArray(
-						[
-							rtfeldman$elm_css$Html$Styled$text('loading')
-						]);
-				}
-			}(),
-			title: 'SOKOL SOKOL | Articles'
-		};
-	});
-var rtfeldman$elm_css$Css$display = rtfeldman$elm_css$Css$prop1('display');
-var rtfeldman$elm_css$Css$inlineBlock = {display: rtfeldman$elm_css$Css$Structure$Compatible, value: 'inline-block'};
-var rtfeldman$elm_css$Css$lastChild = rtfeldman$elm_css$Css$pseudoClass('last-child');
-var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
-var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
-var rtfeldman$elm_css$Css$top = rtfeldman$elm_css$Css$prop1('top');
+var author$project$Element$Color$gray = rtfeldman$elm_css$Css$hex('f5f5f5');
 var rtfeldman$elm_css$Css$Internal$property = F2(
 	function (key, value) {
 		return rtfeldman$elm_css$Css$Preprocess$AppendProperty(key + (':' + value));
@@ -9680,6 +9516,41 @@ var rtfeldman$elm_css$Css$Internal$getOverloadedProperty = F3(
 	});
 var rtfeldman$elm_css$Css$Internal$IncompatibleUnits = {$: 'IncompatibleUnits'};
 var rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty = A3(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$Internal$IncompatibleUnits, '', 0);
+var rtfeldman$elm_css$Css$alignItems = function (fn) {
+	return A3(
+		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
+		'alignItems',
+		'align-items',
+		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
+};
+var rtfeldman$elm_css$Css$backgroundImage = rtfeldman$elm_css$Css$prop1('background-image');
+var rtfeldman$elm_css$Css$backgroundPosition = function (fn) {
+	return A3(
+		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
+		'backgroundPosition',
+		'background-position',
+		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
+};
+var rtfeldman$elm_css$Css$backgroundSize = rtfeldman$elm_css$Css$prop1('background-size');
+var rtfeldman$elm_css$Css$batch = rtfeldman$elm_css$Css$Preprocess$ApplyStyles;
+var rtfeldman$elm_css$Css$center = rtfeldman$elm_css$Css$prop1('center');
+var rtfeldman$elm_css$Css$cover = {lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, value: 'cover'};
+var rtfeldman$elm_css$Css$display = rtfeldman$elm_css$Css$prop1('display');
+var rtfeldman$elm_css$Css$displayFlex = A2(rtfeldman$elm_css$Css$property, 'display', 'flex');
+var rtfeldman$elm_css$Css$height = rtfeldman$elm_css$Css$prop1('height');
+var rtfeldman$elm_css$Css$inlineBlock = {display: rtfeldman$elm_css$Css$Structure$Compatible, value: 'inline-block'};
+var rtfeldman$elm_css$Css$justifyContent = function (fn) {
+	return A3(
+		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
+		'justifyContent',
+		'justify-content',
+		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
+};
+var rtfeldman$elm_css$Css$opacity = rtfeldman$elm_css$Css$prop1('opacity');
+var rtfeldman$elm_css$Css$top = rtfeldman$elm_css$Css$prop1('top');
+var rtfeldman$elm_css$Css$url = function (urlValue) {
+	return {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, value: 'url(' + (urlValue + ')')};
+};
 var rtfeldman$elm_css$Css$verticalAlign = function (fn) {
 	return A3(
 		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
@@ -9687,6 +9558,222 @@ var rtfeldman$elm_css$Css$verticalAlign = function (fn) {
 		'vertical-align',
 		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
 };
+var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
+var author$project$Element$Image$editable = F2(
+	function (msg, maybeUrl) {
+		var layover = function () {
+			if (maybeUrl.$ === 'Just') {
+				var url = maybeUrl.a;
+				return _List_fromArray(
+					[
+						A2(author$project$Element$Button$button, msg.remove, 'Remove'),
+						A2(author$project$Element$Button$button, msg.select, 'Change')
+					]);
+			} else {
+				return _List_fromArray(
+					[
+						A2(author$project$Element$Button$button, msg.select, 'Add cover')
+					]);
+			}
+		}();
+		return A2(
+			rtfeldman$elm_css$Html$Styled$div,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$width(
+							rtfeldman$elm_css$Css$px(200)),
+							rtfeldman$elm_css$Css$height(
+							rtfeldman$elm_css$Css$px(200)),
+							rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock),
+							rtfeldman$elm_css$Css$verticalAlign(rtfeldman$elm_css$Css$top),
+							rtfeldman$elm_css$Css$marginRight(
+							rtfeldman$elm_css$Css$px(48)),
+							function () {
+							if (maybeUrl.$ === 'Just') {
+								var url = maybeUrl.a;
+								return rtfeldman$elm_css$Css$batch(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$backgroundImage(
+											rtfeldman$elm_css$Css$url(url)),
+											rtfeldman$elm_css$Css$backgroundPosition(rtfeldman$elm_css$Css$center),
+											rtfeldman$elm_css$Css$backgroundSize(rtfeldman$elm_css$Css$cover)
+										]));
+							} else {
+								return rtfeldman$elm_css$Css$batch(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$gray)
+										]));
+							}
+						}()
+						]))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					rtfeldman$elm_css$Html$Styled$div,
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$width(
+									rtfeldman$elm_css$Css$px(200)),
+									rtfeldman$elm_css$Css$height(
+									rtfeldman$elm_css$Css$px(200)),
+									rtfeldman$elm_css$Css$displayFlex,
+									rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center),
+									rtfeldman$elm_css$Css$justifyContent(rtfeldman$elm_css$Css$center),
+									rtfeldman$elm_css$Css$opacity(
+									rtfeldman$elm_css$Css$int(0)),
+									rtfeldman$elm_css$Css$hover(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$opacity(
+											rtfeldman$elm_css$Css$int(1))
+										]))
+								]))
+						]),
+					layover)
+				]));
+	});
+var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
+var author$project$Element$Text$body = F2(
+	function (attrs, content) {
+		return A4(
+			rtfeldman$elm_css$Html$Styled$styled,
+			rtfeldman$elm_css$Html$Styled$h2,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Css$border(
+					rtfeldman$elm_css$Css$px(0)),
+					rtfeldman$elm_css$Css$fontWeight(
+					rtfeldman$elm_css$Css$int(400)),
+					rtfeldman$elm_css$Css$fontSize(
+					rtfeldman$elm_css$Css$px(16)),
+					rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none)
+				]),
+			attrs,
+			content);
+	});
+var author$project$Page$Article$Pick = {$: 'Pick'};
+var author$project$Page$Article$Remove = {$: 'Remove'};
+var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
+var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
+var rtfeldman$elm_css$Css$right = rtfeldman$elm_css$Css$prop1('right');
+var rtfeldman$elm_css$Css$textAlign = function (fn) {
+	return A3(
+		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
+		'textAlign',
+		'text-align',
+		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
+};
+var elm$json$Json$Encode$bool = _Json_wrap;
+var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			rtfeldman$elm_css$VirtualDom$Styled$property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
+var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
+var author$project$Page$Article$viewArticleEditing = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				author$project$Element$Image$editable,
+				{remove: author$project$Page$Article$Remove, select: author$project$Page$Article$Pick},
+				article.cover),
+				A2(
+				rtfeldman$elm_css$Html$Styled$article,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$width(
+								rtfeldman$elm_css$Css$px(780)),
+								rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						author$project$Element$Text$h1,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
+								rtfeldman$elm_css$Html$Styled$Attributes$id('title')
+							]),
+						article.title),
+						A2(
+						author$project$Element$Text$body,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
+								rtfeldman$elm_css$Html$Styled$Attributes$id('body')
+							]),
+						author$project$Page$Article$paragraphs(article))
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$div,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$width(
+								rtfeldman$elm_css$Css$pct(100)),
+								rtfeldman$elm_css$Css$textAlign(rtfeldman$elm_css$Css$right)
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Save')
+					]))
+			]));
+};
+var author$project$Page$Article$view = F2(
+	function (session, model) {
+		return {
+			body: function () {
+				var _n0 = A2(author$project$Session$getArticle, model.id, session);
+				if (_n0.$ === 'Just') {
+					var article = _n0.a;
+					var _n1 = session.user;
+					if (_n1.$ === 'LoggedIn') {
+						var state = _n1.a;
+						return state.editing ? _List_fromArray(
+							[
+								author$project$Page$Article$viewArticleEditing(article)
+							]) : _List_fromArray(
+							[
+								author$project$Page$Article$viewArticleEditable(article)
+							]);
+					} else {
+						return _List_fromArray(
+							[
+								author$project$Page$Article$viewArticle(article)
+							]);
+					}
+				} else {
+					return _List_fromArray(
+						[
+							rtfeldman$elm_css$Html$Styled$text('loading')
+						]);
+				}
+			}(),
+			title: 'SOKOL SOKOL | Articles'
+		};
+	});
 var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
 var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
 	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
@@ -9826,30 +9913,14 @@ var author$project$Page$Skeleton$logo = A2(
 		[
 			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
 		]));
-var rtfeldman$elm_css$Css$alignItems = function (fn) {
-	return A3(
-		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
-		'alignItems',
-		'align-items',
-		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
-};
-var rtfeldman$elm_css$Css$center = rtfeldman$elm_css$Css$prop1('center');
+var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
 var rtfeldman$elm_css$Css$row = {flexDirection: rtfeldman$elm_css$Css$Structure$Compatible, flexDirectionOrWrap: rtfeldman$elm_css$Css$Structure$Compatible, value: 'row'};
 var rtfeldman$elm_css$Css$column = _Utils_update(
 	rtfeldman$elm_css$Css$row,
 	{value: 'column'});
 var rtfeldman$elm_css$Css$cursor = rtfeldman$elm_css$Css$prop1('cursor');
-var rtfeldman$elm_css$Css$displayFlex = A2(rtfeldman$elm_css$Css$property, 'display', 'flex');
 var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-direction');
-var rtfeldman$elm_css$Css$justifyContent = function (fn) {
-	return A3(
-		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
-		'justifyContent',
-		'justify-content',
-		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
-};
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
-var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
 var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
 var rtfeldman$elm_css$Css$VwUnits = {$: 'VwUnits'};
