@@ -3,6 +3,8 @@ module Page.Article exposing (Model, Msg, init, subscriptions, update, view)
 import Css
 import Data.Article as Article
 import Element.Color as Color
+import Element.Text as Text
+import Element.Button as Button
 import File
 import File.Select as Select
 import Html.Styled as Html
@@ -45,7 +47,7 @@ update session msg model =
 
         GotFiles file files ->
             ( model
-            , Task.perform (GotFileUrl (Debug.log "here" <| File.name file)) (File.toUrl file)
+            , Task.perform (GotFileUrl (File.name file)) (File.toUrl file)
             , session
             )
 
@@ -135,12 +137,7 @@ viewArticle article =
 
             Nothing ->
                 Html.text ""
-        , Html.h1
-            [ Attr.css
-                [ Css.textDecoration Css.overline
-                , Css.firstChild [ Css.marginTop Css.zero ]
-                ]
-            ] [ Html.text article.title ]
+        , Text.h1 [] article.title
         , Html.div []
             (paragraphs article)
         ]
@@ -163,23 +160,10 @@ viewArticleEditable article =
 
             Nothing ->
                 Html.text ""
-        , Html.h1
-            [ Attr.css
-                [ Css.textDecoration Css.overline
-                , Css.firstChild [ Css.marginTop Css.zero ]
-                ]
-            ]
-            [ Html.text article.title ]
+        , Text.h1 [] article.title
         , Html.div []
             (paragraphs article)
-        , Html.button
-            [ Attr.css
-                [ Css.backgroundColor Color.transparent
-                , Css.border3 (Css.px 1) Css.solid Color.black
-                ]
-            , Events.onClick Toggle
-            ]
-            [ Html.text "Edit" ]
+        , Button.button Toggle "Edit"
         ]
 
 
@@ -220,39 +204,18 @@ viewArticleEditing article =
                 [ Css.width (Css.px 780)
                 ]
             ]
-            [ Html.div
-                [ Attr.css
-                    [ Css.textDecoration Css.overline
-                    , Css.border (Css.px 0)
-                    , Css.fontWeight (Css.int 500)
-                    , Css.fontSize (Css.px 32)
-                    , Css.outline Css.none
-                    ]
-                , Attr.contenteditable True
+            [ Text.h1
+                [ Attr.contenteditable True
                 , Attr.id "title"
                 ]
-                [ Html.text article.title ]
-            , Html.div
-                [ Attr.css
-                    [ Css.border (Css.px 0)
-                    , Css.fontWeight (Css.int 400)
-                    , Css.fontSize (Css.px 16)
-                    , Css.outline Css.none
-                    , Css.marginTop (Css.px 12)
-                    ]
-                , Attr.contenteditable True
+                article.title
+            , Text.body
+                [ Attr.contenteditable True
                 , Attr.id "body"
                 ]
                 (paragraphs article)
             ]
-        , Html.button
-            [ Attr.css
-                [ Css.backgroundColor Color.transparent
-                , Css.border3 (Css.px 1) Css.solid Color.black
-                ]
-            , Events.onClick Toggle
-            ]
-            [ Html.text "Save" ]
+        , Button.button Toggle "Save"
         ]
 
 

@@ -6280,7 +6280,6 @@ var author$project$Session$toggleEditing = function (data) {
 		return data;
 	}
 };
-var elm$core$Debug$log = _Debug_log;
 var elm$core$Task$Perform = function (a) {
 	return {$: 'Perform', a: a};
 };
@@ -6397,10 +6396,7 @@ var author$project$Page$Article$update = F3(
 					A2(
 						elm$core$Task$perform,
 						author$project$Page$Article$GotFileUrl(
-							A2(
-								elm$core$Debug$log,
-								'here',
-								elm$file$File$name(file))),
+							elm$file$File$name(file)),
 						elm$file$File$toUrl(file)),
 					session);
 			case 'GotFileUrl':
@@ -8807,16 +8803,7 @@ var author$project$Page$Admin$view = F2(
 			title: 'SOKOL SOKOL | The wool pants'
 		};
 	});
-var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
-var author$project$Page$Article$paragraphs = function (article) {
-	return A2(
-		elm$core$List$map,
-		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
-		A2(
-			elm$core$List$map,
-			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
-			A2(elm$core$String$split, '\n', article.body)));
-};
+var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
 var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
 	function (a, b) {
 		return {$: 'ExtendSelector', a: a, b: b};
@@ -8829,10 +8816,78 @@ var rtfeldman$elm_css$Css$pseudoClass = function (_class) {
 		rtfeldman$elm_css$Css$Structure$PseudoClassSelector(_class));
 };
 var rtfeldman$elm_css$Css$firstChild = rtfeldman$elm_css$Css$pseudoClass('first-child');
-var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
-var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
+var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
+var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
+	var value = _n0.value;
+	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
+};
 var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
+var rtfeldman$elm_css$Css$int = function (val) {
+	return {
+		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
+		intOrAuto: rtfeldman$elm_css$Css$Structure$Compatible,
+		lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible,
+		number: rtfeldman$elm_css$Css$Structure$Compatible,
+		numberOrInfinite: rtfeldman$elm_css$Css$Structure$Compatible,
+		numericValue: val,
+		unitLabel: '',
+		units: rtfeldman$elm_css$Css$UnitlessInteger,
+		value: elm$core$String$fromInt(val)
+	};
+};
+var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
+var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
+var rtfeldman$elm_css$Css$outline = rtfeldman$elm_css$Css$prop1('outline');
 var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
+var rtfeldman$elm_css$Html$Styled$styled = F4(
+	function (fn, styles, attrs, children) {
+		return A2(
+			fn,
+			A2(
+				elm$core$List$cons,
+				rtfeldman$elm_css$Html$Styled$Internal$css(styles),
+				attrs),
+			children);
+	});
+var author$project$Element$Text$h1 = F2(
+	function (attrs, content) {
+		return A4(
+			rtfeldman$elm_css$Html$Styled$styled,
+			rtfeldman$elm_css$Html$Styled$h1,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
+					rtfeldman$elm_css$Css$border(
+					rtfeldman$elm_css$Css$px(0)),
+					rtfeldman$elm_css$Css$fontWeight(
+					rtfeldman$elm_css$Css$int(500)),
+					rtfeldman$elm_css$Css$fontSize(
+					rtfeldman$elm_css$Css$px(32)),
+					rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none),
+					rtfeldman$elm_css$Css$firstChild(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
+						]))
+				]),
+			attrs,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$text(content)
+				]));
+	});
+var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
+var author$project$Page$Article$paragraphs = function (article) {
+	return A2(
+		elm$core$List$map,
+		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
+		A2(
+			elm$core$List$map,
+			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
+			A2(elm$core$String$split, '\n', article.body)));
+};
+var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
 var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
 var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
@@ -8875,25 +8930,7 @@ var author$project$Page$Article$viewArticle = function (article) {
 					return rtfeldman$elm_css$Html$Styled$text('');
 				}
 			}(),
-				A2(
-				rtfeldman$elm_css$Html$Styled$h1,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
-								rtfeldman$elm_css$Css$firstChild(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
-									]))
-							]))
-					]),
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(article.title)
-					])),
+				A2(author$project$Element$Text$h1, _List_Nil, article.title),
 				A2(
 				rtfeldman$elm_css$Html$Styled$div,
 				_List_Nil,
@@ -9311,7 +9348,7 @@ var rtfeldman$elm_css$Css$rgba = F4(
 		};
 	});
 var author$project$Element$Color$transparent = A4(rtfeldman$elm_css$Css$rgba, 0, 0, 0, 0);
-var author$project$Page$Article$Toggle = {$: 'Toggle'};
+var author$project$Element$Color$white = rtfeldman$elm_css$Css$hex('ffffff');
 var rtfeldman$elm_css$Css$backgroundColor = function (c) {
 	return A2(rtfeldman$elm_css$Css$property, 'background-color', c.value);
 };
@@ -9327,8 +9364,59 @@ var rtfeldman$elm_css$Css$prop3 = F4(
 					[argA.value, argB.value, argC.value])));
 	});
 var rtfeldman$elm_css$Css$border3 = rtfeldman$elm_css$Css$prop3('border');
+var rtfeldman$elm_css$Css$color = function (c) {
+	return A2(rtfeldman$elm_css$Css$property, 'color', c.value);
+};
+var rtfeldman$elm_css$Css$hover = rtfeldman$elm_css$Css$pseudoClass('hover');
+var rtfeldman$elm_css$Css$prop2 = F3(
+	function (key, argA, argB) {
+		return A2(
+			rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				elm$core$String$join,
+				' ',
+				_List_fromArray(
+					[argA.value, argB.value])));
+	});
+var rtfeldman$elm_css$Css$padding2 = rtfeldman$elm_css$Css$prop2('padding');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
+var author$project$Element$Button$button = F2(
+	function (onClick, content) {
+		return A2(
+			rtfeldman$elm_css$Html$Styled$button,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$transparent),
+							A3(
+							rtfeldman$elm_css$Css$border3,
+							rtfeldman$elm_css$Css$px(1),
+							rtfeldman$elm_css$Css$solid,
+							author$project$Element$Color$black),
+							A2(
+							rtfeldman$elm_css$Css$padding2,
+							rtfeldman$elm_css$Css$px(4),
+							rtfeldman$elm_css$Css$px(8)),
+							rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none),
+							rtfeldman$elm_css$Css$hover(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$black),
+									rtfeldman$elm_css$Css$color(author$project$Element$Color$white)
+								]))
+						])),
+					rtfeldman$elm_css$Html$Styled$Events$onClick(onClick)
+				]),
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$text(content)
+				]));
+	});
+var author$project$Page$Article$Toggle = {$: 'Toggle'};
 var author$project$Page$Article$viewArticleEditable = function (article) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$article,
@@ -9366,77 +9454,37 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 					return rtfeldman$elm_css$Html$Styled$text('');
 				}
 			}(),
-				A2(
-				rtfeldman$elm_css$Html$Styled$h1,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
-								rtfeldman$elm_css$Css$firstChild(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$marginTop(rtfeldman$elm_css$Css$zero)
-									]))
-							]))
-					]),
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(article.title)
-					])),
+				A2(author$project$Element$Text$h1, _List_Nil, article.title),
 				A2(
 				rtfeldman$elm_css$Html$Styled$div,
 				_List_Nil,
 				author$project$Page$Article$paragraphs(article)),
-				A2(
-				rtfeldman$elm_css$Html$Styled$button,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$transparent),
-								A3(
-								rtfeldman$elm_css$Css$border3,
-								rtfeldman$elm_css$Css$px(1),
-								rtfeldman$elm_css$Css$solid,
-								author$project$Element$Color$black)
-							])),
-						rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Article$Toggle)
-					]),
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text('Edit')
-					]))
+				A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Edit')
 			]));
 };
 var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
+var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
+var author$project$Element$Text$body = F2(
+	function (attrs, content) {
+		return A4(
+			rtfeldman$elm_css$Html$Styled$styled,
+			rtfeldman$elm_css$Html$Styled$h2,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Css$border(
+					rtfeldman$elm_css$Css$px(0)),
+					rtfeldman$elm_css$Css$fontWeight(
+					rtfeldman$elm_css$Css$int(400)),
+					rtfeldman$elm_css$Css$fontSize(
+					rtfeldman$elm_css$Css$px(16)),
+					rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none)
+				]),
+			attrs,
+			content);
+	});
 var author$project$Page$Article$Pick = {$: 'Pick'};
-var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
-var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
-var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
-	var value = _n0.value;
-	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
-};
 var rtfeldman$elm_css$Css$height = rtfeldman$elm_css$Css$prop1('height');
-var rtfeldman$elm_css$Css$int = function (val) {
-	return {
-		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
-		intOrAuto: rtfeldman$elm_css$Css$Structure$Compatible,
-		lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible,
-		number: rtfeldman$elm_css$Css$Structure$Compatible,
-		numberOrInfinite: rtfeldman$elm_css$Css$Structure$Compatible,
-		numericValue: val,
-		unitLabel: '',
-		units: rtfeldman$elm_css$Css$UnitlessInteger,
-		value: elm$core$String$fromInt(val)
-	};
-};
 var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
-var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
-var rtfeldman$elm_css$Css$outline = rtfeldman$elm_css$Css$prop1('outline');
 var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
 var elm$json$Json$Encode$bool = _Json_wrap;
 var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
@@ -9509,70 +9557,23 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 				_List_fromArray(
 					[
 						A2(
-						rtfeldman$elm_css$Html$Styled$div,
+						author$project$Element$Text$h1,
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
-										rtfeldman$elm_css$Css$border(
-										rtfeldman$elm_css$Css$px(0)),
-										rtfeldman$elm_css$Css$fontWeight(
-										rtfeldman$elm_css$Css$int(500)),
-										rtfeldman$elm_css$Css$fontSize(
-										rtfeldman$elm_css$Css$px(32)),
-										rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none)
-									])),
 								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
 								rtfeldman$elm_css$Html$Styled$Attributes$id('title')
 							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text(article.title)
-							])),
+						article.title),
 						A2(
-						rtfeldman$elm_css$Html$Styled$div,
+						author$project$Element$Text$body,
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$border(
-										rtfeldman$elm_css$Css$px(0)),
-										rtfeldman$elm_css$Css$fontWeight(
-										rtfeldman$elm_css$Css$int(400)),
-										rtfeldman$elm_css$Css$fontSize(
-										rtfeldman$elm_css$Css$px(16)),
-										rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none),
-										rtfeldman$elm_css$Css$marginTop(
-										rtfeldman$elm_css$Css$px(12))
-									])),
 								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
 								rtfeldman$elm_css$Html$Styled$Attributes$id('body')
 							]),
 						author$project$Page$Article$paragraphs(article))
 					])),
-				A2(
-				rtfeldman$elm_css$Html$Styled$button,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$transparent),
-								A3(
-								rtfeldman$elm_css$Css$border3,
-								rtfeldman$elm_css$Css$px(1),
-								rtfeldman$elm_css$Css$solid,
-								author$project$Element$Color$black)
-							])),
-						rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Article$Toggle)
-					]),
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text('Save')
-					]))
+				A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Save')
 			]));
 };
 var author$project$Page$Article$view = F2(
@@ -9760,7 +9761,6 @@ var elm$core$Dict$values = function (dict) {
 var author$project$Session$getArticles = function (data) {
 	return elm$core$Dict$values(data.articles);
 };
-var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
 var author$project$Page$Articles$view = F2(
 	function (session, model) {
 		return {
@@ -9834,9 +9834,6 @@ var rtfeldman$elm_css$Css$alignItems = function (fn) {
 		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
 };
 var rtfeldman$elm_css$Css$center = rtfeldman$elm_css$Css$prop1('center');
-var rtfeldman$elm_css$Css$color = function (c) {
-	return A2(rtfeldman$elm_css$Css$property, 'color', c.value);
-};
 var rtfeldman$elm_css$Css$row = {flexDirection: rtfeldman$elm_css$Css$Structure$Compatible, flexDirectionOrWrap: rtfeldman$elm_css$Css$Structure$Compatible, value: 'row'};
 var rtfeldman$elm_css$Css$column = _Utils_update(
 	rtfeldman$elm_css$Css$row,
@@ -9844,7 +9841,6 @@ var rtfeldman$elm_css$Css$column = _Utils_update(
 var rtfeldman$elm_css$Css$cursor = rtfeldman$elm_css$Css$prop1('cursor');
 var rtfeldman$elm_css$Css$displayFlex = A2(rtfeldman$elm_css$Css$property, 'display', 'flex');
 var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-direction');
-var rtfeldman$elm_css$Css$hover = rtfeldman$elm_css$Css$pseudoClass('hover');
 var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 	return A3(
 		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
