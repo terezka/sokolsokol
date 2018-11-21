@@ -41,7 +41,7 @@ update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
 update session msg model =
     case msg of
         Pick ->
-            ( model, Select.files ["image/*"] GotFiles, session )
+            ( model, Select.files [ "image/*" ] GotFiles, session )
 
         GotFiles file files ->
             ( model
@@ -206,7 +206,6 @@ viewArticleEditing article =
                     , Events.onClick Pick
                     ]
                     []
-
         , Html.article
             [ Attr.css
                 [ Css.width (Css.px 780)
