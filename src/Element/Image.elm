@@ -1,11 +1,14 @@
 module Element.Image exposing (editable, single, thumbnail)
 
 import Css
+import Css.Animations
+import Css.Transitions
 import Element.Button as Button
 import Element.Color as Color
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
+import Json.Decode as Decode
 
 
 thumbnail : String -> Html.Html msg
@@ -21,14 +24,21 @@ thumbnail url =
         []
 
 
-single : String -> Html.Html msg
-single url =
+single : (String -> msg) -> Bool -> String -> Html.Html msg
+single onLoad isLoaded url =
     Html.img
         [ Attr.css
             [ Css.property "width" "calc(100% - 8px)"
             , Css.marginBottom (Css.px 8)
+            , if isLoaded then
+                Css.opacity (Css.int 1)
+
+              else
+                Css.opacity (Css.int 0)
+            , Css.Transitions.transition [ Css.Transitions.opacity3 200 0 Css.Transitions.easeIn ]
             ]
         , Attr.src url
+        , Events.on "load" (Decode.succeed (onLoad url))
         ]
         []
 
@@ -82,4 +92,21 @@ editable msg maybeUrl =
                 ]
             ]
             layover
+        ]
+
+
+fadeInAnimation : Css.Style
+fadeInAnimation =
+    Css.batch
+        [ Css.animationName fadeInKeyframes
+        , Css.animationDuration (Css.sec 0.4)
+        , Css.animationDelay (Css.sec 0.2)
+        ]
+
+
+fadeInKeyframes : Css.Animations.Keyframes {}
+fadeInKeyframes =
+    Css.Animations.keyframes
+        [ ( 0, [ Css.Animations.opacity Css.zero ] )
+        , ( 100, [ Css.Animations.opacity (Css.num 1) ] )
         ]

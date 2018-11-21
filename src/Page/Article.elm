@@ -24,19 +24,21 @@ import Task
 type alias Model =
     { id : Article.Id
     , editing : Maybe Article.Article
+    , imageLoaded : Bool
     }
 
 
 init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { id = id, editing = Nothing }
+    ( { id = id, editing = Nothing, imageLoaded = False }
     , Cmd.none
     , session
     )
 
 
 type Msg
-    = Toggle
+    = ImageLoaded String
+    | Toggle
     | Pick
     | Remove
     | GotFiles File.File (List File.File)
@@ -48,6 +50,9 @@ type Msg
 update : Nav.Key -> Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
 update key session msg model =
     case msg of
+        ImageLoaded _ ->
+            ( { model | imageLoaded = True }, Cmd.none, session )
+
         Pick ->
             ( model, Select.files [ "image/*" ] GotFiles, session )
 
@@ -142,7 +147,7 @@ view session model =
                     Nothing ->
                         case Session.getArticle model.id session of
                             Just article ->
-                                [ viewArticleEditable article ]
+                                [ viewArticleEditable model article ]
 
                             Nothing ->
                                 [ viewArticleEditing Article.placeholder ]
@@ -150,28 +155,28 @@ view session model =
             Session.Anonymous ->
                 case Session.getArticle model.id session of
                     Just article ->
-                        [ viewArticle article ]
+                        [ viewArticle model article ]
 
                     Nothing ->
                         [ Html.text "Loading..." ]
     }
 
 
-viewArticle : Article.Article -> Html.Html Msg
-viewArticle article =
+viewArticle : Model -> Article.Article -> Html.Html Msg
+viewArticle model article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Util.maybe article.cover Image.single
+        [ Util.maybe article.cover (Image.single ImageLoaded model.imageLoaded)
         , Text.h1 [] article.title
         , Html.div [] (paragraphs article)
         ]
 
 
-viewArticleEditable : Article.Article -> Html.Html Msg
-viewArticleEditable article =
+viewArticleEditable : Model -> Article.Article -> Html.Html Msg
+viewArticleEditable model article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Util.maybe article.cover Image.single
+        [ Util.maybe article.cover (Image.single ImageLoaded model.imageLoaded)
         , Text.h1 [] article.title
         , Html.div [] (paragraphs article)
         , Button.button Toggle "Edit"

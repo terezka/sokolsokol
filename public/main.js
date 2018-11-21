@@ -5182,7 +5182,7 @@ var author$project$Page$Admin$init = function (session) {
 var author$project$Page$Article$init = F2(
 	function (session, id) {
 		return _Utils_Tuple3(
-			{editing: elm$core$Maybe$Nothing, id: id},
+			{editing: elm$core$Maybe$Nothing, id: id, imageLoaded: false},
 			elm$core$Platform$Cmd$none,
 			session);
 	});
@@ -6553,6 +6553,13 @@ var elm$file$File$Select$files = F2(
 var author$project$Page$Article$update = F4(
 	function (key, session, msg, model) {
 		switch (msg.$) {
+			case 'ImageLoaded':
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{imageLoaded: true}),
+					elm$core$Platform$Cmd$none,
+					session);
 			case 'Pick':
 				return _Utils_Tuple3(
 					model,
@@ -8844,27 +8851,331 @@ var author$project$Page$Admin$view = F2(
 			title: 'SOKOL SOKOL | The wool pants'
 		};
 	});
+var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
+var rtfeldman$elm_css$Css$int = function (val) {
+	return {
+		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
+		intOrAuto: rtfeldman$elm_css$Css$Structure$Compatible,
+		lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible,
+		number: rtfeldman$elm_css$Css$Structure$Compatible,
+		numberOrInfinite: rtfeldman$elm_css$Css$Structure$Compatible,
+		numericValue: val,
+		unitLabel: '',
+		units: rtfeldman$elm_css$Css$UnitlessInteger,
+		value: elm$core$String$fromInt(val)
+	};
+};
 var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
+var rtfeldman$elm_css$Css$opacity = rtfeldman$elm_css$Css$prop1('opacity');
+var rtfeldman$elm_css$Css$Transitions$EaseIn = {$: 'EaseIn'};
+var rtfeldman$elm_css$Css$Transitions$easeIn = rtfeldman$elm_css$Css$Transitions$EaseIn;
+var rtfeldman$elm_css$Css$Transitions$Opacity = {$: 'Opacity'};
+var rtfeldman$elm_css$Css$Transitions$Transition = function (a) {
+	return {$: 'Transition', a: a};
+};
+var rtfeldman$elm_css$Css$Transitions$fullTransition = F4(
+	function (animation, duration, delay, timing) {
+		return rtfeldman$elm_css$Css$Transitions$Transition(
+			{
+				animation: animation,
+				delay: elm$core$Maybe$Just(delay),
+				duration: duration,
+				timing: elm$core$Maybe$Just(timing)
+			});
+	});
+var rtfeldman$elm_css$Css$Transitions$opacity3 = rtfeldman$elm_css$Css$Transitions$fullTransition(rtfeldman$elm_css$Css$Transitions$Opacity);
+var rtfeldman$elm_css$Css$Transitions$propToString = function (prop) {
+	switch (prop.$) {
+		case 'Background':
+			return 'background';
+		case 'BackgroundColor':
+			return 'background-color';
+		case 'BackgroundPosition':
+			return 'background-position';
+		case 'BackgroundSize':
+			return 'background-size';
+		case 'Border':
+			return 'border';
+		case 'BorderBottom':
+			return 'border-bottom';
+		case 'BorderBottomColor':
+			return 'border-bottom-color';
+		case 'BorderBottomLeftRadius':
+			return 'border-bottom-left-radius';
+		case 'BorderBottomRightRadius':
+			return 'border-bottom-right-radius';
+		case 'BorderBottomWidth':
+			return 'border-bottom-width';
+		case 'BorderColor':
+			return 'border-color';
+		case 'BorderLeft':
+			return 'border-left';
+		case 'BorderLeftColor':
+			return 'border-left-color';
+		case 'BorderLeftWidth':
+			return 'border-left-width';
+		case 'BorderRadius':
+			return 'border-radius';
+		case 'BorderRight':
+			return 'border-right';
+		case 'BorderRightColor':
+			return 'border-right-color';
+		case 'BorderRightWidth':
+			return 'border-right-width';
+		case 'BorderTop':
+			return 'border-top';
+		case 'BorderTopColor':
+			return 'border-top-color';
+		case 'BorderTopLeftRadius':
+			return 'border-top-left-radius';
+		case 'BorderTopRightRadius':
+			return 'border-top-right-radius';
+		case 'BorderTopWidth':
+			return 'border-top-width';
+		case 'BorderWidth':
+			return 'border-width';
+		case 'Bottom':
+			return 'bottom';
+		case 'BoxShadow':
+			return 'box-shadow';
+		case 'CaretColor':
+			return 'caret-color';
+		case 'Clip':
+			return 'clip';
+		case 'ClipPath':
+			return 'clip-path';
+		case 'Color':
+			return 'color';
+		case 'ColumnCount':
+			return 'column-count';
+		case 'ColumnGap':
+			return 'column-gap';
+		case 'ColumnRule':
+			return 'column-rule';
+		case 'ColumnRuleColor':
+			return 'column-rule-color';
+		case 'ColumnRuleWidth':
+			return 'column-rule-width';
+		case 'ColumnWidth':
+			return 'column-width';
+		case 'Columns':
+			return 'columns';
+		case 'Filter':
+			return 'filter';
+		case 'Flex':
+			return 'flex';
+		case 'FlexBasis':
+			return 'flex-basis';
+		case 'FlexGrow':
+			return 'flex-grow';
+		case 'FlexShrink':
+			return 'flex-shrink';
+		case 'Font':
+			return 'font';
+		case 'FontSize':
+			return 'font-size';
+		case 'FontSizeAdjust':
+			return 'font-size-adjust';
+		case 'FontStretch':
+			return 'font-stretch';
+		case 'FontVariationSettings':
+			return 'font-variation-settings';
+		case 'FontWeight':
+			return 'font-weight';
+		case 'GridColumnGap':
+			return 'grid-column-gap';
+		case 'GridGap':
+			return 'grid-gap';
+		case 'GridRowGap':
+			return 'grid-row-gap';
+		case 'Height':
+			return 'height';
+		case 'Left':
+			return 'left';
+		case 'LetterSpacing':
+			return 'letter-spacing';
+		case 'LineHeight':
+			return 'line-height';
+		case 'Margin':
+			return 'margin';
+		case 'MarginBottom':
+			return 'margin-bottom';
+		case 'MarginLeft':
+			return 'margin-left';
+		case 'MarginRight':
+			return 'margin-right';
+		case 'MarginTop':
+			return 'margin-top';
+		case 'Mask':
+			return 'mask';
+		case 'MaskPosition':
+			return 'mask-position';
+		case 'MaskSize':
+			return 'mask-size';
+		case 'MaxHeight':
+			return 'max-height';
+		case 'MaxWidth':
+			return 'max-width';
+		case 'MinHeight':
+			return 'min-height';
+		case 'MinWidth':
+			return 'min-width';
+		case 'ObjectPosition':
+			return 'object-position';
+		case 'Offset':
+			return 'offset';
+		case 'OffsetAnchor':
+			return 'offset-anchor';
+		case 'OffsetDistance':
+			return 'offset-distance';
+		case 'OffsetPath':
+			return 'offset-path';
+		case 'OffsetRotate':
+			return 'offset-rotate';
+		case 'Opacity':
+			return 'opacity';
+		case 'Order':
+			return 'order';
+		case 'Outline':
+			return 'outline';
+		case 'OutlineColor':
+			return 'outline-color';
+		case 'OutlineOffset':
+			return 'outline-offset';
+		case 'OutlineWidth':
+			return 'outline-width';
+		case 'Padding':
+			return 'padding';
+		case 'PaddingBottom':
+			return 'padding-bottom';
+		case 'PaddingLeft':
+			return 'padding-left';
+		case 'PaddingRight':
+			return 'padding-right';
+		case 'PaddingTop':
+			return 'padding-top';
+		case 'Right':
+			return 'right';
+		case 'TabSize':
+			return 'tab-size';
+		case 'TextIndent':
+			return 'text-indent';
+		case 'TextShadow':
+			return 'text-shadow';
+		case 'Top':
+			return 'top';
+		case 'Transform':
+			return 'transform';
+		case 'TransformOrigin':
+			return 'transform-origin';
+		case 'VerticalAlign':
+			return 'vertical-align';
+		case 'Visibility':
+			return 'visibility';
+		case 'Width':
+			return 'width';
+		case 'WordSpacing':
+			return 'word-spacing';
+		default:
+			return 'z-index';
+	}
+};
+var rtfeldman$elm_css$Css$Transitions$timeToString = function (time) {
+	return elm$core$String$fromFloat(time) + 'ms';
+};
+var rtfeldman$elm_css$Css$Transitions$timingFunctionToString = function (tf) {
+	switch (tf.$) {
+		case 'Ease':
+			return 'ease';
+		case 'Linear':
+			return 'linear';
+		case 'EaseIn':
+			return 'ease-in';
+		case 'EaseOut':
+			return 'ease-out';
+		case 'EaseInOut':
+			return 'ease-in-out';
+		case 'StepStart':
+			return 'step-start';
+		case 'StepEnd':
+			return 'step-end';
+		default:
+			var _float = tf.a;
+			var float2 = tf.b;
+			var float3 = tf.c;
+			var float4 = tf.d;
+			return 'cubic-bezier(' + (elm$core$String$fromFloat(_float) + (' , ' + (elm$core$String$fromFloat(float2) + (' , ' + (elm$core$String$fromFloat(float3) + (' , ' + (elm$core$String$fromFloat(float4) + ')')))))));
+	}
+};
+var rtfeldman$elm_css$Css$Transitions$transition = function (options) {
+	var v = A3(
+		elm$core$String$slice,
+		0,
+		-1,
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, s) {
+					var animation = _n0.a.animation;
+					var duration = _n0.a.duration;
+					var delay = _n0.a.delay;
+					var timing = _n0.a.timing;
+					return s + (A2(
+						elm$core$String$join,
+						' ',
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$Transitions$propToString(animation),
+								rtfeldman$elm_css$Css$Transitions$timeToString(duration),
+								A2(
+								elm$core$Maybe$withDefault,
+								'',
+								A2(elm$core$Maybe$map, rtfeldman$elm_css$Css$Transitions$timeToString, delay)),
+								A2(
+								elm$core$Maybe$withDefault,
+								'',
+								A2(elm$core$Maybe$map, rtfeldman$elm_css$Css$Transitions$timingFunctionToString, timing))
+							])) + ',');
+				}),
+			'',
+			options));
+	return A2(rtfeldman$elm_css$Css$property, 'transition', v);
+};
 var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
 var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
 	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
 };
-var author$project$Element$Image$single = function (url) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$img,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
-						rtfeldman$elm_css$Css$marginBottom(
-						rtfeldman$elm_css$Css$px(8))
-					])),
-				rtfeldman$elm_css$Html$Styled$Attributes$src(url)
-			]),
-		_List_Nil);
-};
+var author$project$Element$Image$single = F3(
+	function (onLoad, isLoaded, url) {
+		return A2(
+			rtfeldman$elm_css$Html$Styled$img,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100% - 8px)'),
+							rtfeldman$elm_css$Css$marginBottom(
+							rtfeldman$elm_css$Css$px(8)),
+							isLoaded ? rtfeldman$elm_css$Css$opacity(
+							rtfeldman$elm_css$Css$int(1)) : rtfeldman$elm_css$Css$opacity(
+							rtfeldman$elm_css$Css$int(0)),
+							rtfeldman$elm_css$Css$Transitions$transition(
+							_List_fromArray(
+								[
+									A3(rtfeldman$elm_css$Css$Transitions$opacity3, 200, 0, rtfeldman$elm_css$Css$Transitions$easeIn)
+								]))
+						])),
+					rtfeldman$elm_css$Html$Styled$Attributes$src(url),
+					A2(
+					rtfeldman$elm_css$Html$Styled$Events$on,
+					'load',
+					elm$json$Json$Decode$succeed(
+						onLoad(url)))
+				]),
+			_List_Nil);
+	});
 var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
 var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
 	function (a, b) {
@@ -8882,21 +9193,6 @@ var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
 var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
 	var value = _n0.value;
 	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
-};
-var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
-var rtfeldman$elm_css$Css$int = function (val) {
-	return {
-		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
-		intOrAuto: rtfeldman$elm_css$Css$Structure$Compatible,
-		lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible,
-		number: rtfeldman$elm_css$Css$Structure$Compatible,
-		numberOrInfinite: rtfeldman$elm_css$Css$Structure$Compatible,
-		numericValue: val,
-		unitLabel: '',
-		units: rtfeldman$elm_css$Css$UnitlessInteger,
-		value: elm$core$String$fromInt(val)
-	};
 };
 var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
@@ -8948,6 +9244,9 @@ var author$project$Element$Util$maybe = F2(
 			return rtfeldman$elm_css$Html$Styled$text('');
 		}
 	});
+var author$project$Page$Article$ImageLoaded = function (a) {
+	return {$: 'ImageLoaded', a: a};
+};
 var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
 var author$project$Page$Article$paragraphs = function (article) {
 	return A2(
@@ -8959,29 +9258,33 @@ var author$project$Page$Article$paragraphs = function (article) {
 			A2(elm$core$String$split, '\n', article.body)));
 };
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
-var author$project$Page$Article$viewArticle = function (article) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$article,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Css$maxWidth(
-						rtfeldman$elm_css$Css$px(1080)),
-						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
-					]))
-			]),
-		_List_fromArray(
-			[
-				A2(author$project$Element$Util$maybe, article.cover, author$project$Element$Image$single),
-				A2(author$project$Element$Text$h1, _List_Nil, article.title),
-				A2(
-				rtfeldman$elm_css$Html$Styled$div,
-				_List_Nil,
-				author$project$Page$Article$paragraphs(article))
-			]));
-};
+var author$project$Page$Article$viewArticle = F2(
+	function (model, article) {
+		return A2(
+			rtfeldman$elm_css$Html$Styled$article,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$maxWidth(
+							rtfeldman$elm_css$Css$px(1080)),
+							A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+						]))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					author$project$Element$Util$maybe,
+					article.cover,
+					A2(author$project$Element$Image$single, author$project$Page$Article$ImageLoaded, model.imageLoaded)),
+					A2(author$project$Element$Text$h1, _List_Nil, article.title),
+					A2(
+					rtfeldman$elm_css$Html$Styled$div,
+					_List_Nil,
+					author$project$Page$Article$paragraphs(article))
+				]));
+	});
 var elm$core$String$foldr = _String_foldr;
 var elm$core$String$toList = function (string) {
 	return A3(elm$core$String$foldr, elm$core$List$cons, _List_Nil, string);
@@ -9452,30 +9755,34 @@ var author$project$Element$Button$button = F2(
 				]));
 	});
 var author$project$Page$Article$Toggle = {$: 'Toggle'};
-var author$project$Page$Article$viewArticleEditable = function (article) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$article,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Css$maxWidth(
-						rtfeldman$elm_css$Css$px(1080)),
-						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
-					]))
-			]),
-		_List_fromArray(
-			[
-				A2(author$project$Element$Util$maybe, article.cover, author$project$Element$Image$single),
-				A2(author$project$Element$Text$h1, _List_Nil, article.title),
-				A2(
-				rtfeldman$elm_css$Html$Styled$div,
-				_List_Nil,
-				author$project$Page$Article$paragraphs(article)),
-				A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Edit')
-			]));
-};
+var author$project$Page$Article$viewArticleEditable = F2(
+	function (model, article) {
+		return A2(
+			rtfeldman$elm_css$Html$Styled$article,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$maxWidth(
+							rtfeldman$elm_css$Css$px(1080)),
+							A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+						]))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					author$project$Element$Util$maybe,
+					article.cover,
+					A2(author$project$Element$Image$single, author$project$Page$Article$ImageLoaded, model.imageLoaded)),
+					A2(author$project$Element$Text$h1, _List_Nil, article.title),
+					A2(
+					rtfeldman$elm_css$Html$Styled$div,
+					_List_Nil,
+					author$project$Page$Article$paragraphs(article)),
+					A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Edit')
+				]));
+	});
 var author$project$Element$Color$gray = rtfeldman$elm_css$Css$hex('f5f5f5');
 var rtfeldman$elm_css$Css$Internal$property = F2(
 	function (key, value) {
@@ -9572,7 +9879,6 @@ var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 		'justify-content',
 		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
 };
-var rtfeldman$elm_css$Css$opacity = rtfeldman$elm_css$Css$prop1('opacity');
 var rtfeldman$elm_css$Css$top = rtfeldman$elm_css$Css$prop1('top');
 var rtfeldman$elm_css$Css$url = function (urlValue) {
 	return {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, value: 'url(' + (urlValue + ')')};
@@ -9787,7 +10093,7 @@ var author$project$Page$Article$view = F2(
 							var article = _n2.a;
 							return _List_fromArray(
 								[
-									author$project$Page$Article$viewArticleEditable(article)
+									A2(author$project$Page$Article$viewArticleEditable, model, article)
 								]);
 						} else {
 							return _List_fromArray(
@@ -9802,7 +10108,7 @@ var author$project$Page$Article$view = F2(
 						var article = _n3.a;
 						return _List_fromArray(
 							[
-								author$project$Page$Article$viewArticle(article)
+								A2(author$project$Page$Article$viewArticle, model, article)
 							]);
 					} else {
 						return _List_fromArray(
