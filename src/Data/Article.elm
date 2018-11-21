@@ -4,14 +4,16 @@ import Json.Decode as Decode
 
 
 type alias Article =
-    { title : String
+    { id : String
+    , title : String
     , body : String
     }
 
 
 decodeOne : Decode.Decoder Article
 decodeOne =
-    Decode.map2 Article
+    Decode.map3 Article
+        (Decode.field "id" Decode.string)
         (Decode.field "title" Decode.string)
         (Decode.field "body" Decode.string)
 

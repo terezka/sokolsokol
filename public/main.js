@@ -6058,13 +6058,15 @@ var author$project$Page$Admin$update = F2(
 				}
 		}
 	});
-var author$project$Data$Article$Article = F2(
-	function (title, body) {
-		return {body: body, title: title};
+var author$project$Data$Article$Article = F3(
+	function (id, title, body) {
+		return {body: body, id: id, title: title};
 	});
-var author$project$Data$Article$decodeOne = A3(
-	elm$json$Json$Decode$map2,
+var elm$json$Json$Decode$map3 = _Json_map3;
+var author$project$Data$Article$decodeOne = A4(
+	elm$json$Json$Decode$map3,
 	author$project$Data$Article$Article,
+	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
 var author$project$Page$Article$update = F2(
@@ -8491,6 +8493,10 @@ var author$project$Page$Article$view = function (model) {
 		title: 'SOKOL SOKOL | Articles'
 	};
 };
+var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
+var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
+	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
+};
 var author$project$Page$Articles$viewArticle = function (article) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$article,
@@ -8500,25 +8506,33 @@ var author$project$Page$Articles$viewArticle = function (article) {
 				_List_fromArray(
 					[
 						rtfeldman$elm_css$Css$maxWidth(
-						rtfeldman$elm_css$Css$px(1080)),
-						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+						rtfeldman$elm_css$Css$px(300))
 					]))
 			]),
 		_List_fromArray(
 			[
 				A2(
-				rtfeldman$elm_css$Html$Styled$h1,
+				rtfeldman$elm_css$Html$Styled$a,
 				_List_fromArray(
 					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-							]))
+						rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id)
 					]),
 				_List_fromArray(
 					[
-						rtfeldman$elm_css$Html$Styled$text(article.title)
+						A2(
+						rtfeldman$elm_css$Html$Styled$h1,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+									]))
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text(article.title)
+							]))
 					])),
 				A2(
 				rtfeldman$elm_css$Html$Styled$p,

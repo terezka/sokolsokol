@@ -50,8 +50,12 @@ view model =
 viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
     Html.article
-        [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
+        [ Attr.css [ Css.maxWidth (Css.px 300) ] ]
+        [ Html.a [Attr.href ("/articles/" ++ article.id)]
+            [ Html.h1
+                    [ Attr.css [ Css.textDecoration Css.overline ] ]
+                    [ Html.text article.title ]
+            ]
         , Html.p [] [ Html.text article.body ]
         ]
 
