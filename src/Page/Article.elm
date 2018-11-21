@@ -1,11 +1,12 @@
 module Page.Article exposing (Model, Msg, init, subscriptions, update, view)
 
+import Browser.Navigation as Nav
 import Css
 import Data.Article as Article
-import Element.Color as Color
-import Element.Text as Text
 import Element.Button as Button
+import Element.Color as Color
 import Element.Image as Image
+import Element.Text as Text
 import Element.Util as Util
 import File
 import File.Select as Select
@@ -44,8 +45,8 @@ type Msg
     | GotArticle Encode.Value
 
 
-update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
-update session msg model =
+update : Nav.Key -> Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
+update key session msg model =
     case msg of
         Pick ->
             ( model, Select.files [ "image/*" ] GotFiles, session )
@@ -98,11 +99,17 @@ update session msg model =
                 Just article ->
                     ( model
                     , Ports.getEditedArticle (Article.encodeOne article)
-                    , session
+                    , Session.removeArticle article session
                     )
 
                 Nothing ->
-                    ( { model | editing = Session.getArticle model.id session }
+                    ( { model
+                        | editing =
+                            session
+                                |> Session.getArticle model.id
+                                |> Maybe.withDefault Article.placeholder
+                                |> Just
+                      }
                     , Cmd.none
                     , session
                     )
@@ -111,13 +118,15 @@ update session msg model =
             case Decode.decodeValue Article.decodeOne value of
                 Ok article ->
                     ( { model | editing = Nothing }
-                    , Ports.saveEditedArticle (Article.encodeOne article)
+                    , Cmd.batch
+                        [ Nav.pushUrl key ("/articles/" ++ article.id)
+                        , Ports.saveEditedArticle (Article.encodeOne article)
+                        ]
                     , Session.setArticle article session
                     )
 
                 Err _ ->
                     ( model, Cmd.none, session )
-
 
 
 view : Session.Data -> Model -> Skeleton.Document Msg
@@ -138,9 +147,8 @@ view session model =
                             Nothing ->
                                 [ viewArticleEditing Article.placeholder ]
 
-
             Session.Anonymous ->
-                 case Session.getArticle model.id session of
+                case Session.getArticle model.id session of
                     Just article ->
                         [ viewArticle article ]
 
@@ -221,5 +229,3 @@ subscriptions model =
         [ Ports.uploadedImage GotFileDownloadUrl
         , Ports.receiveEditedArticle GotArticle
         ]
-
-

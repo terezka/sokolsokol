@@ -1,4 +1,4 @@
-module Data.Article exposing (Article, Id, placeholder, decodeMany, decodeOne, encodeOne, setCover)
+module Data.Article exposing (Article, Id, decodeMany, decodeOne, encodeOne, placeholder, setCover)
 
 import Json.Decode as Decode
 import Json.Encode as Encode

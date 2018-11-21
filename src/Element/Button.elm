@@ -1,9 +1,9 @@
 module Element.Button exposing (button)
 
 import Css
+import Element.Color as Color
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import Element.Color as Color
 import Html.Styled.Events as Events
 
 

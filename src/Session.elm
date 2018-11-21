@@ -3,19 +3,20 @@ module Session exposing
     , State
     , User(..)
     , empty
-    , withAdmin
     , getArticle
     , getArticles
     , setArticle
+    , removeArticle
     , setArticles
     , setUser
     , toggleEditing
+    , withAdmin
     )
 
 import Data.Article as Article
-import Html.Styled as Html
 import Data.User as User
 import Dict
+import Html.Styled as Html
 
 
 type alias Data =
@@ -45,8 +46,11 @@ empty =
 withAdmin : Data -> (State -> Html.Html msg) -> Html.Html msg
 withAdmin data view =
     case data.user of
-        LoggedIn state -> view state
-        Anonymous -> Html.text ""
+        LoggedIn state ->
+            view state
+
+        Anonymous ->
+            Html.text ""
 
 
 setArticles : List Article.Article -> Data -> Data
@@ -62,6 +66,13 @@ setArticles articles data =
 setArticle : Article.Article -> Data -> Data
 setArticle article data =
     { data | articles = Dict.insert article.id article data.articles }
+
+
+
+removeArticle : Article.Article -> Data -> Data
+removeArticle article data =
+    { data | articles = Dict.remove article.id data.articles }
+
 
 
 getArticles : Data -> List Article.Article

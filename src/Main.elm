@@ -190,7 +190,7 @@ update message model =
         ArticleMsg msg ->
             case model.page of
                 Article articleModel ->
-                    stepArticle model (Article.update model.session msg articleModel)
+                    stepArticle model (Article.update model.key model.session msg articleModel)
 
                 _ ->
                     ( model, Cmd.none )

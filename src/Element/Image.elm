@@ -1,9 +1,8 @@
-module Element.Image exposing (thumbnail, single, editable)
+module Element.Image exposing (editable, single, thumbnail)
 
-
-import Element.Color as Color
-import Element.Button as Button
 import Css
+import Element.Button as Button
+import Element.Color as Color
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
@@ -48,7 +47,6 @@ editable msg maybeUrl =
                     [ Button.button msg.select "Add cover"
                     ]
     in
-
     Html.div
         [ Attr.css
             [ Css.width (Css.px 200)
@@ -85,5 +83,3 @@ editable msg maybeUrl =
             ]
             layover
         ]
-
-
