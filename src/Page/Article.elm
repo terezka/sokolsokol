@@ -52,15 +52,14 @@ update msg model =
                     in
                     ( { model | editing = isEditing }
                     , if isEditing then
-                            Cmd.none
-                        else
-                            Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
+                        Cmd.none
+
+                      else
+                        Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
                     )
 
                 Nothing ->
                     ( model, Cmd.none )
-
-
 
 
 view : Model -> Skeleton.Document Msg
@@ -71,6 +70,7 @@ view model =
             Just article ->
                 if model.editing then
                     [ viewArticleEditable article ]
+
                 else
                     [ viewArticle article ]
 
@@ -81,26 +81,24 @@ view model =
 
 viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
-
-
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
         [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
         , Html.div []
-                (paragraphs article)
+            (paragraphs article)
         , Html.button
             [ Attr.css
                 [ Css.backgroundColor Color.transparent
                 , Css.border3 (Css.px 1) Css.solid Color.black
                 ]
-            , Events.onClick Toggle ]
+            , Events.onClick Toggle
+            ]
             [ Html.text "Edit" ]
         ]
 
 
 viewArticleEditable : Article.Article -> Html.Html Msg
 viewArticleEditable article =
-
     Html.div
         [ Attr.css
             [ Css.border3 (Css.px 1) Css.dotted Color.black
@@ -142,17 +140,18 @@ viewArticleEditable article =
                 [ Css.backgroundColor Color.transparent
                 , Css.border3 (Css.px 1) Css.solid Color.black
                 ]
-            , Events.onClick Toggle ]
+            , Events.onClick Toggle
+            ]
             [ Html.text "Save" ]
         ]
 
 
 paragraphs : Article.Article -> List (Html.Html msg)
-paragraphs article=
+paragraphs article =
     article.body
-                |> String.split "\n"
-                |> List.map (List.singleton << Html.text)
-                |> List.map (Html.p [])
+        |> String.split "\n"
+        |> List.map (List.singleton << Html.text)
+        |> List.map (Html.p [])
 
 
 subscriptions : Model -> Sub Msg
