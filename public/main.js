@@ -10298,6 +10298,7 @@ var author$project$Page$Articles$view = F2(
 			title: 'SOKOL SOKOL | Articles'
 		};
 	});
+var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var author$project$Page$Skeleton$logo = A2(
 	rtfeldman$elm_css$Html$Styled$h1,
 	_List_fromArray(
@@ -10306,7 +10307,10 @@ var author$project$Page$Skeleton$logo = A2(
 			_List_fromArray(
 				[
 					rtfeldman$elm_css$Css$marginBottom(
-					rtfeldman$elm_css$Css$px(8))
+					rtfeldman$elm_css$Css$px(8)),
+					rtfeldman$elm_css$Css$padding(
+					rtfeldman$elm_css$Css$px(8)),
+					rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$white)
 				]))
 		]),
 	_List_fromArray(
@@ -10321,7 +10325,6 @@ var rtfeldman$elm_css$Css$column = _Utils_update(
 var rtfeldman$elm_css$Css$cursor = rtfeldman$elm_css$Css$prop1('cursor');
 var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-direction');
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
-var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
 var rtfeldman$elm_css$Css$Structure$TypeSelector = function (a) {
 	return {$: 'TypeSelector', a: a};

@@ -3,7 +3,7 @@ module Page.Skeleton exposing (Document, view)
 import Browser
 import Css
 import Css.Global
-import Element.Color
+import Element.Color as Color
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Session
@@ -36,7 +36,11 @@ view toMsg session document =
 logo : Html.Html msg
 logo =
     Html.h1
-        [ Attr.css [ Css.marginBottom (Css.px 8) ]
+        [ Attr.css
+            [ Css.marginBottom (Css.px 8)
+            , Css.padding (Css.px 8)
+            , Css.backgroundColor Color.white
+            ]
         ]
         [ Html.text "SOKOL SOKOL" ]
 
@@ -98,8 +102,8 @@ styles =
         , Css.fontSize (Css.px 12)
         , Css.cursor Css.pointer
         , Css.textDecoration Css.none
-        , Css.color Element.Color.black
+        , Css.color Color.black
         , Css.hover
-            [ Css.color Element.Color.blue ]
+            [ Css.color Color.blue ]
         ]
     ]
