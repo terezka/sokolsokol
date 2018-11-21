@@ -4370,29 +4370,7 @@ var author$project$Main$LinkClicked = function (a) {
 var author$project$Main$UrlChanged = function (a) {
 	return {$: 'UrlChanged', a: a};
 };
-var author$project$Main$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
-var author$project$Main$exit = function (model) {
-	var _n0 = model.page;
-	switch (_n0.$) {
-		case 'NotFound':
-			var session = _n0.a;
-			return session;
-		case 'Articles':
-			var m = _n0.a;
-			return m.session;
-		case 'Article':
-			var m = _n0.a;
-			return m.session;
-		case 'Design':
-			var m = _n0.a;
-			return m.session;
-		default:
-			var m = _n0.a;
-			return m.session;
-	}
-};
+var author$project$Main$NotFound = {$: 'NotFound'};
 var elm$core$Basics$apL = F2(
 	function (f, x) {
 		return f(x);
@@ -4994,11 +4972,13 @@ var author$project$Main$stepAdmin = F2(
 	function (model, _n0) {
 		var articleModel = _n0.a;
 		var cmds = _n0.b;
+		var session = _n0.c;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
 				{
-					page: author$project$Main$Admin(articleModel)
+					page: author$project$Main$Admin(articleModel),
+					session: session
 				}),
 			A2(elm$core$Platform$Cmd$map, author$project$Main$AdminMsg, cmds));
 	});
@@ -5012,11 +4992,13 @@ var author$project$Main$stepArticle = F2(
 	function (model, _n0) {
 		var articleModel = _n0.a;
 		var cmds = _n0.b;
+		var session = _n0.c;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
 				{
-					page: author$project$Main$Article(articleModel)
+					page: author$project$Main$Article(articleModel),
+					session: session
 				}),
 			A2(elm$core$Platform$Cmd$map, author$project$Main$ArticleMsg, cmds));
 	});
@@ -5030,42 +5012,27 @@ var author$project$Main$stepArticles = F2(
 	function (model, _n0) {
 		var articlesModel = _n0.a;
 		var cmds = _n0.b;
+		var session = _n0.c;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
 				{
-					page: author$project$Main$Articles(articlesModel)
+					page: author$project$Main$Articles(articlesModel),
+					session: session
 				}),
 			A2(elm$core$Platform$Cmd$map, author$project$Main$ArticlesMsg, cmds));
 	});
-var author$project$Main$Design = function (a) {
-	return {$: 'Design', a: a};
-};
-var author$project$Main$DesignMsg = function (a) {
-	return {$: 'DesignMsg', a: a};
-};
-var author$project$Main$stepDesign = F2(
-	function (model, _n0) {
-		var articleModel = _n0.a;
-		var cmds = _n0.b;
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{
-					page: author$project$Main$Design(articleModel)
-				}),
-			A2(elm$core$Platform$Cmd$map, author$project$Main$DesignMsg, cmds));
-	});
-var author$project$Page$Admin$Model = F4(
-	function (session, email, password, message) {
-		return {email: email, message: message, password: password, session: session};
+var author$project$Page$Admin$Model = F3(
+	function (email, password, message) {
+		return {email: email, message: message, password: password};
 	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Page$Admin$init = function (session) {
-	return _Utils_Tuple2(
-		A4(author$project$Page$Admin$Model, session, '', '', elm$core$Maybe$Nothing),
-		elm$core$Platform$Cmd$none);
+	return _Utils_Tuple3(
+		A3(author$project$Page$Admin$Model, '', '', elm$core$Maybe$Nothing),
+		elm$core$Platform$Cmd$none,
+		session);
 };
 var author$project$Ports$fetchArticles = _Platform_outgoingPort('fetchArticles', elm$core$Basics$identity);
 var elm$json$Json$Encode$object = function (pairs) {
@@ -5084,8 +5051,8 @@ var elm$json$Json$Encode$object = function (pairs) {
 var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Article$init = F2(
 	function (session, id) {
-		return _Utils_Tuple2(
-			{article: elm$core$Maybe$Nothing, editing: false, session: session},
+		return _Utils_Tuple3(
+			{article: elm$core$Maybe$Nothing, editing: false},
 			author$project$Ports$fetchArticles(
 				elm$json$Json$Encode$object(
 					_List_fromArray(
@@ -5093,18 +5060,15 @@ var author$project$Page$Article$init = F2(
 							_Utils_Tuple2(
 							'id',
 							elm$json$Json$Encode$string(id))
-						]))));
+						]))),
+			session);
 	});
 var author$project$Page$Articles$init = function (session) {
-	return _Utils_Tuple2(
-		{articles: _List_Nil, session: session},
+	return _Utils_Tuple3(
+		{articles: _List_Nil},
 		author$project$Ports$fetchArticles(
-			elm$json$Json$Encode$object(_List_Nil)));
-};
-var author$project$Page$Design$init = function (session) {
-	return _Utils_Tuple2(
-		{session: session},
-		elm$core$Platform$Cmd$none);
+			elm$json$Json$Encode$object(_List_Nil)),
+		session);
 };
 var elm$core$List$append = F2(
 	function (xs, ys) {
@@ -5843,7 +5807,6 @@ var elm$url$Url$Parser$top = elm$url$Url$Parser$Parser(
 	});
 var author$project$Main$stepUrl = F2(
 	function (url, model) {
-		var session = author$project$Main$exit(model);
 		var parser = elm$url$Url$Parser$oneOf(
 			_List_fromArray(
 				[
@@ -5853,14 +5816,14 @@ var author$project$Main$stepUrl = F2(
 					A2(
 						author$project$Main$stepArticles,
 						model,
-						author$project$Page$Articles$init(session))),
+						author$project$Page$Articles$init(model.session))),
 					A2(
 					author$project$Main$route,
 					elm$url$Url$Parser$s('articles'),
 					A2(
 						author$project$Main$stepArticles,
 						model,
-						author$project$Page$Articles$init(session))),
+						author$project$Page$Articles$init(model.session))),
 					A2(
 					author$project$Main$route,
 					A2(
@@ -5871,22 +5834,15 @@ var author$project$Main$stepUrl = F2(
 						return A2(
 							author$project$Main$stepArticle,
 							model,
-							A2(author$project$Page$Article$init, session, id));
+							A2(author$project$Page$Article$init, model.session, id));
 					}),
-					A2(
-					author$project$Main$route,
-					elm$url$Url$Parser$s('designs'),
-					A2(
-						author$project$Main$stepDesign,
-						model,
-						author$project$Page$Design$init(session))),
 					A2(
 					author$project$Main$route,
 					elm$url$Url$Parser$s('admin'),
 					A2(
 						author$project$Main$stepAdmin,
 						model,
-						author$project$Page$Admin$init(session)))
+						author$project$Page$Admin$init(model.session)))
 				]));
 		var _n0 = A2(elm$url$Url$Parser$parse, parser, url);
 		if (_n0.$ === 'Just') {
@@ -5896,23 +5852,22 @@ var author$project$Main$stepUrl = F2(
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{
-						page: author$project$Main$NotFound(session)
-					}),
+					{page: author$project$Main$NotFound}),
 				elm$core$Platform$Cmd$none);
 		}
 	});
-var author$project$Session$empty = {};
+var author$project$Session$Anonymous = {$: 'Anonymous'};
+var author$project$Session$empty = {user: author$project$Session$Anonymous};
 var author$project$Main$init = F3(
 	function (_n0, url, key) {
 		return A2(
 			author$project$Main$stepUrl,
 			url,
-			{
-				key: key,
-				page: author$project$Main$NotFound(author$project$Session$empty)
-			});
+			{key: key, page: author$project$Main$NotFound, session: author$project$Session$empty});
 	});
+var author$project$Main$OnAuthChange = function (a) {
+	return {$: 'OnAuthChange', a: a};
+};
 var author$project$Page$Admin$GotError = function (a) {
 	return {$: 'GotError', a: a};
 };
@@ -5940,40 +5895,55 @@ var author$project$Ports$receiveArticles = _Platform_incomingPort('receiveArticl
 var author$project$Page$Articles$subscriptions = function (model) {
 	return author$project$Ports$receiveArticles(author$project$Page$Articles$GotArticles);
 };
+var author$project$Ports$authenticationState = _Platform_incomingPort('authenticationState', elm$json$Json$Decode$value);
 var elm$core$Platform$Sub$map = _Platform_map;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
-	var _n0 = model.page;
-	switch (_n0.$) {
-		case 'Admin':
-			var adminModel = _n0.a;
-			return A2(
-				elm$core$Platform$Sub$map,
-				author$project$Main$AdminMsg,
-				author$project$Page$Admin$subscriptions(adminModel));
-		case 'Articles':
-			var articlesModel = _n0.a;
-			return A2(
-				elm$core$Platform$Sub$map,
-				author$project$Main$ArticlesMsg,
-				author$project$Page$Articles$subscriptions(articlesModel));
-		case 'Article':
-			var articleModel = _n0.a;
-			return A2(
-				elm$core$Platform$Sub$map,
-				author$project$Main$ArticleMsg,
-				author$project$Page$Article$subscriptions(articleModel));
-		default:
-			return elm$core$Platform$Sub$none;
-	}
+	return elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				author$project$Ports$authenticationState(author$project$Main$OnAuthChange),
+				function () {
+				var _n0 = model.page;
+				switch (_n0.$) {
+					case 'Admin':
+						var adminModel = _n0.a;
+						return A2(
+							elm$core$Platform$Sub$map,
+							author$project$Main$AdminMsg,
+							author$project$Page$Admin$subscriptions(adminModel));
+					case 'Articles':
+						var articlesModel = _n0.a;
+						return A2(
+							elm$core$Platform$Sub$map,
+							author$project$Main$ArticlesMsg,
+							author$project$Page$Articles$subscriptions(articlesModel));
+					case 'Article':
+						var articleModel = _n0.a;
+						return A2(
+							elm$core$Platform$Sub$map,
+							author$project$Main$ArticleMsg,
+							author$project$Page$Article$subscriptions(articleModel));
+					default:
+						return elm$core$Platform$Sub$none;
+				}
+			}()
+			]));
 };
-var author$project$Page$Admin$authenticate = _Platform_outgoingPort('authenticate', elm$core$Basics$identity);
-var elm$json$Json$Decode$bool = _Json_decodeBool;
+var author$project$Data$User$User = function (email) {
+	return {email: email};
+};
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$Data$User$decodeOne = A2(
+	elm$json$Json$Decode$map,
+	author$project$Data$User$User,
+	A2(elm$json$Json$Decode$field, 'email', elm$json$Json$Decode$string));
+var author$project$Page$Admin$authenticate = _Platform_outgoingPort('authenticate', elm$core$Basics$identity);
+var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$oneOf = _Json_oneOf;
-var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$Page$Admin$decodeResponse = elm$json$Json$Decode$oneOf(
 	_List_fromArray(
 		[
@@ -6005,59 +5975,65 @@ var author$project$Page$Admin$encodeUser = F2(
 				]));
 	});
 var elm$json$Json$Decode$decodeValue = _Json_run;
-var author$project$Page$Admin$update = F2(
-	function (msg, model) {
+var author$project$Page$Admin$update = F3(
+	function (session, msg, model) {
 		switch (msg.$) {
 			case 'UpdateEmail':
 				var email = msg.a;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{email: email}),
-					elm$core$Platform$Cmd$none);
+					elm$core$Platform$Cmd$none,
+					session);
 			case 'UpdatePassword':
 				var password = msg.a;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{password: password}),
-					elm$core$Platform$Cmd$none);
+					elm$core$Platform$Cmd$none,
+					session);
 			case 'Submit':
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					model,
 					author$project$Page$Admin$authenticate(
-						A2(author$project$Page$Admin$encodeUser, model.email, model.password)));
+						A2(author$project$Page$Admin$encodeUser, model.email, model.password)),
+					session);
 			default:
 				var messageValue = msg.a;
 				var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Page$Admin$decodeResponse, messageValue);
 				if (_n1.$ === 'Err') {
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						_Utils_update(
 							model,
 							{
 								message: elm$core$Maybe$Just('Could not decode error')
 							}),
-						elm$core$Platform$Cmd$none);
+						elm$core$Platform$Cmd$none,
+						session);
 				} else {
 					if (_n1.a.$ === 'Err') {
 						var _n2 = _n1.a.a;
 						var code = _n2.a;
 						var message = _n2.b;
-						return _Utils_Tuple2(
+						return _Utils_Tuple3(
 							_Utils_update(
 								model,
 								{
 									message: elm$core$Maybe$Just(message)
 								}),
-							elm$core$Platform$Cmd$none);
+							elm$core$Platform$Cmd$none,
+							session);
 					} else {
-						return _Utils_Tuple2(
+						return _Utils_Tuple3(
 							_Utils_update(
 								model,
 								{
 									message: elm$core$Maybe$Just('Logged in!')
 								}),
-							elm$core$Platform$Cmd$none);
+							elm$core$Platform$Cmd$none,
+							session);
 					}
 				}
 		}
@@ -6075,29 +6051,30 @@ var author$project$Data$Article$decodeOne = A4(
 	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
 var author$project$Ports$fetchEditedArticle = _Platform_outgoingPort('fetchEditedArticle', elm$core$Basics$identity);
 var elm$core$Basics$not = _Basics_not;
-var author$project$Page$Article$update = F2(
-	function (msg, model) {
+var author$project$Page$Article$update = F3(
+	function (session, msg, model) {
 		if (msg.$ === 'GotArticle') {
 			var value = msg.a;
 			var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
 			if (_n1.$ === 'Ok') {
 				var article = _n1.a;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{
 							article: elm$core$Maybe$Just(article)
 						}),
-					elm$core$Platform$Cmd$none);
+					elm$core$Platform$Cmd$none,
+					session);
 			} else {
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 			}
 		} else {
 			var _n2 = model.article;
 			if (_n2.$ === 'Just') {
 				var article = _n2.a;
 				var isEditing = !model.editing;
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{editing: isEditing}),
@@ -6108,32 +6085,49 @@ var author$project$Page$Article$update = F2(
 									_Utils_Tuple2(
 									'id',
 									elm$json$Json$Encode$string(article.id))
-								]))));
+								]))),
+					session);
 			} else {
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 			}
 		}
 	});
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Data$Article$decodeMany = elm$json$Json$Decode$list(author$project$Data$Article$decodeOne);
-var author$project$Page$Articles$update = F2(
-	function (msg, model) {
+var author$project$Page$Articles$update = F3(
+	function (session, msg, model) {
 		var value = msg.a;
 		var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeMany, value);
 		if (_n1.$ === 'Ok') {
 			var articles = _n1.a;
-			return _Utils_Tuple2(
+			return _Utils_Tuple3(
 				_Utils_update(
 					model,
 					{articles: articles}),
-				elm$core$Platform$Cmd$none);
+				elm$core$Platform$Cmd$none,
+				session);
 		} else {
-			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 		}
 	});
-var author$project$Page$Design$update = F2(
-	function (msg, model) {
-		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+var author$project$Session$LoggedIn = function (a) {
+	return {$: 'LoggedIn', a: a};
+};
+var author$project$Session$setUser = F2(
+	function (maybeUser, data) {
+		if (maybeUser.$ === 'Just') {
+			var user = maybeUser.a;
+			return _Utils_update(
+				data,
+				{
+					user: author$project$Session$LoggedIn(
+						{editing: false, user: user})
+				});
+		} else {
+			return _Utils_update(
+				data,
+				{user: author$project$Session$Anonymous});
+		}
 	});
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
@@ -6444,39 +6438,51 @@ var author$project$Main$update = F2(
 			case 'UrlChanged':
 				var url = message.a;
 				return A2(author$project$Main$stepUrl, url, model);
+			case 'OnAuthChange':
+				var value = message.a;
+				var _n2 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$User$decodeOne, value);
+				if (_n2.$ === 'Ok') {
+					var user = _n2.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								session: A2(
+									author$project$Session$setUser,
+									elm$core$Maybe$Just(user),
+									model.session)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								session: A2(author$project$Session$setUser, elm$core$Maybe$Nothing, model.session)
+							}),
+						elm$core$Platform$Cmd$none);
+				}
 			case 'ArticlesMsg':
 				var msg = message.a;
-				var _n2 = model.page;
-				if (_n2.$ === 'Articles') {
-					var article2Model = _n2.a;
+				var _n3 = model.page;
+				if (_n3.$ === 'Articles') {
+					var article2Model = _n3.a;
 					return A2(
 						author$project$Main$stepArticles,
 						model,
-						A2(author$project$Page$Articles$update, msg, article2Model));
+						A3(author$project$Page$Articles$update, model.session, msg, article2Model));
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
 			case 'ArticleMsg':
 				var msg = message.a;
-				var _n3 = model.page;
-				if (_n3.$ === 'Article') {
-					var articleModel = _n3.a;
+				var _n4 = model.page;
+				if (_n4.$ === 'Article') {
+					var articleModel = _n4.a;
 					return A2(
 						author$project$Main$stepArticle,
 						model,
-						A2(author$project$Page$Article$update, msg, articleModel));
-				} else {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				}
-			case 'DesignMsg':
-				var msg = message.a;
-				var _n4 = model.page;
-				if (_n4.$ === 'Design') {
-					var designModel = _n4.a;
-					return A2(
-						author$project$Main$stepDesign,
-						model,
-						A2(author$project$Page$Design$update, msg, designModel));
+						A3(author$project$Page$Article$update, model.session, msg, articleModel));
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
@@ -6488,7 +6494,7 @@ var author$project$Main$update = F2(
 					return A2(
 						author$project$Main$stepAdmin,
 						model,
-						A2(author$project$Page$Admin$update, msg, designModel));
+						A3(author$project$Page$Admin$update, model.session, msg, designModel));
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
@@ -8387,78 +8393,125 @@ var rtfeldman$elm_css$Html$Styled$Events$onInput = function (tagger) {
 			rtfeldman$elm_css$Html$Styled$Events$alwaysStop,
 			A2(elm$json$Json$Decode$map, tagger, rtfeldman$elm_css$Html$Styled$Events$targetValue)));
 };
-var author$project$Page$Admin$view = function (model) {
-	return {
-		body: _List_fromArray(
+var author$project$Page$Admin$view = F2(
+	function (session, model) {
+		return {
+			body: _List_fromArray(
+				[
+					A2(
+					rtfeldman$elm_css$Html$Styled$form,
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$maxWidth(
+									rtfeldman$elm_css$Css$px(700))
+								]))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							rtfeldman$elm_css$Html$Styled$h1,
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$Attributes$css(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+										]))
+								]),
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$text('Sign in')
+								])),
+							A2(
+							rtfeldman$elm_css$Html$Styled$input,
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$Attributes$value(model.email),
+									rtfeldman$elm_css$Html$Styled$Attributes$type_('email'),
+									rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Admin$UpdateEmail)
+								]),
+							_List_Nil),
+							A2(
+							rtfeldman$elm_css$Html$Styled$input,
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$Attributes$value(model.password),
+									rtfeldman$elm_css$Html$Styled$Attributes$type_('password'),
+									rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Admin$UpdatePassword)
+								]),
+							_List_Nil),
+							A2(
+							rtfeldman$elm_css$Html$Styled$div,
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Admin$Submit)
+								]),
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Html$Styled$text('Submit')
+								])),
+							function () {
+							var _n0 = model.message;
+							if (_n0.$ === 'Just') {
+								var message = _n0.a;
+								return rtfeldman$elm_css$Html$Styled$text(message);
+							} else {
+								return rtfeldman$elm_css$Html$Styled$text('');
+							}
+						}()
+						]))
+				]),
+			title: 'SOKOL SOKOL | The wool pants'
+		};
+	});
+var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
+var author$project$Page$Article$paragraphs = function (article) {
+	return A2(
+		elm$core$List$map,
+		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
+		A2(
+			elm$core$List$map,
+			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
+			A2(elm$core$String$split, '\n', article.body)));
+};
+var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
+var author$project$Page$Article$viewArticle = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$article,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Css$maxWidth(
+						rtfeldman$elm_css$Css$px(1080)),
+						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+					]))
+			]),
+		_List_fromArray(
 			[
 				A2(
-				rtfeldman$elm_css$Html$Styled$form,
+				rtfeldman$elm_css$Html$Styled$h1,
 				_List_fromArray(
 					[
 						rtfeldman$elm_css$Html$Styled$Attributes$css(
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Css$maxWidth(
-								rtfeldman$elm_css$Css$px(700))
+								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
 							]))
 					]),
 				_List_fromArray(
 					[
-						A2(
-						rtfeldman$elm_css$Html$Styled$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-									]))
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Sign in')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$input,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$value(model.email),
-								rtfeldman$elm_css$Html$Styled$Attributes$type_('email'),
-								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Admin$UpdateEmail)
-							]),
-						_List_Nil),
-						A2(
-						rtfeldman$elm_css$Html$Styled$input,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$value(model.password),
-								rtfeldman$elm_css$Html$Styled$Attributes$type_('password'),
-								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Admin$UpdatePassword)
-							]),
-						_List_Nil),
-						A2(
-						rtfeldman$elm_css$Html$Styled$div,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Admin$Submit)
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Submit')
-							])),
-						function () {
-						var _n0 = model.message;
-						if (_n0.$ === 'Just') {
-							var message = _n0.a;
-							return rtfeldman$elm_css$Html$Styled$text(message);
-						} else {
-							return rtfeldman$elm_css$Html$Styled$text('');
-						}
-					}()
-					]))
-			]),
-		title: 'SOKOL SOKOL | The wool pants'
-	};
+						rtfeldman$elm_css$Html$Styled$text(article.title)
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$div,
+				_List_Nil,
+				author$project$Page$Article$paragraphs(article))
+			]));
 };
 var elm$core$String$foldr = _String_foldr;
 var elm$core$String$toList = function (string) {
@@ -8872,16 +8925,6 @@ var rtfeldman$elm_css$Css$rgba = F4(
 	});
 var author$project$Element$Color$transparent = A4(rtfeldman$elm_css$Css$rgba, 0, 0, 0, 0);
 var author$project$Page$Article$Toggle = {$: 'Toggle'};
-var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
-var author$project$Page$Article$paragraphs = function (article) {
-	return A2(
-		elm$core$List$map,
-		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
-		A2(
-			elm$core$List$map,
-			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
-			A2(elm$core$String$split, '\n', article.body)));
-};
 var rtfeldman$elm_css$Css$backgroundColor = function (c) {
 	return A2(rtfeldman$elm_css$Css$property, 'background-color', c.value);
 };
@@ -8898,9 +8941,8 @@ var rtfeldman$elm_css$Css$prop3 = F4(
 	});
 var rtfeldman$elm_css$Css$border3 = rtfeldman$elm_css$Css$prop3('border');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
-var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
-var author$project$Page$Article$viewArticle = function (article) {
+var author$project$Page$Article$viewArticleEditable = function (article) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$article,
 		_List_fromArray(
@@ -8956,7 +8998,6 @@ var author$project$Page$Article$viewArticle = function (article) {
 			]));
 };
 var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
-var rtfeldman$elm_css$Css$dotted = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'dotted'};
 var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
 var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
 	var value = _n0.value;
@@ -8980,7 +9021,6 @@ var rtfeldman$elm_css$Css$int = function (val) {
 var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
 var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
 var rtfeldman$elm_css$Css$outline = rtfeldman$elm_css$Css$prop1('outline');
-var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var elm$json$Json$Encode$bool = _Json_wrap;
 var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -8991,23 +9031,10 @@ var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 	});
 var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
 var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
-var author$project$Page$Article$viewArticleEditable = function (article) {
+var author$project$Page$Article$viewArticleEditing = function (article) {
 	return A2(
 		rtfeldman$elm_css$Html$Styled$div,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						A3(
-						rtfeldman$elm_css$Css$border3,
-						rtfeldman$elm_css$Css$px(1),
-						rtfeldman$elm_css$Css$dotted,
-						author$project$Element$Color$black),
-						rtfeldman$elm_css$Css$padding(
-						rtfeldman$elm_css$Css$px(24))
-					]))
-			]),
+		_List_Nil,
 		_List_fromArray(
 			[
 				A2(
@@ -9090,29 +9117,39 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 					]))
 			]));
 };
-var author$project$Page$Article$view = function (model) {
-	return {
-		body: function () {
-			var _n0 = model.article;
-			if (_n0.$ === 'Just') {
-				var article = _n0.a;
-				return model.editing ? _List_fromArray(
-					[
-						author$project$Page$Article$viewArticleEditable(article)
-					]) : _List_fromArray(
-					[
-						author$project$Page$Article$viewArticle(article)
-					]);
-			} else {
-				return _List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text('loading')
-					]);
-			}
-		}(),
-		title: 'SOKOL SOKOL | Articles'
-	};
-};
+var author$project$Page$Article$view = F2(
+	function (session, model) {
+		return {
+			body: function () {
+				var _n0 = model.article;
+				if (_n0.$ === 'Just') {
+					var article = _n0.a;
+					var _n1 = session.user;
+					if (_n1.$ === 'LoggedIn') {
+						var state = _n1.a;
+						return state.editing ? _List_fromArray(
+							[
+								author$project$Page$Article$viewArticleEditing(article)
+							]) : _List_fromArray(
+							[
+								author$project$Page$Article$viewArticleEditable(article)
+							]);
+					} else {
+						return _List_fromArray(
+							[
+								author$project$Page$Article$viewArticle(article)
+							]);
+					}
+				} else {
+					return _List_fromArray(
+						[
+							rtfeldman$elm_css$Html$Styled$text('loading')
+						]);
+				}
+			}(),
+			title: 'SOKOL SOKOL | Articles'
+		};
+	});
 var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
 var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
 	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
@@ -9163,118 +9200,13 @@ var author$project$Page$Articles$viewArticle = function (article) {
 					]))
 			]));
 };
-var author$project$Page$Articles$view = function (model) {
-	return {
-		body: A2(elm$core$List$map, author$project$Page$Articles$viewArticle, model.articles),
-		title: 'SOKOL SOKOL | Articles'
-	};
-};
-var author$project$Page$Design$view = function (model) {
-	return {
-		body: _List_fromArray(
-			[
-				A2(
-				rtfeldman$elm_css$Html$Styled$article,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$maxWidth(
-								rtfeldman$elm_css$Css$px(700))
-							]))
-					]),
-				_List_fromArray(
-					[
-						A2(
-						rtfeldman$elm_css$Html$Styled$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-									]))
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('The wool pants')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							]))
-					]))
-			]),
-		title: 'SOKOL SOKOL | The wool pants'
-	};
-};
+var author$project$Page$Articles$view = F2(
+	function (session, model) {
+		return {
+			body: A2(elm$core$List$map, author$project$Page$Articles$viewArticle, model.articles),
+			title: 'SOKOL SOKOL | Articles'
+		};
+	});
 var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
 var author$project$Page$Skeleton$logo = A2(
 	rtfeldman$elm_css$Html$Styled$h1,
@@ -9397,6 +9329,7 @@ var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
 var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
 var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
+var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
 var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
 var rtfeldman$elm_css$Css$Structure$TypeSelector = function (a) {
@@ -10095,8 +10028,8 @@ var rtfeldman$elm_css$VirtualDom$Styled$toUnstyled = function (vdom) {
 	}
 };
 var rtfeldman$elm_css$Html$Styled$toUnstyled = rtfeldman$elm_css$VirtualDom$Styled$toUnstyled;
-var author$project$Page$Skeleton$view = F2(
-	function (toMsg, document) {
+var author$project$Page$Skeleton$view = F3(
+	function (toMsg, session, document) {
 		return {
 			body: A2(
 				elm$core$List$map,
@@ -10141,9 +10074,10 @@ var author$project$Main$view = function (model) {
 	var _n0 = model.page;
 	switch (_n0.$) {
 		case 'NotFound':
-			return A2(
+			return A3(
 				author$project$Page$Skeleton$view,
 				elm$core$Basics$never,
+				model.session,
 				{
 					body: _List_fromArray(
 						[
@@ -10153,28 +10087,25 @@ var author$project$Main$view = function (model) {
 				});
 		case 'Articles':
 			var articlesModel = _n0.a;
-			return A2(
+			return A3(
 				author$project$Page$Skeleton$view,
 				author$project$Main$ArticlesMsg,
-				author$project$Page$Articles$view(articlesModel));
+				model.session,
+				A2(author$project$Page$Articles$view, model.session, articlesModel));
 		case 'Article':
 			var articleModel = _n0.a;
-			return A2(
+			return A3(
 				author$project$Page$Skeleton$view,
 				author$project$Main$ArticleMsg,
-				author$project$Page$Article$view(articleModel));
-		case 'Design':
-			var designModel = _n0.a;
-			return A2(
-				author$project$Page$Skeleton$view,
-				author$project$Main$DesignMsg,
-				author$project$Page$Design$view(designModel));
+				model.session,
+				A2(author$project$Page$Article$view, model.session, articleModel));
 		default:
 			var adminModel = _n0.a;
-			return A2(
+			return A3(
 				author$project$Page$Skeleton$view,
 				author$project$Main$AdminMsg,
-				author$project$Page$Admin$view(adminModel));
+				model.session,
+				A2(author$project$Page$Admin$view, model.session, adminModel));
 	}
 };
 var elm$browser$Browser$application = _Browser_application;

@@ -14,16 +14,16 @@ import Session
 
 
 type alias Model =
-    { session : Session.Data
-    , editing : Bool
+    { editing : Bool
     , article : Maybe Article.Article
     }
 
 
-init : Session.Data -> String -> ( Model, Cmd Msg )
+init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { session = session, editing = False, article = Nothing }
+    ( { editing = False, article = Nothing }
     , Ports.fetchArticles (Encode.object [ ( "id", Encode.string id ) ])
+    , session
     )
 
 
@@ -32,16 +32,16 @@ type Msg
     | Toggle
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
+update session msg model =
     case msg of
         GotArticle value ->
             case Decode.decodeValue Article.decodeOne value of
                 Ok article ->
-                    ( { model | article = Just article }, Cmd.none )
+                    ( { model | article = Just article }, Cmd.none, session )
 
                 Err _ ->
-                    ( model, Cmd.none )
+                    ( model, Cmd.none, session )
 
         Toggle ->
             case model.article of
@@ -56,23 +56,29 @@ update msg model =
 
                       else
                         Ports.fetchEditedArticle (Encode.object [ ( "id", Encode.string article.id ) ])
+                    , session
                     )
 
                 Nothing ->
-                    ( model, Cmd.none )
+                    ( model, Cmd.none, session )
 
 
-view : Model -> Skeleton.Document Msg
-view model =
+view : Session.Data -> Model -> Skeleton.Document Msg
+view session model =
     { title = "SOKOL SOKOL | Articles"
     , body =
         case model.article of
             Just article ->
-                if model.editing then
-                    [ viewArticleEditable article ]
+                case session.user of
+                    Session.LoggedIn state ->
+                        if state.editing then
+                            [ viewArticleEditing article ]
 
-                else
-                    [ viewArticle article ]
+                        else
+                            [ viewArticleEditable article ]
+
+                    Session.Anonymous ->
+                            [ viewArticle article ]
 
             Nothing ->
                 [ Html.text "loading" ]
@@ -81,6 +87,17 @@ view model =
 
 viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
+    Html.article
+        [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
+        [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
+        , Html.div []
+            (paragraphs article)
+        ]
+
+
+
+viewArticleEditable : Article.Article -> Html.Html Msg
+viewArticleEditable article =
     Html.article
         [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
         [ Html.h1 [ Attr.css [ Css.textDecoration Css.overline ] ] [ Html.text article.title ]
@@ -97,14 +114,10 @@ viewArticle article =
         ]
 
 
-viewArticleEditable : Article.Article -> Html.Html Msg
-viewArticleEditable article =
+viewArticleEditing : Article.Article -> Html.Html Msg
+viewArticleEditing article =
     Html.div
-        [ Attr.css
-            [ Css.border3 (Css.px 1) Css.dotted Color.black
-            , Css.padding (Css.px 24)
-            ]
-        ]
+        []
         [ Html.article
             [ Attr.css
                 [ Css.maxWidth (Css.px 780)

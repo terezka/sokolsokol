@@ -12,15 +12,15 @@ import Session
 
 
 type alias Model =
-    { session : Session.Data
-    , articles : List Article.Article
+    { articles : List Article.Article
     }
 
 
-init : Session.Data -> ( Model, Cmd Msg )
+init : Session.Data -> ( Model, Cmd Msg, Session.Data )
 init session =
-    ( { session = session, articles = [] }
+    ( { articles = [] }
     , Ports.fetchArticles (Encode.object [])
+    , session
     )
 
 
@@ -28,20 +28,20 @@ type Msg
     = GotArticles Encode.Value
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
+update session msg model =
     case msg of
         GotArticles value ->
             case Decode.decodeValue Article.decodeMany value of
                 Ok articles ->
-                    ( { model | articles = articles }, Cmd.none )
+                    ( { model | articles = articles }, Cmd.none, session )
 
                 Err _ ->
-                    ( model, Cmd.none )
+                    ( model, Cmd.none, session )
 
 
-view : Model -> Skeleton.Document Msg
-view model =
+view : Session.Data -> Model -> Skeleton.Document Msg
+view session model =
     { title = "SOKOL SOKOL | Articles"
     , body = List.map viewArticle model.articles
     }

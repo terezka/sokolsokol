@@ -6,6 +6,7 @@ import Css.Global
 import Element.Color
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Session
 
 
 type alias Document msg =
@@ -14,8 +15,8 @@ type alias Document msg =
     }
 
 
-view : (a -> msg) -> Document a -> Browser.Document msg
-view toMsg document =
+view : (a -> msg) -> Session.Data -> Document a -> Browser.Document msg
+view toMsg session document =
     { title = document.title
     , body =
         List.map Html.toUnstyled

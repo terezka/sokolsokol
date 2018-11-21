@@ -11,16 +11,15 @@ import Session
 
 
 type alias Model =
-    { session : Session.Data
-    , email : String
+    { email : String
     , password : String
     , message : Maybe String
     }
 
 
-init : Session.Data -> ( Model, Cmd Msg )
+init : Session.Data -> ( Model, Cmd Msg, Session.Data)
 init session =
-    ( Model session "" "" Nothing, Cmd.none )
+    ( Model "" "" Nothing, Cmd.none, session )
 
 
 type Msg
@@ -30,34 +29,35 @@ type Msg
     | GotError Encode.Value
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
+update session msg model =
     case msg of
         UpdateEmail email ->
-            ( { model | email = email }, Cmd.none )
+            ( { model | email = email }, Cmd.none, session )
 
         UpdatePassword password ->
-            ( { model | password = password }, Cmd.none )
+            ( { model | password = password }, Cmd.none, session  )
 
         Submit ->
             ( model
             , authenticate (encodeUser model.email model.password)
+            , session
             )
 
         GotError messageValue ->
             case Decode.decodeValue decodeResponse messageValue of
                 Err _ ->
-                    ( { model | message = Just "Could not decode error" }, Cmd.none )
+                    ( { model | message = Just "Could not decode error" }, Cmd.none, session  )
 
                 Ok (Err ( code, message )) ->
-                    ( { model | message = Just message }, Cmd.none )
+                    ( { model | message = Just message }, Cmd.none, session  )
 
                 Ok (Ok _) ->
-                    ( { model | message = Just "Logged in!" }, Cmd.none )
+                    ( { model | message = Just "Logged in!" }, Cmd.none, session  )
 
 
-view : Model -> Skeleton.Document Msg
-view model =
+view : Session.Data -> Model -> Skeleton.Document Msg
+view session model =
     { title = "SOKOL SOKOL | The wool pants"
     , body =
         [ Html.form

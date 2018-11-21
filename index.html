@@ -32,6 +32,7 @@
     var el = document.getElementById("elm")
     var app = Elm.Main.init({ node: el });
 
+    // AUTHENTICATION | LOGIN
     app.ports.authenticate.subscribe(function(data) {
       firebase.auth()
         .setPersistence(firebase.auth.Auth.Persistence.SESSION)
@@ -45,6 +46,16 @@
         });
     });
 
+    // AUTHENTICATION | SESSION
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        app.ports.authenticationState.send({ email: user.email });
+      } else {
+        app.ports.authenticationState.send(null);
+      }
+    });
+
+    // ARTICLES
     app.ports.fetchArticles.subscribe(function(data) {
       if (data.id) {
         database.ref('/articles/' + data.id).once('value').then(function(snapshot) {
