@@ -83,6 +83,7 @@ styles =
         , Css.margin Css.zero
         , Css.marginTop (Css.px 200)
         , Css.marginBottom (Css.px 200)
+        , Css.marginLeft (Css.px 120)
         ]
     , Css.Global.h1
         [ Css.fontWeight (Css.int 500)

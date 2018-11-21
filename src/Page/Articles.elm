@@ -37,7 +37,7 @@ view session model =
     { title = "SOKOL SOKOL | Articles"
     , body =
         [ Html.div
-            [ Attr.css [ Css.maxWidth (Css.px 1100) ] ]
+            [ Attr.css [ Css.maxWidth (Css.px 1100), Css.width (Css.pct 100) ] ]
             [ Html.h2
                 [ Attr.css [ Css.maxWidth (Css.px 700) ] ]
                 [ Html.text "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque." ]

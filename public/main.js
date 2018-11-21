@@ -9774,7 +9774,9 @@ var author$project$Page$Articles$view = F2(
 							_List_fromArray(
 								[
 									rtfeldman$elm_css$Css$maxWidth(
-									rtfeldman$elm_css$Css$px(1100))
+									rtfeldman$elm_css$Css$px(1100)),
+									rtfeldman$elm_css$Css$width(
+									rtfeldman$elm_css$Css$pct(100))
 								]))
 						]),
 					_List_fromArray(
@@ -9851,6 +9853,7 @@ var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 		fn(rtfeldman$elm_css$Css$Internal$lengthForOverloadedProperty));
 };
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
+var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
 var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
 var rtfeldman$elm_css$Css$VwUnits = {$: 'VwUnits'};
@@ -9906,7 +9909,9 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 				rtfeldman$elm_css$Css$marginTop(
 				rtfeldman$elm_css$Css$px(200)),
 				rtfeldman$elm_css$Css$marginBottom(
-				rtfeldman$elm_css$Css$px(200))
+				rtfeldman$elm_css$Css$px(200)),
+				rtfeldman$elm_css$Css$marginLeft(
+				rtfeldman$elm_css$Css$px(120))
 			])),
 		rtfeldman$elm_css$Css$Global$h1(
 		_List_fromArray(
