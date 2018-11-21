@@ -1,10 +1,12 @@
 {
   "alias": "sokolsokol.com",
-  "rewrites": [
-    { "source": "src/**", "destination": "/index.html" },
-    { "source": "articles", "destination": "/index.html" },
-    { "source": "articles/**", "destination": "/index.html" },
-    { "source": "designs", "destination": "/index.html" },
-    { "source": "designs/**", "destination": "/index.html" }
-  ]
+  "static": {
+  	"rewrites": [
+	    { "source": "src/**", "destination": "/index.html" },
+	    { "source": "articles", "destination": "/index.html" },
+	    { "source": "articles/**", "destination": "/index.html" },
+	    { "source": "designs", "destination": "/index.html" },
+	    { "source": "designs/**", "destination": "/index.html" }
+	  ]
+  }
 }
