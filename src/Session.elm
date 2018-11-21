@@ -3,6 +3,7 @@ module Session exposing
     , State
     , User(..)
     , empty
+    , withAdmin
     , getArticle
     , getArticles
     , setArticle
@@ -12,6 +13,7 @@ module Session exposing
     )
 
 import Data.Article as Article
+import Html.Styled as Html
 import Data.User as User
 import Dict
 
@@ -38,6 +40,13 @@ empty =
     { articles = Dict.empty
     , user = Anonymous
     }
+
+
+withAdmin : Data -> (State -> Html.Html msg) -> Html.Html msg
+withAdmin data view =
+    case data.user of
+        LoggedIn state -> view state
+        Anonymous -> Html.text ""
 
 
 setArticles : List Article.Article -> Data -> Data

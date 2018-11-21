@@ -44,7 +44,14 @@ view session model =
             , Html.div
                 [ Attr.css []
                 ]
-                (List.map viewArticle (Session.getArticles session))
+                (List.map viewArticle <|
+                    case session.user of
+                        Session.LoggedIn _ ->
+                            Article.placeholder :: Session.getArticles session
+
+                        Session.Anonymous ->
+                            Session.getArticles session
+                )
             ]
         ]
     }
@@ -54,7 +61,7 @@ viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
     Html.article
         [ Attr.css
-            [ Css.width (Css.pct 33)
+            [ Css.width (Css.pct 32)
             , Css.display Css.inlineBlock
             , Css.verticalAlign Css.top
             , Css.marginRight (Css.px 8)

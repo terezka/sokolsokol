@@ -79,7 +79,7 @@ styles =
         , Css.alignItems Css.center
         , Css.justifyContent Css.center
         , Css.flexDirection Css.column
-        , Css.width (Css.vw 100)
+        , Css.property "width" "calc(100vw - 120px)"
         , Css.margin Css.zero
         , Css.marginTop (Css.px 100)
         , Css.marginBottom (Css.px 100)

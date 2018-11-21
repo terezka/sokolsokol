@@ -5182,7 +5182,7 @@ var author$project$Page$Admin$init = function (session) {
 var author$project$Page$Article$init = F2(
 	function (session, id) {
 		return _Utils_Tuple3(
-			{id: id},
+			{editing: elm$core$Maybe$Nothing, id: id},
 			elm$core$Platform$Cmd$none,
 			session);
 	});
@@ -6016,14 +6016,23 @@ var author$project$Page$Admin$authenticateResponse = _Platform_incomingPort('aut
 var author$project$Page$Admin$subscriptions = function (model) {
 	return author$project$Page$Admin$authenticateResponse(author$project$Page$Admin$GotError);
 };
+var author$project$Page$Article$GotArticle = function (a) {
+	return {$: 'GotArticle', a: a};
+};
 var author$project$Page$Article$GotFileDownloadUrl = function (a) {
 	return {$: 'GotFileDownloadUrl', a: a};
 };
+var author$project$Ports$receiveEditedArticle = _Platform_incomingPort('receiveEditedArticle', elm$json$Json$Decode$value);
 var author$project$Ports$uploadedImage = _Platform_incomingPort('uploadedImage', elm$json$Json$Decode$value);
-var author$project$Page$Article$subscriptions = function (model) {
-	return author$project$Ports$uploadedImage(author$project$Page$Article$GotFileDownloadUrl);
-};
 var elm$core$Platform$Sub$batch = _Platform_batch;
+var author$project$Page$Article$subscriptions = function (model) {
+	return elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				author$project$Ports$uploadedImage(author$project$Page$Article$GotFileDownloadUrl),
+				author$project$Ports$receiveEditedArticle(author$project$Page$Article$GotArticle)
+			]));
+};
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Page$Articles$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
@@ -6252,6 +6261,7 @@ var author$project$Page$Article$GotFiles = F2(
 	function (a, b) {
 		return {$: 'GotFiles', a: a, b: b};
 	});
+var author$project$Ports$getEditedArticle = _Platform_outgoingPort('getEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$saveEditedArticle = _Platform_outgoingPort('saveEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$uploadImage = _Platform_outgoingPort('uploadImage', elm$core$Basics$identity);
 var author$project$Session$getArticle = F2(
@@ -6266,26 +6276,6 @@ var author$project$Session$setArticle = F2(
 				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
 			});
 	});
-var author$project$Session$LoggedIn = function (a) {
-	return {$: 'LoggedIn', a: a};
-};
-var elm$core$Basics$not = _Basics_not;
-var author$project$Session$toggleEditing = function (data) {
-	var _n0 = data.user;
-	if (_n0.$ === 'LoggedIn') {
-		var state = _n0.a;
-		return _Utils_update(
-			data,
-			{
-				user: author$project$Session$LoggedIn(
-					_Utils_update(
-						state,
-						{editing: !state.editing}))
-			});
-	} else {
-		return data;
-	}
-};
 var elm$core$Task$Perform = function (a) {
 	return {$: 'Perform', a: a};
 };
@@ -6438,7 +6428,7 @@ var author$project$Page$Article$update = F3(
 					session);
 			case 'GotFileDownloadUrl':
 				var value = msg.a;
-				var _n2 = A2(author$project$Session$getArticle, model.id, session);
+				var _n2 = model.editing;
 				if (_n2.$ === 'Just') {
 					var article = _n2.a;
 					var _n3 = A2(
@@ -6462,23 +6452,37 @@ var author$project$Page$Article$update = F3(
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
-			default:
-				var _n4 = A2(author$project$Session$getArticle, model.id, session);
+			case 'Toggle':
+				var _n4 = model.editing;
 				if (_n4.$ === 'Just') {
 					var article = _n4.a;
 					return _Utils_Tuple3(
 						model,
-						function () {
-							var _n5 = session.user;
-							if (_n5.$ === 'LoggedIn') {
-								var state = _n5.a;
-								return state.editing ? author$project$Ports$saveEditedArticle(
-									author$project$Data$Article$encodeOne(article)) : elm$core$Platform$Cmd$none;
-							} else {
-								return elm$core$Platform$Cmd$none;
-							}
-						}(),
-						author$project$Session$toggleEditing(session));
+						author$project$Ports$getEditedArticle(
+							author$project$Data$Article$encodeOne(article)),
+						session);
+				} else {
+					return _Utils_Tuple3(
+						_Utils_update(
+							model,
+							{
+								editing: A2(author$project$Session$getArticle, model.id, session)
+							}),
+						elm$core$Platform$Cmd$none,
+						session);
+				}
+			default:
+				var value = msg.a;
+				var _n5 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
+				if (_n5.$ === 'Ok') {
+					var article = _n5.a;
+					return _Utils_Tuple3(
+						_Utils_update(
+							model,
+							{editing: elm$core$Maybe$Nothing}),
+						author$project$Ports$saveEditedArticle(
+							author$project$Data$Article$encodeOne(article)),
+						A2(author$project$Session$setArticle, article, session));
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
@@ -6514,6 +6518,9 @@ var author$project$Session$setArticles = F2(
 						articles))
 			});
 	});
+var author$project$Session$LoggedIn = function (a) {
+	return {$: 'LoggedIn', a: a};
+};
 var author$project$Session$setUser = F2(
 	function (maybeUser, data) {
 		if (maybeUser.$ === 'Just') {
@@ -8176,6 +8183,7 @@ var elm$core$Basics$composeL = F3(
 		return g(
 			f(x));
 	});
+var elm$core$Basics$not = _Basics_not;
 var elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -8818,6 +8826,7 @@ var author$project$Page$Admin$view = F2(
 			title: 'SOKOL SOKOL | The wool pants'
 		};
 	});
+var author$project$Data$Article$placeholder = {body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.', cover: elm$core$Maybe$Nothing, id: 'placeholder', title: 'Placeholder'};
 var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
 var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
 var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
@@ -9745,30 +9754,45 @@ var author$project$Page$Article$view = F2(
 	function (session, model) {
 		return {
 			body: function () {
-				var _n0 = A2(author$project$Session$getArticle, model.id, session);
-				if (_n0.$ === 'Just') {
-					var article = _n0.a;
-					var _n1 = session.user;
-					if (_n1.$ === 'LoggedIn') {
-						var state = _n1.a;
-						return state.editing ? _List_fromArray(
+				var _n0 = session.user;
+				if (_n0.$ === 'LoggedIn') {
+					var state = _n0.a;
+					var _n1 = model.editing;
+					if (_n1.$ === 'Just') {
+						var article = _n1.a;
+						return _List_fromArray(
 							[
 								author$project$Page$Article$viewArticleEditing(article)
-							]) : _List_fromArray(
-							[
-								author$project$Page$Article$viewArticleEditable(article)
 							]);
 					} else {
+						var _n2 = A2(author$project$Session$getArticle, model.id, session);
+						if (_n2.$ === 'Just') {
+							var article = _n2.a;
+							return _List_fromArray(
+								[
+									author$project$Page$Article$viewArticleEditable(article)
+								]);
+						} else {
+							return _List_fromArray(
+								[
+									author$project$Page$Article$viewArticleEditing(author$project$Data$Article$placeholder)
+								]);
+						}
+					}
+				} else {
+					var _n3 = A2(author$project$Session$getArticle, model.id, session);
+					if (_n3.$ === 'Just') {
+						var article = _n3.a;
 						return _List_fromArray(
 							[
 								author$project$Page$Article$viewArticle(article)
 							]);
+					} else {
+						return _List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Loading...')
+							]);
 					}
-				} else {
-					return _List_fromArray(
-						[
-							rtfeldman$elm_css$Html$Styled$text('loading')
-						]);
 				}
 			}(),
 			title: 'SOKOL SOKOL | Articles'
@@ -9787,7 +9811,7 @@ var author$project$Page$Articles$viewArticle = function (article) {
 				_List_fromArray(
 					[
 						rtfeldman$elm_css$Css$width(
-						rtfeldman$elm_css$Css$pct(33)),
+						rtfeldman$elm_css$Css$pct(32)),
 						rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock),
 						rtfeldman$elm_css$Css$verticalAlign(rtfeldman$elm_css$Css$top),
 						rtfeldman$elm_css$Css$marginRight(
@@ -9892,7 +9916,17 @@ var author$project$Page$Articles$view = F2(
 							A2(
 								elm$core$List$map,
 								author$project$Page$Articles$viewArticle,
-								author$project$Session$getArticles(session)))
+								function () {
+									var _n0 = session.user;
+									if (_n0.$ === 'LoggedIn') {
+										return A2(
+											elm$core$List$cons,
+											author$project$Data$Article$placeholder,
+											author$project$Session$getArticles(session));
+									} else {
+										return author$project$Session$getArticles(session);
+									}
+								}()))
 						]))
 				]),
 			title: 'SOKOL SOKOL | Articles'
@@ -9923,8 +9957,6 @@ var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-dire
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
 var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
-var rtfeldman$elm_css$Css$VwUnits = {$: 'VwUnits'};
-var rtfeldman$elm_css$Css$vw = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$VwUnits, 'vw');
 var rtfeldman$elm_css$Css$Structure$TypeSelector = function (a) {
 	return {$: 'TypeSelector', a: a};
 };
@@ -9970,8 +10002,7 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 				rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center),
 				rtfeldman$elm_css$Css$justifyContent(rtfeldman$elm_css$Css$center),
 				rtfeldman$elm_css$Css$flexDirection(rtfeldman$elm_css$Css$column),
-				rtfeldman$elm_css$Css$width(
-				rtfeldman$elm_css$Css$vw(100)),
+				A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100vw - 120px)'),
 				rtfeldman$elm_css$Css$margin(rtfeldman$elm_css$Css$zero),
 				rtfeldman$elm_css$Css$marginTop(
 				rtfeldman$elm_css$Css$px(100)),

@@ -22,12 +22,13 @@ import Task
 
 type alias Model =
     { id : Article.Id
+    , editing : Maybe Article.Article
     }
 
 
 init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { id = id }
+    ( { id = id, editing = Nothing }
     , Cmd.none
     , session
     )
@@ -40,6 +41,7 @@ type Msg
     | GotFiles File.File (List File.File)
     | GotFileUrl String String
     | GotFileDownloadUrl Encode.Value
+    | GotArticle Encode.Value
 
 
 update : Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
@@ -76,7 +78,7 @@ update session msg model =
             )
 
         GotFileDownloadUrl value ->
-            case Session.getArticle model.id session of
+            case model.editing of
                 Just article ->
                     case Decode.decodeValue (Decode.field "url" Decode.string) value of
                         Ok url ->
@@ -92,45 +94,58 @@ update session msg model =
                     ( model, Cmd.none, session )
 
         Toggle ->
-            case Session.getArticle model.id session of
+            case model.editing of
                 Just article ->
                     ( model
-                    , case session.user of
-                        Session.LoggedIn state ->
-                            if state.editing then
-                                Ports.saveEditedArticle (Article.encodeOne article)
-
-                            else
-                                Cmd.none
-
-                        Session.Anonymous ->
-                            Cmd.none
-                    , Session.toggleEditing session
+                    , Ports.getEditedArticle (Article.encodeOne article)
+                    , session
                     )
 
                 Nothing ->
+                    ( { model | editing = Session.getArticle model.id session }
+                    , Cmd.none
+                    , session
+                    )
+
+        GotArticle value ->
+            case Decode.decodeValue Article.decodeOne value of
+                Ok article ->
+                    ( { model | editing = Nothing }
+                    , Ports.saveEditedArticle (Article.encodeOne article)
+                    , Session.setArticle article session
+                    )
+
+                Err _ ->
                     ( model, Cmd.none, session )
+
 
 
 view : Session.Data -> Model -> Skeleton.Document Msg
 view session model =
     { title = "SOKOL SOKOL | Articles"
     , body =
-        case Session.getArticle model.id session of
-            Just article ->
-                case session.user of
-                    Session.LoggedIn state ->
-                        if state.editing then
-                            [ viewArticleEditing article ]
+        case session.user of
+            Session.LoggedIn state ->
+                case model.editing of
+                    Just article ->
+                        [ viewArticleEditing article ]
 
-                        else
-                            [ viewArticleEditable article ]
+                    Nothing ->
+                        case Session.getArticle model.id session of
+                            Just article ->
+                                [ viewArticleEditable article ]
 
-                    Session.Anonymous ->
+                            Nothing ->
+                                [ viewArticleEditing Article.placeholder ]
+
+
+            Session.Anonymous ->
+                 case Session.getArticle model.id session of
+                    Just article ->
                         [ viewArticle article ]
 
-            Nothing ->
-                [ Html.text "loading" ]
+                    Nothing ->
+                        [ Html.text "Loading..." ]
     }
 
 
@@ -202,4 +217,9 @@ paragraphs article =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Ports.uploadedImage GotFileDownloadUrl
+    Sub.batch
+        [ Ports.uploadedImage GotFileDownloadUrl
+        , Ports.receiveEditedArticle GotArticle
+        ]
+
+

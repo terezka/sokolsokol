@@ -1,4 +1,5 @@
-port module Ports exposing (authenticationState, fetchArticles, receiveArticle, receiveArticles, saveEditedArticle, uploadImage, uploadedImage)
+port module Ports exposing (authenticationState, fetchArticles, getEditedArticle,
+    receiveEditedArticle, receiveArticle, receiveArticles, saveEditedArticle, uploadImage, uploadedImage)
 
 import Data.Article as Article
 import Json.Decode as Decode
@@ -24,3 +25,10 @@ port uploadImage : Encode.Value -> Cmd msg
 
 
 port uploadedImage : (Encode.Value -> msg) -> Sub msg
+
+
+port getEditedArticle : Encode.Value -> Cmd msg
+
+port receiveEditedArticle : (Encode.Value -> msg) -> Sub msg
+
+

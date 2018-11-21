@@ -73,24 +73,25 @@
       });
     });
 
-    app.ports.saveEditedArticle.subscribe(function(data) {
-      console.log(data)
+
+    app.ports.getEditedArticle.subscribe(function(data) {
       var titleEl = document.getElementById("title");
       var bodyEl = document.getElementById("body");
 
-      var article =
-        { cover: data.cover,
-          title: titleEl ? titleEl.outerText : data.title,
-          body : bodyEl ? bodyEl.outerText : data.body
-        };
-
-      database.ref('articles/' + data.id).set(article);
-
-      app.ports.receiveArticle.send({
+      app.ports.receiveEditedArticle.send({
         id: data.id,
         cover: data.cover,
-        title: article.title,
-        body: article.body
+        title: titleEl ? titleEl.outerText : data.title,
+        body: bodyEl ? bodyEl.outerText : data.body
+      });
+    });
+
+    app.ports.saveEditedArticle.subscribe(function(data) {
+      database.ref('articles/' + data.id).set({
+        id: data.id,
+        cover: data.cover,
+        title: data.title,
+        body: data.body
       });
     });
 
