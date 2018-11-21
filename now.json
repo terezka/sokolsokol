@@ -1,3 +1,13 @@
 {
-  "alias": "sokolsokol.com"
+  "alias": "sokolsokol.com",
+  "static": {
+  	"rewrites": [
+	    { "source": "src/**", "destination": "/index.html" },
+	    { "source": "articles", "destination": "/index.html" },
+	    { "source": "articles/**", "destination": "/index.html" },
+	    { "source": "designs", "destination": "/index.html" },
+	    { "source": "designs/**", "destination": "/index.html" },
+	    { "source": "admin", "destination": "/index.html" }
+	  ]
+  }
 }

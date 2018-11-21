@@ -4,14 +4,20 @@ import Browser
 import Browser.Navigation as Nav
 import Css
 import Css.Global
+import Data.Article as Article
+import Data.User as User
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Json.Decode as Decode
+import Json.Encode as Encode
+import Page.Admin as Admin
 import Page.Article as Article
-import Page.Design as Design
+import Page.Articles as Articles
 import Page.Skeleton as Skeleton
+import Ports
 import Session
 import Url
-import Url.Parser as Parser exposing ((</>), Parser, custom, fragment, map, oneOf, s, top)
+import Url.Parser as Parser exposing ((</>), Parser, custom, fragment, map, oneOf, s, string, top)
 
 
 main =
@@ -27,14 +33,16 @@ main =
 
 type alias Model =
     { key : Nav.Key
+    , session : Session.Data
     , page : Page
     }
 
 
 type Page
-    = NotFound Session.Data
+    = NotFound
+    | Articles Articles.Model
     | Article Article.Model
-    | Design Design.Model
+    | Admin Admin.Model
 
 
 
@@ -43,7 +51,26 @@ type Page
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch
+        [ Ports.authenticationState OnAuthChange
+        , Ports.receiveArticles GotArticles
+        , Ports.receiveArticle GotArticle
+        , case model.page of
+            Admin adminModel ->
+                Admin.subscriptions adminModel
+                    |> Sub.map AdminMsg
+
+            Articles articlesModel ->
+                Articles.subscriptions articlesModel
+                    |> Sub.map ArticlesMsg
+
+            Article articleModel ->
+                Article.subscriptions articleModel
+                    |> Sub.map ArticleMsg
+
+            _ ->
+                Sub.none
+        ]
 
 
 
@@ -53,17 +80,21 @@ subscriptions model =
 view : Model -> Browser.Document Msg
 view model =
     case model.page of
-        NotFound _ ->
+        NotFound ->
             Skeleton.view never
+                model.session
                 { title = "SOKOL SOKOL | Not found."
                 , body = [ Html.text "Not found." ]
                 }
 
-        Article articleModel ->
-            Skeleton.view ArticleMsg (Article.view articleModel)
+        Articles articlesModel ->
+            Skeleton.view ArticlesMsg model.session (Articles.view model.session articlesModel)
 
-        Design designModel ->
-            Skeleton.view DesignMsg (Design.view designModel)
+        Article articleModel ->
+            Skeleton.view ArticleMsg model.session (Article.view model.session articleModel)
+
+        Admin adminModel ->
+            Skeleton.view AdminMsg model.session (Admin.view model.session adminModel)
 
 
 
@@ -72,10 +103,15 @@ view model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    stepUrl url
-        { key = key
-        , page = NotFound Session.empty
-        }
+    let
+        ( model, cmd ) =
+            stepUrl url
+                { key = key
+                , page = NotFound
+                , session = Session.empty
+                }
+    in
+    ( model, Cmd.batch [ Ports.fetchArticles Encode.null, cmd ] )
 
 
 
@@ -86,8 +122,12 @@ type Msg
     = NoOp
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | OnAuthChange Encode.Value
+    | GotArticles Encode.Value
+    | GotArticle Encode.Value
+    | ArticlesMsg Articles.Msg
     | ArticleMsg Article.Msg
-    | DesignMsg Design.Msg
+    | AdminMsg Admin.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -111,52 +151,78 @@ update message model =
         UrlChanged url ->
             stepUrl url model
 
+        OnAuthChange value ->
+            case Decode.decodeValue User.decodeOne value of
+                Ok user ->
+                    ( { model | session = Session.setUser (Just user) model.session }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model | session = Session.setUser Nothing model.session }
+                    , Cmd.none
+                    )
+
+        GotArticles value ->
+            case Decode.decodeValue Article.decodeMany value of
+                Ok articles ->
+                    ( { model | session = Session.setArticles articles model.session }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        GotArticle value ->
+            case Decode.decodeValue Article.decodeOne value of
+                Ok article ->
+                    ( { model | session = Session.setArticle article model.session }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        ArticlesMsg msg ->
+            case model.page of
+                Articles article2Model ->
+                    stepArticles model (Articles.update model.session msg article2Model)
+
+                _ ->
+                    ( model, Cmd.none )
+
         ArticleMsg msg ->
             case model.page of
                 Article articleModel ->
-                    stepArticle model (Article.update msg articleModel)
+                    stepArticle model (Article.update model.key model.session msg articleModel)
 
                 _ ->
                     ( model, Cmd.none )
 
-        DesignMsg msg ->
+        AdminMsg msg ->
             case model.page of
-                Design designModel ->
-                    stepDesign model (Design.update msg designModel)
+                Admin designModel ->
+                    stepAdmin model (Admin.update model.session msg designModel)
 
                 _ ->
                     ( model, Cmd.none )
 
 
-stepArticle : Model -> ( Article.Model, Cmd Article.Msg ) -> ( Model, Cmd Msg )
-stepArticle model ( articleModel, cmds ) =
-    ( { model | page = Article articleModel }
+stepArticles : Model -> ( Articles.Model, Cmd Articles.Msg, Session.Data ) -> ( Model, Cmd Msg )
+stepArticles model ( articlesModel, cmds, session ) =
+    ( { model | page = Articles articlesModel, session = session }
+    , Cmd.map ArticlesMsg cmds
+    )
+
+
+stepArticle : Model -> ( Article.Model, Cmd Article.Msg, Session.Data ) -> ( Model, Cmd Msg )
+stepArticle model ( articleModel, cmds, session ) =
+    ( { model | page = Article articleModel, session = session }
     , Cmd.map ArticleMsg cmds
     )
 
 
-stepDesign : Model -> ( Design.Model, Cmd Design.Msg ) -> ( Model, Cmd Msg )
-stepDesign model ( articleModel, cmds ) =
-    ( { model | page = Design articleModel }
-    , Cmd.map DesignMsg cmds
+stepAdmin : Model -> ( Admin.Model, Cmd Admin.Msg, Session.Data ) -> ( Model, Cmd Msg )
+stepAdmin model ( articleModel, cmds, session ) =
+    ( { model | page = Admin articleModel, session = session }
+    , Cmd.map AdminMsg cmds
     )
-
-
-
--- EXIT
-
-
-exit : Model -> Session.Data
-exit model =
-    case model.page of
-        NotFound session ->
-            session
-
-        Article m ->
-            m.session
-
-        Design m ->
-            m.session
 
 
 
@@ -166,17 +232,16 @@ exit model =
 stepUrl : Url.Url -> Model -> ( Model, Cmd Msg )
 stepUrl url model =
     let
-        session =
-            exit model
-
         parser =
             oneOf
                 [ route top
-                    (stepArticle model (Article.init session))
+                    (stepArticles model (Articles.init model.session))
                 , route (s "articles")
-                    (stepArticle model (Article.init session))
-                , route (s "designs")
-                    (stepDesign model (Design.init session))
+                    (stepArticles model (Articles.init model.session))
+                , route (s "articles" </> string)
+                    (\id -> stepArticle model (Article.init model.session id))
+                , route (s "admin")
+                    (stepAdmin model (Admin.init model.session))
                 ]
     in
     case Parser.parse parser url of
@@ -184,7 +249,7 @@ stepUrl url model =
             answer
 
         Nothing ->
-            ( { model | page = NotFound session }
+            ( { model | page = NotFound }
             , Cmd.none
             )
 

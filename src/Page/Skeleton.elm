@@ -3,9 +3,10 @@ module Page.Skeleton exposing (Document, view)
 import Browser
 import Css
 import Css.Global
-import Element.Color
+import Element.Color as Color
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Session
 
 
 type alias Document msg =
@@ -14,8 +15,8 @@ type alias Document msg =
     }
 
 
-view : (a -> msg) -> Document a -> Browser.Document msg
-view toMsg document =
+view : (a -> msg) -> Session.Data -> Document a -> Browser.Document msg
+view toMsg session document =
     { title = document.title
     , body =
         List.map Html.toUnstyled
@@ -26,13 +27,7 @@ view toMsg document =
                     , Css.top Css.zero
                     ]
                 ]
-                [ logo
-                , nav
-                    [ navItem "/articles" "writing"
-                    , navItem "/designs" "designs"
-                    , navItem "/moods" "moods"
-                    ]
-                ]
+                [ Html.a [ Attr.href "/" ] [ logo ] ]
             , Html.main_ [] (List.map (Html.map toMsg) document.body)
             ]
     }
@@ -41,7 +36,11 @@ view toMsg document =
 logo : Html.Html msg
 logo =
     Html.h1
-        [ Attr.css [ Css.marginBottom (Css.px 8) ]
+        [ Attr.css
+            [ Css.marginBottom (Css.px 8)
+            , Css.padding (Css.px 8)
+            , Css.backgroundColor Color.white
+            ]
         ]
         [ Html.text "SOKOL SOKOL" ]
 
@@ -84,10 +83,11 @@ styles =
         , Css.alignItems Css.center
         , Css.justifyContent Css.center
         , Css.flexDirection Css.column
-        , Css.marginRight Css.zero
-        , Css.marginTop (Css.px 200)
-        , Css.marginBottom (Css.px 200)
-        , Css.marginLeft (Css.px 200)
+        , Css.property "width" "calc(100vw - 120px)"
+        , Css.margin Css.zero
+        , Css.marginTop (Css.px 100)
+        , Css.marginBottom (Css.px 100)
+        , Css.marginLeft (Css.px 120)
         ]
     , Css.Global.h1
         [ Css.fontWeight (Css.int 500)
@@ -102,8 +102,8 @@ styles =
         , Css.fontSize (Css.px 12)
         , Css.cursor Css.pointer
         , Css.textDecoration Css.none
-        , Css.color Element.Color.black
+        , Css.color Color.black
         , Css.hover
-            [ Css.color Element.Color.blue ]
+            [ Css.color Color.blue ]
         ]
     ]
