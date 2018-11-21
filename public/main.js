@@ -5067,11 +5067,6 @@ var author$project$Page$Admin$init = function (session) {
 		A4(author$project$Page$Admin$Model, session, '', '', elm$core$Maybe$Nothing),
 		elm$core$Platform$Cmd$none);
 };
-var author$project$Page$Article$init = function (session) {
-	return _Utils_Tuple2(
-		{session: session},
-		elm$core$Platform$Cmd$none);
-};
 var author$project$Ports$fetchArticles = _Platform_outgoingPort('fetchArticles', elm$core$Basics$identity);
 var elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5086,6 +5081,20 @@ var elm$json$Json$Encode$object = function (pairs) {
 			_Json_emptyObject(_Utils_Tuple0),
 			pairs));
 };
+var elm$json$Json$Encode$string = _Json_wrap;
+var author$project$Page$Article$init = F2(
+	function (session, id) {
+		return _Utils_Tuple2(
+			{article: elm$core$Maybe$Nothing, session: session},
+			author$project$Ports$fetchArticles(
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'id',
+							elm$json$Json$Encode$string(id))
+						]))));
+	});
 var author$project$Page$Articles$init = function (session) {
 	return _Utils_Tuple2(
 		{articles: _List_Nil, session: session},
@@ -5862,7 +5871,7 @@ var author$project$Main$stepUrl = F2(
 						return A2(
 							author$project$Main$stepArticle,
 							model,
-							author$project$Page$Article$init(session));
+							A2(author$project$Page$Article$init, session, id));
 					}),
 					A2(
 					author$project$Main$route,
@@ -5912,6 +5921,13 @@ var author$project$Page$Admin$authenticateResponse = _Platform_incomingPort('aut
 var author$project$Page$Admin$subscriptions = function (model) {
 	return author$project$Page$Admin$authenticateResponse(author$project$Page$Admin$GotError);
 };
+var author$project$Page$Article$GotArticle = function (a) {
+	return {$: 'GotArticle', a: a};
+};
+var author$project$Ports$receiveArticle = _Platform_incomingPort('receiveArticle', elm$json$Json$Decode$value);
+var author$project$Page$Article$subscriptions = function (model) {
+	return author$project$Ports$receiveArticle(author$project$Page$Article$GotArticle);
+};
 var author$project$Page$Articles$GotArticles = function (a) {
 	return {$: 'GotArticles', a: a};
 };
@@ -5937,6 +5953,12 @@ var author$project$Main$subscriptions = function (model) {
 				elm$core$Platform$Sub$map,
 				author$project$Main$ArticlesMsg,
 				author$project$Page$Articles$subscriptions(articlesModel));
+		case 'Article':
+			var articleModel = _n0.a;
+			return A2(
+				elm$core$Platform$Sub$map,
+				author$project$Main$ArticleMsg,
+				author$project$Page$Article$subscriptions(articleModel));
 		default:
 			return elm$core$Platform$Sub$none;
 	}
@@ -5965,7 +5987,6 @@ var author$project$Page$Admin$decodeResponse = elm$json$Json$Decode$oneOf(
 			A2(elm$json$Json$Decode$field, 'code', elm$json$Json$Decode$string),
 			A2(elm$json$Json$Decode$field, 'message', elm$json$Json$Decode$string))
 		]));
-var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Admin$encodeUser = F2(
 	function (email, password) {
 		return elm$json$Json$Encode$object(
@@ -6037,10 +6058,6 @@ var author$project$Page$Admin$update = F2(
 				}
 		}
 	});
-var author$project$Page$Article$update = F2(
-	function (msg, model) {
-		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-	});
 var author$project$Data$Article$Article = F2(
 	function (title, body) {
 		return {body: body, title: title};
@@ -6050,6 +6067,23 @@ var author$project$Data$Article$decodeOne = A3(
 	author$project$Data$Article$Article,
 	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
+var author$project$Page$Article$update = F2(
+	function (msg, model) {
+		var value = msg.a;
+		var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
+		if (_n1.$ === 'Ok') {
+			var article = _n1.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						article: elm$core$Maybe$Just(article)
+					}),
+				elm$core$Platform$Cmd$none);
+		} else {
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		}
+	});
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Data$Article$decodeMany = elm$json$Json$Decode$list(author$project$Data$Article$decodeOne);
 var author$project$Page$Articles$update = F2(
@@ -8397,141 +8431,64 @@ var author$project$Page$Admin$view = function (model) {
 		title: 'SOKOL SOKOL | The wool pants'
 	};
 };
-var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
-var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
-var rtfeldman$elm_css$Css$width = rtfeldman$elm_css$Css$prop1('width');
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
-var rtfeldman$elm_css$Html$Styled$i = rtfeldman$elm_css$Html$Styled$node('i');
-var rtfeldman$elm_css$Html$Styled$img = rtfeldman$elm_css$Html$Styled$node('img');
 var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
-var rtfeldman$elm_css$Html$Styled$Attributes$src = function (url) {
-	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'src', url);
-};
-var author$project$Page$Article$view = function (model) {
-	return {
-		body: _List_fromArray(
+var author$project$Page$Article$viewArticle = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$article,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Css$maxWidth(
+						rtfeldman$elm_css$Css$px(1080)),
+						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+					]))
+			]),
+		_List_fromArray(
 			[
 				A2(
-				rtfeldman$elm_css$Html$Styled$article,
+				rtfeldman$elm_css$Html$Styled$h1,
 				_List_fromArray(
 					[
 						rtfeldman$elm_css$Html$Styled$Attributes$css(
 						_List_fromArray(
 							[
-								rtfeldman$elm_css$Css$maxWidth(
-								rtfeldman$elm_css$Css$px(1080)),
-								A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
 							]))
 					]),
 				_List_fromArray(
 					[
-						A2(
-						rtfeldman$elm_css$Html$Styled$img,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$src('https://spectrum.ieee.org/image/Mjc5MDM4Nw.jpeg'),
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$width(
-										rtfeldman$elm_css$Css$pct(100))
-									]))
-							]),
-						_List_Nil),
-						A2(
-						rtfeldman$elm_css$Html$Styled$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-									]))
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Kafka, Civilization, and Bureaucracy')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$i,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('By Tereza Sokol')
-							]))
+						rtfeldman$elm_css$Html$Styled$text(article.title)
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text(article.body)
 					]))
-			]),
-		title: 'SOKOL SOKOL | Kafka, Civilization, and Bureaucracy'
+			]));
+};
+var author$project$Page$Article$view = function (model) {
+	return {
+		body: function () {
+			var _n0 = model.article;
+			if (_n0.$ === 'Just') {
+				var article = _n0.a;
+				return _List_fromArray(
+					[
+						author$project$Page$Article$viewArticle(article)
+					]);
+			} else {
+				return _List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text('loading')
+					]);
+			}
+		}(),
+		title: 'SOKOL SOKOL | Articles'
 	};
 };
 var author$project$Page$Articles$viewArticle = function (article) {

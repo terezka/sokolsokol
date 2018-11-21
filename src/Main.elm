@@ -56,6 +56,10 @@ subscriptions model =
             Articles.subscriptions articlesModel
                 |> Sub.map ArticlesMsg
 
+        Article articleModel ->
+            Article.subscriptions articleModel
+                |> Sub.map ArticleMsg
+
         _ ->
             Sub.none
 
@@ -234,7 +238,7 @@ stepUrl url model =
                 , route (s "articles")
                     (stepArticles model (Articles.init session))
                 , route (s "articles" </> string)
-                    (\id -> stepArticle model (Article.init session))
+                    (\id -> stepArticle model (Article.init session id))
                 , route (s "designs")
                     (stepDesign model (Design.init session))
                 , route (s "admin")

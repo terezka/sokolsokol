@@ -8,7 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-database.js"></script>
-    <script src="public/main.js"></script>
+    <script src="/public/main.js"></script>
   </head>
   <body>
     <div id="elm"></div>
@@ -45,7 +45,7 @@
         database.ref('/articles/' + data.id).once('value').then(function(snapshot) {
           var article = snapshot.val();
           article.id = data.id;
-          app.ports.receiveArticles.send([article]);
+          app.ports.receiveArticle.send(article);
         });
       } else {
         database.ref('/articles').once('value').then(function(snapshot) {
