@@ -57,7 +57,7 @@
 
     // ARTICLES
     app.ports.fetchArticles.subscribe(function(data) {
-      if (data.id) {
+      if (data) {
         database.ref('/articles/' + data.id).once('value').then(function(snapshot) {
           var article = snapshot.val();
           article.id = data.id;

@@ -2,15 +2,23 @@ module Session exposing
     ( Data
     , User(..)
     , State
+    , getArticles
+    , getArticle
+    , setArticles
     , setUser
     , toggleEditing
     , empty
     )
 
 import Data.User as User
+import Data.Article as Article
+import Dict
+
 
 type alias Data =
-    { user : User }
+    { articles : Dict.Dict Article.Id Article.Article
+    , user : User
+    }
 
 
 type User
@@ -26,7 +34,29 @@ type alias State =
 
 empty : Data
 empty =
-    { user = Anonymous }
+    { articles = Dict.empty
+    , user = Anonymous
+    }
+
+
+
+setArticles : List Article.Article -> Data -> Data
+setArticles articles data =
+    ( { data | articles =
+            articles
+                |> List.map (\a -> ( a.id, a ))
+                |> Dict.fromList
+    })
+
+
+getArticles :  Data -> List Article.Article
+getArticles data =
+    Dict.values data.articles
+
+
+getArticle : Article.Id -> Data -> Maybe Article.Article
+getArticle id data =
+    Dict.get id data.articles
 
 
 setUser : Maybe User.User -> Data -> Data

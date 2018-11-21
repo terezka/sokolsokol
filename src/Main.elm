@@ -14,6 +14,7 @@ import Page.Articles as Articles
 import Page.Skeleton as Skeleton
 import Session
 import Data.User as User
+import Data.Article as Article
 import Url
 import Url.Parser as Parser exposing ((</>), Parser, custom, fragment, map, oneOf, s, string, top)
 import Ports
@@ -51,6 +52,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
     [ Ports.authenticationState OnAuthChange
+    , Ports.receiveArticles GotArticles
     , case model.page of
             Admin adminModel ->
                 Admin.subscriptions adminModel
@@ -97,11 +99,15 @@ view model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    stepUrl url
-        { key = key
-        , page = NotFound
-        , session = Session.empty
-        }
+    let
+        ( model, cmd ) =
+            stepUrl url
+                { key = key
+                , page = NotFound
+                , session = Session.empty
+                }
+    in
+    ( model, Cmd.batch [ Ports.fetchArticles Encode.null, cmd ])
 
 
 
@@ -113,6 +119,7 @@ type Msg
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | OnAuthChange Encode.Value
+    | GotArticles Encode.Value
     | ArticlesMsg Articles.Msg
     | ArticleMsg Article.Msg
     | AdminMsg Admin.Msg
@@ -150,6 +157,14 @@ update message model =
                     ( { model | session = Session.setUser Nothing model.session }
                     , Cmd.none
                     )
+
+        GotArticles value ->
+            case Decode.decodeValue Article.decodeMany value of
+                Ok articles ->
+                    ( { model | session = Session.setArticles articles model.session }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
         ArticlesMsg msg ->
             case model.page of

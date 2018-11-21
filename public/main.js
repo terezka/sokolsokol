@@ -5065,9 +5065,8 @@ var author$project$Page$Article$init = F2(
 	});
 var author$project$Page$Articles$init = function (session) {
 	return _Utils_Tuple3(
-		{articles: _List_Nil},
-		author$project$Ports$fetchArticles(
-			elm$json$Json$Encode$object(_List_Nil)),
+		{},
+		elm$core$Platform$Cmd$none,
 		session);
 };
 var elm$core$List$append = F2(
@@ -5857,14 +5856,28 @@ var author$project$Main$stepUrl = F2(
 		}
 	});
 var author$project$Session$Anonymous = {$: 'Anonymous'};
-var author$project$Session$empty = {user: author$project$Session$Anonymous};
+var author$project$Session$empty = {articles: elm$core$Dict$empty, user: author$project$Session$Anonymous};
+var elm$json$Json$Encode$null = _Json_encodeNull;
 var author$project$Main$init = F3(
 	function (_n0, url, key) {
-		return A2(
+		var _n1 = A2(
 			author$project$Main$stepUrl,
 			url,
 			{key: key, page: author$project$Main$NotFound, session: author$project$Session$empty});
+		var model = _n1.a;
+		var cmd = _n1.b;
+		return _Utils_Tuple2(
+			model,
+			elm$core$Platform$Cmd$batch(
+				_List_fromArray(
+					[
+						author$project$Ports$fetchArticles(elm$json$Json$Encode$null),
+						cmd
+					])));
 	});
+var author$project$Main$GotArticles = function (a) {
+	return {$: 'GotArticles', a: a};
+};
 var author$project$Main$OnAuthChange = function (a) {
 	return {$: 'OnAuthChange', a: a};
 };
@@ -5888,21 +5901,19 @@ var author$project$Page$Article$subscriptions = function (model) {
 				author$project$Ports$receiveArticle(author$project$Page$Article$GotArticle)
 			]));
 };
-var author$project$Page$Articles$GotArticles = function (a) {
-	return {$: 'GotArticles', a: a};
-};
-var author$project$Ports$receiveArticles = _Platform_incomingPort('receiveArticles', elm$json$Json$Decode$value);
+var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Page$Articles$subscriptions = function (model) {
-	return author$project$Ports$receiveArticles(author$project$Page$Articles$GotArticles);
+	return elm$core$Platform$Sub$none;
 };
 var author$project$Ports$authenticationState = _Platform_incomingPort('authenticationState', elm$json$Json$Decode$value);
+var author$project$Ports$receiveArticles = _Platform_incomingPort('receiveArticles', elm$json$Json$Decode$value);
 var elm$core$Platform$Sub$map = _Platform_map;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
 	return elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
 				author$project$Ports$authenticationState(author$project$Main$OnAuthChange),
+				author$project$Ports$receiveArticles(author$project$Main$GotArticles),
 				function () {
 				var _n0 = model.page;
 				switch (_n0.$) {
@@ -5930,12 +5941,25 @@ var author$project$Main$subscriptions = function (model) {
 			}()
 			]));
 };
+var author$project$Data$Article$Article = F3(
+	function (id, title, body) {
+		return {body: body, id: id, title: title};
+	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$map3 = _Json_map3;
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$Data$Article$decodeOne = A4(
+	elm$json$Json$Decode$map3,
+	author$project$Data$Article$Article,
+	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
+var elm$json$Json$Decode$list = _Json_decodeList;
+var author$project$Data$Article$decodeMany = elm$json$Json$Decode$list(author$project$Data$Article$decodeOne);
 var author$project$Data$User$User = function (email) {
 	return {email: email};
 };
-var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$map = _Json_map1;
-var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$Data$User$decodeOne = A2(
 	elm$json$Json$Decode$map,
 	author$project$Data$User$User,
@@ -6038,17 +6062,6 @@ var author$project$Page$Admin$update = F3(
 				}
 		}
 	});
-var author$project$Data$Article$Article = F3(
-	function (id, title, body) {
-		return {body: body, id: id, title: title};
-	});
-var elm$json$Json$Decode$map3 = _Json_map3;
-var author$project$Data$Article$decodeOne = A4(
-	elm$json$Json$Decode$map3,
-	author$project$Data$Article$Article,
-	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
 var author$project$Ports$fetchEditedArticle = _Platform_outgoingPort('fetchEditedArticle', elm$core$Basics$identity);
 var author$project$Session$LoggedIn = function (a) {
 	return {$: 'LoggedIn', a: a};
@@ -6116,23 +6129,35 @@ var author$project$Page$Article$update = F3(
 			}
 		}
 	});
-var elm$json$Json$Decode$list = _Json_decodeList;
-var author$project$Data$Article$decodeMany = elm$json$Json$Decode$list(author$project$Data$Article$decodeOne);
 var author$project$Page$Articles$update = F3(
 	function (session, msg, model) {
-		var value = msg.a;
-		var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeMany, value);
-		if (_n1.$ === 'Ok') {
-			var articles = _n1.a;
-			return _Utils_Tuple3(
-				_Utils_update(
-					model,
-					{articles: articles}),
-				elm$core$Platform$Cmd$none,
-				session);
-		} else {
-			return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-		}
+		return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+	});
+var elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		elm$core$List$foldl,
+		F2(
+			function (_n0, dict) {
+				var key = _n0.a;
+				var value = _n0.b;
+				return A3(elm$core$Dict$insert, key, value, dict);
+			}),
+		elm$core$Dict$empty,
+		assocs);
+};
+var author$project$Session$setArticles = F2(
+	function (articles, data) {
+		return _Utils_update(
+			data,
+			{
+				articles: elm$core$Dict$fromList(
+					A2(
+						elm$core$List$map,
+						function (a) {
+							return _Utils_Tuple2(a.id, a);
+						},
+						articles))
+			});
 	});
 var author$project$Session$setUser = F2(
 	function (maybeUser, data) {
@@ -6483,11 +6508,26 @@ var author$project$Main$update = F2(
 							}),
 						elm$core$Platform$Cmd$none);
 				}
+			case 'GotArticles':
+				var value = message.a;
+				var _n3 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeMany, value);
+				if (_n3.$ === 'Ok') {
+					var articles = _n3.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								session: A2(author$project$Session$setArticles, articles, model.session)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
 			case 'ArticlesMsg':
 				var msg = message.a;
-				var _n3 = model.page;
-				if (_n3.$ === 'Articles') {
-					var article2Model = _n3.a;
+				var _n4 = model.page;
+				if (_n4.$ === 'Articles') {
+					var article2Model = _n4.a;
 					return A2(
 						author$project$Main$stepArticles,
 						model,
@@ -6497,9 +6537,9 @@ var author$project$Main$update = F2(
 				}
 			case 'ArticleMsg':
 				var msg = message.a;
-				var _n4 = model.page;
-				if (_n4.$ === 'Article') {
-					var articleModel = _n4.a;
+				var _n5 = model.page;
+				if (_n5.$ === 'Article') {
+					var articleModel = _n5.a;
 					return A2(
 						author$project$Main$stepArticle,
 						model,
@@ -6509,9 +6549,9 @@ var author$project$Main$update = F2(
 				}
 			default:
 				var msg = message.a;
-				var _n5 = model.page;
-				if (_n5.$ === 'Admin') {
-					var designModel = _n5.a;
+				var _n6 = model.page;
+				if (_n6.$ === 'Admin') {
+					var designModel = _n6.a;
 					return A2(
 						author$project$Main$stepAdmin,
 						model,
@@ -9221,10 +9261,26 @@ var author$project$Page$Articles$viewArticle = function (article) {
 					]))
 			]));
 };
+var elm$core$Dict$values = function (dict) {
+	return A3(
+		elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2(elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
+var author$project$Session$getArticles = function (data) {
+	return elm$core$Dict$values(data.articles);
+};
 var author$project$Page$Articles$view = F2(
 	function (session, model) {
 		return {
-			body: A2(elm$core$List$map, author$project$Page$Articles$viewArticle, model.articles),
+			body: A2(
+				elm$core$List$map,
+				author$project$Page$Articles$viewArticle,
+				author$project$Session$getArticles(session)),
 			title: 'SOKOL SOKOL | Articles'
 		};
 	});

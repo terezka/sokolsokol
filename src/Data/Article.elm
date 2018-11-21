@@ -1,13 +1,17 @@
-module Data.Article exposing (Article, decodeMany, decodeOne)
+module Data.Article exposing (Article, Id, decodeMany, decodeOne)
 
 import Json.Decode as Decode
 
 
 type alias Article =
-    { id : String
+    { id : Id
     , title : String
     , body : String
     }
+
+
+type alias Id =
+    String
 
 
 decodeOne : Decode.Decoder Article
