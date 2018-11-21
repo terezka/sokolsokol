@@ -59,5 +59,16 @@
         });
       }
     });
+
+    app.ports.fetchEditedArticle.subscribe(function(data) {
+      var titleEl = document.getElementById("title");
+      var bodyEl = document.getElementById("body");
+
+      app.ports.receiveArticle.send({
+        id: data.id,
+        title: titleEl.outerText,
+        body: bodyEl.outerText
+      });
+    });
   </script>
 </html>

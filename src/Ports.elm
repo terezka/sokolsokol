@@ -1,4 +1,4 @@
-port module Ports exposing (fetchArticles, receiveArticle, receiveArticles)
+port module Ports exposing (fetchArticles, receiveArticle, receiveArticles, fetchEditedArticle)
 
 import Data.Article as Article
 import Json.Decode as Decode
@@ -12,3 +12,7 @@ port receiveArticles : (Encode.Value -> msg) -> Sub msg
 
 
 port receiveArticle : (Encode.Value -> msg) -> Sub msg
+
+
+port fetchEditedArticle : Encode.Value -> Cmd msg
+

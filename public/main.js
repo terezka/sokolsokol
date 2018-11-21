@@ -5085,7 +5085,7 @@ var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Article$init = F2(
 	function (session, id) {
 		return _Utils_Tuple2(
-			{article: elm$core$Maybe$Nothing, session: session},
+			{article: elm$core$Maybe$Nothing, editing: false, session: session},
 			author$project$Ports$fetchArticles(
 				elm$json$Json$Encode$object(
 					_List_fromArray(
@@ -5925,8 +5925,13 @@ var author$project$Page$Article$GotArticle = function (a) {
 	return {$: 'GotArticle', a: a};
 };
 var author$project$Ports$receiveArticle = _Platform_incomingPort('receiveArticle', elm$json$Json$Decode$value);
+var elm$core$Platform$Sub$batch = _Platform_batch;
 var author$project$Page$Article$subscriptions = function (model) {
-	return author$project$Ports$receiveArticle(author$project$Page$Article$GotArticle);
+	return elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				author$project$Ports$receiveArticle(author$project$Page$Article$GotArticle)
+			]));
 };
 var author$project$Page$Articles$GotArticles = function (a) {
 	return {$: 'GotArticles', a: a};
@@ -5936,7 +5941,6 @@ var author$project$Page$Articles$subscriptions = function (model) {
 	return author$project$Ports$receiveArticles(author$project$Page$Articles$GotArticles);
 };
 var elm$core$Platform$Sub$map = _Platform_map;
-var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
 	var _n0 = model.page;
@@ -6069,21 +6073,44 @@ var author$project$Data$Article$decodeOne = A4(
 	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
+var author$project$Ports$fetchEditedArticle = _Platform_outgoingPort('fetchEditedArticle', elm$core$Basics$identity);
+var elm$core$Basics$not = _Basics_not;
 var author$project$Page$Article$update = F2(
 	function (msg, model) {
-		var value = msg.a;
-		var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
-		if (_n1.$ === 'Ok') {
-			var article = _n1.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						article: elm$core$Maybe$Just(article)
-					}),
-				elm$core$Platform$Cmd$none);
+		if (msg.$ === 'GotArticle') {
+			var value = msg.a;
+			var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
+			if (_n1.$ === 'Ok') {
+				var article = _n1.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							article: elm$core$Maybe$Just(article)
+						}),
+					elm$core$Platform$Cmd$none);
+			} else {
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			}
 		} else {
-			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			var _n2 = model.article;
+			if (_n2.$ === 'Just') {
+				var article = _n2.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{editing: !model.editing}),
+					(!model.editing) ? elm$core$Platform$Cmd$none : author$project$Ports$fetchEditedArticle(
+						elm$json$Json$Encode$object(
+							_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'id',
+									elm$json$Json$Encode$string(article.id))
+								]))));
+			} else {
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			}
 		}
 	});
 var elm$json$Json$Decode$list = _Json_decodeList;
@@ -7791,7 +7818,6 @@ var elm$core$Basics$composeL = F3(
 		return g(
 			f(x));
 	});
-var elm$core$Basics$not = _Basics_not;
 var elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -8433,244 +8459,6 @@ var author$project$Page$Admin$view = function (model) {
 		title: 'SOKOL SOKOL | The wool pants'
 	};
 };
-var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
-var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
-var author$project$Page$Article$viewArticle = function (article) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$article,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Css$maxWidth(
-						rtfeldman$elm_css$Css$px(1080)),
-						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
-					]))
-			]),
-		_List_fromArray(
-			[
-				A2(
-				rtfeldman$elm_css$Html$Styled$h1,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-							]))
-					]),
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(article.title)
-					])),
-				A2(
-				rtfeldman$elm_css$Html$Styled$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(article.body)
-					]))
-			]));
-};
-var author$project$Page$Article$view = function (model) {
-	return {
-		body: function () {
-			var _n0 = model.article;
-			if (_n0.$ === 'Just') {
-				var article = _n0.a;
-				return _List_fromArray(
-					[
-						author$project$Page$Article$viewArticle(article)
-					]);
-			} else {
-				return _List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text('loading')
-					]);
-			}
-		}(),
-		title: 'SOKOL SOKOL | Articles'
-	};
-};
-var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
-var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
-	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
-};
-var author$project$Page$Articles$viewArticle = function (article) {
-	return A2(
-		rtfeldman$elm_css$Html$Styled$article,
-		_List_fromArray(
-			[
-				rtfeldman$elm_css$Html$Styled$Attributes$css(
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Css$maxWidth(
-						rtfeldman$elm_css$Css$px(300))
-					]))
-			]),
-		_List_fromArray(
-			[
-				A2(
-				rtfeldman$elm_css$Html$Styled$a,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						rtfeldman$elm_css$Html$Styled$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-									]))
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text(article.title)
-							]))
-					])),
-				A2(
-				rtfeldman$elm_css$Html$Styled$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(article.body)
-					]))
-			]));
-};
-var author$project$Page$Articles$view = function (model) {
-	return {
-		body: A2(elm$core$List$map, author$project$Page$Articles$viewArticle, model.articles),
-		title: 'SOKOL SOKOL | Articles'
-	};
-};
-var author$project$Page$Design$view = function (model) {
-	return {
-		body: _List_fromArray(
-			[
-				A2(
-				rtfeldman$elm_css$Html$Styled$article,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$maxWidth(
-								rtfeldman$elm_css$Css$px(700))
-							]))
-					]),
-				_List_fromArray(
-					[
-						A2(
-						rtfeldman$elm_css$Html$Styled$h1,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[
-										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
-									]))
-							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('The wool pants')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							])),
-						A2(
-						rtfeldman$elm_css$Html$Styled$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
-							]))
-					]))
-			]),
-		title: 'SOKOL SOKOL | The wool pants'
-	};
-};
-var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
-var author$project$Page$Skeleton$logo = A2(
-	rtfeldman$elm_css$Html$Styled$h1,
-	_List_fromArray(
-		[
-			rtfeldman$elm_css$Html$Styled$Attributes$css(
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Css$marginBottom(
-					rtfeldman$elm_css$Css$px(8))
-				]))
-		]),
-	_List_fromArray(
-		[
-			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
-		]));
 var elm$core$String$foldr = _String_foldr;
 var elm$core$String$toList = function (string) {
 	return A3(elm$core$String$foldr, elm$core$List$cons, _List_Nil, string);
@@ -9054,6 +8842,452 @@ var rtfeldman$elm_css$Css$hex = function (str) {
 	return rtfeldman$elm_css$Css$erroneousHex(str);
 };
 var author$project$Element$Color$black = rtfeldman$elm_css$Css$hex('000000');
+var rtfeldman$elm_css$Css$cssFunction = F2(
+	function (funcName, args) {
+		return funcName + ('(' + (A2(elm$core$String$join, ', ', args) + ')'));
+	});
+var rtfeldman$elm_css$Css$rgba = F4(
+	function (r, g, b, alpha) {
+		return {
+			alpha: alpha,
+			blue: b,
+			color: rtfeldman$elm_css$Css$Structure$Compatible,
+			green: g,
+			red: r,
+			value: A2(
+				rtfeldman$elm_css$Css$cssFunction,
+				'rgba',
+				_Utils_ap(
+					A2(
+						elm$core$List$map,
+						elm$core$String$fromInt,
+						_List_fromArray(
+							[r, g, b])),
+					_List_fromArray(
+						[
+							elm$core$String$fromFloat(alpha)
+						])))
+		};
+	});
+var author$project$Element$Color$transparent = A4(rtfeldman$elm_css$Css$rgba, 0, 0, 0, 0);
+var author$project$Page$Article$Toggle = {$: 'Toggle'};
+var rtfeldman$elm_css$Css$backgroundColor = function (c) {
+	return A2(rtfeldman$elm_css$Css$property, 'background-color', c.value);
+};
+var rtfeldman$elm_css$Css$prop3 = F4(
+	function (key, argA, argB, argC) {
+		return A2(
+			rtfeldman$elm_css$Css$property,
+			key,
+			A2(
+				elm$core$String$join,
+				' ',
+				_List_fromArray(
+					[argA.value, argB.value, argC.value])));
+	});
+var rtfeldman$elm_css$Css$border3 = rtfeldman$elm_css$Css$prop3('border');
+var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
+var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
+var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
+var rtfeldman$elm_css$Html$Styled$p = rtfeldman$elm_css$Html$Styled$node('p');
+var author$project$Page$Article$viewArticle = function (article) {
+	var paragraphs = A2(
+		elm$core$List$map,
+		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
+		A2(
+			elm$core$List$map,
+			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
+			A2(elm$core$String$split, '\n', article.body)));
+	return A2(
+		rtfeldman$elm_css$Html$Styled$article,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Css$maxWidth(
+						rtfeldman$elm_css$Css$px(1080)),
+						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$h1,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+							]))
+					]),
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text(article.title)
+					])),
+				A2(rtfeldman$elm_css$Html$Styled$div, _List_Nil, paragraphs),
+				A2(
+				rtfeldman$elm_css$Html$Styled$button,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$transparent),
+								A3(
+								rtfeldman$elm_css$Css$border3,
+								rtfeldman$elm_css$Css$px(1),
+								rtfeldman$elm_css$Css$solid,
+								author$project$Element$Color$black)
+							])),
+						rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Article$Toggle)
+					]),
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text('Edit')
+					]))
+			]));
+};
+var rtfeldman$elm_css$Css$border = rtfeldman$elm_css$Css$prop1('border');
+var rtfeldman$elm_css$Css$dotted = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'dotted'};
+var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
+var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
+	var value = _n0.value;
+	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
+};
+var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
+var rtfeldman$elm_css$Css$int = function (val) {
+	return {
+		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
+		intOrAuto: rtfeldman$elm_css$Css$Structure$Compatible,
+		lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible,
+		lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible,
+		number: rtfeldman$elm_css$Css$Structure$Compatible,
+		numberOrInfinite: rtfeldman$elm_css$Css$Structure$Compatible,
+		numericValue: val,
+		unitLabel: '',
+		units: rtfeldman$elm_css$Css$UnitlessInteger,
+		value: elm$core$String$fromInt(val)
+	};
+};
+var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
+var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
+var rtfeldman$elm_css$Css$outline = rtfeldman$elm_css$Css$prop1('outline');
+var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
+var elm$json$Json$Encode$bool = _Json_wrap;
+var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			rtfeldman$elm_css$VirtualDom$Styled$property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
+var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
+var author$project$Page$Article$viewArticleEditable = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$div,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						A3(
+						rtfeldman$elm_css$Css$border3,
+						rtfeldman$elm_css$Css$px(1),
+						rtfeldman$elm_css$Css$dotted,
+						author$project$Element$Color$black),
+						rtfeldman$elm_css$Css$padding(
+						rtfeldman$elm_css$Css$px(24))
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$article,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$maxWidth(
+								rtfeldman$elm_css$Css$px(780))
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$div,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
+										rtfeldman$elm_css$Css$border(
+										rtfeldman$elm_css$Css$px(0)),
+										rtfeldman$elm_css$Css$fontWeight(
+										rtfeldman$elm_css$Css$int(500)),
+										rtfeldman$elm_css$Css$fontSize(
+										rtfeldman$elm_css$Css$px(32)),
+										rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none)
+									])),
+								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
+								rtfeldman$elm_css$Html$Styled$Attributes$id('title')
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text(article.title)
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$div,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$border(
+										rtfeldman$elm_css$Css$px(0)),
+										rtfeldman$elm_css$Css$fontWeight(
+										rtfeldman$elm_css$Css$int(400)),
+										rtfeldman$elm_css$Css$fontSize(
+										rtfeldman$elm_css$Css$px(16)),
+										rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none),
+										rtfeldman$elm_css$Css$marginTop(
+										rtfeldman$elm_css$Css$px(12))
+									])),
+								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
+								rtfeldman$elm_css$Html$Styled$Attributes$id('body')
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text(article.body)
+							]))
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$button,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$transparent),
+								A3(
+								rtfeldman$elm_css$Css$border3,
+								rtfeldman$elm_css$Css$px(1),
+								rtfeldman$elm_css$Css$solid,
+								author$project$Element$Color$black)
+							])),
+						rtfeldman$elm_css$Html$Styled$Events$onClick(author$project$Page$Article$Toggle)
+					]),
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text('Save')
+					]))
+			]));
+};
+var author$project$Page$Article$view = function (model) {
+	return {
+		body: function () {
+			var _n0 = model.article;
+			if (_n0.$ === 'Just') {
+				var article = _n0.a;
+				return model.editing ? _List_fromArray(
+					[
+						author$project$Page$Article$viewArticleEditable(article)
+					]) : _List_fromArray(
+					[
+						author$project$Page$Article$viewArticle(article)
+					]);
+			} else {
+				return _List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text('loading')
+					]);
+			}
+		}(),
+		title: 'SOKOL SOKOL | Articles'
+	};
+};
+var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
+var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
+	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
+};
+var author$project$Page$Articles$viewArticle = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$article,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Css$maxWidth(
+						rtfeldman$elm_css$Css$px(300))
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$a,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$h1,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+									]))
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text(article.title)
+							]))
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text(article.body)
+					]))
+			]));
+};
+var author$project$Page$Articles$view = function (model) {
+	return {
+		body: A2(elm$core$List$map, author$project$Page$Articles$viewArticle, model.articles),
+		title: 'SOKOL SOKOL | Articles'
+	};
+};
+var author$project$Page$Design$view = function (model) {
+	return {
+		body: _List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$article,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$maxWidth(
+								rtfeldman$elm_css$Css$px(700))
+							]))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						rtfeldman$elm_css$Html$Styled$h1,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+									]))
+							]),
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('The wool pants')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.')
+							]))
+					]))
+			]),
+		title: 'SOKOL SOKOL | The wool pants'
+	};
+};
+var rtfeldman$elm_css$Css$marginBottom = rtfeldman$elm_css$Css$prop1('margin-bottom');
+var author$project$Page$Skeleton$logo = A2(
+	rtfeldman$elm_css$Html$Styled$h1,
+	_List_fromArray(
+		[
+			rtfeldman$elm_css$Html$Styled$Attributes$css(
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Css$marginBottom(
+					rtfeldman$elm_css$Css$px(8))
+				]))
+		]),
+	_List_fromArray(
+		[
+			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
+		]));
 var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
 var rtfeldman$elm_css$Css$Internal$property = F2(
 	function (key, value) {
@@ -9138,11 +9372,6 @@ var rtfeldman$elm_css$Css$column = _Utils_update(
 var rtfeldman$elm_css$Css$cursor = rtfeldman$elm_css$Css$prop1('cursor');
 var rtfeldman$elm_css$Css$displayFlex = A2(rtfeldman$elm_css$Css$property, 'display', 'flex');
 var rtfeldman$elm_css$Css$flexDirection = rtfeldman$elm_css$Css$prop1('flex-direction');
-var rtfeldman$elm_css$Css$fontSize = rtfeldman$elm_css$Css$prop1('font-size');
-var rtfeldman$elm_css$Css$fontWeight = function (_n0) {
-	var value = _n0.value;
-	return A2(rtfeldman$elm_css$Css$property, 'font-weight', value);
-};
 var rtfeldman$elm_css$Css$Preprocess$ExtendSelector = F2(
 	function (a, b) {
 		return {$: 'ExtendSelector', a: a, b: b};
@@ -9155,21 +9384,6 @@ var rtfeldman$elm_css$Css$pseudoClass = function (_class) {
 		rtfeldman$elm_css$Css$Structure$PseudoClassSelector(_class));
 };
 var rtfeldman$elm_css$Css$hover = rtfeldman$elm_css$Css$pseudoClass('hover');
-var rtfeldman$elm_css$Css$UnitlessInteger = {$: 'UnitlessInteger'};
-var rtfeldman$elm_css$Css$int = function (val) {
-	return {
-		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
-		intOrAuto: rtfeldman$elm_css$Css$Structure$Compatible,
-		lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible,
-		lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible,
-		number: rtfeldman$elm_css$Css$Structure$Compatible,
-		numberOrInfinite: rtfeldman$elm_css$Css$Structure$Compatible,
-		numericValue: val,
-		unitLabel: '',
-		units: rtfeldman$elm_css$Css$UnitlessInteger,
-		value: elm$core$String$fromInt(val)
-	};
-};
 var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 	return A3(
 		rtfeldman$elm_css$Css$Internal$getOverloadedProperty,
@@ -9180,9 +9394,6 @@ var rtfeldman$elm_css$Css$justifyContent = function (fn) {
 var rtfeldman$elm_css$Css$margin = rtfeldman$elm_css$Css$prop1('margin');
 var rtfeldman$elm_css$Css$marginLeft = rtfeldman$elm_css$Css$prop1('margin-left');
 var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-right');
-var rtfeldman$elm_css$Css$marginTop = rtfeldman$elm_css$Css$prop1('margin-top');
-var rtfeldman$elm_css$Css$none = {backgroundImage: rtfeldman$elm_css$Css$Structure$Compatible, blockAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, cursor: rtfeldman$elm_css$Css$Structure$Compatible, display: rtfeldman$elm_css$Css$Structure$Compatible, hoverCapability: rtfeldman$elm_css$Css$Structure$Compatible, inlineAxisOverflow: rtfeldman$elm_css$Css$Structure$Compatible, keyframes: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: rtfeldman$elm_css$Css$Structure$Compatible, listStyleType: rtfeldman$elm_css$Css$Structure$Compatible, listStyleTypeOrPositionOrImage: rtfeldman$elm_css$Css$Structure$Compatible, none: rtfeldman$elm_css$Css$Structure$Compatible, outline: rtfeldman$elm_css$Css$Structure$Compatible, pointerDevice: rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: rtfeldman$elm_css$Css$Structure$Compatible, resize: rtfeldman$elm_css$Css$Structure$Compatible, scriptingSupport: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationLine: rtfeldman$elm_css$Css$Structure$Compatible, textTransform: rtfeldman$elm_css$Css$Structure$Compatible, touchAction: rtfeldman$elm_css$Css$Structure$Compatible, transform: rtfeldman$elm_css$Css$Structure$Compatible, updateFrequency: rtfeldman$elm_css$Css$Structure$Compatible, value: 'none'};
-var rtfeldman$elm_css$Css$padding = rtfeldman$elm_css$Css$prop1('padding');
 var rtfeldman$elm_css$Css$pointer = {cursor: rtfeldman$elm_css$Css$Structure$Compatible, value: 'pointer'};
 var rtfeldman$elm_css$Css$zero = {length: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNone: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNoneOrMinMaxDimension: rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumber: rtfeldman$elm_css$Css$Structure$Compatible, number: rtfeldman$elm_css$Css$Structure$Compatible, numericValue: 0, outline: rtfeldman$elm_css$Css$Structure$Compatible, unitLabel: '', units: rtfeldman$elm_css$Css$UnitlessInteger, value: '0'};
 var rtfeldman$elm_css$Css$Structure$TypeSelector = function (a) {
@@ -9902,7 +10113,16 @@ var author$project$Page$Skeleton$view = F2(
 									]))
 							]),
 						_List_fromArray(
-							[author$project$Page$Skeleton$logo])),
+							[
+								A2(
+								rtfeldman$elm_css$Html$Styled$a,
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Html$Styled$Attributes$href('/')
+									]),
+								_List_fromArray(
+									[author$project$Page$Skeleton$logo]))
+							])),
 						A2(
 						rtfeldman$elm_css$Html$Styled$main_,
 						_List_Nil,

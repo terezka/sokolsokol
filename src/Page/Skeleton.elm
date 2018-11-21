@@ -26,7 +26,7 @@ view toMsg document =
                     , Css.top Css.zero
                     ]
                 ]
-                [ logo ]
+                [ Html.a [ Attr.href "/" ] [ logo ] ]
             , Html.main_ [] (List.map (Html.map toMsg) document.body)
             ]
     }
