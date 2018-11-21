@@ -25,6 +25,9 @@
     };
     firebase.initializeApp(config);
 
+    // FIREBASE | DATABASE
+    var database = firebase.database();
+
     // ELM
     var el = document.getElementById("elm")
     var app = Elm.Main.init({ node: el });
@@ -35,6 +38,26 @@
       }).catch(function(error) {
         app.ports.authenticateResponse.send(error);
       });
+    });
+
+    app.ports.fetchArticles.subscribe(function(data) {
+      if (data.id) {
+        database.ref('/articles/' + data.id).once('value').then(function(snapshot) {
+          var article = snapshot.val();
+          article.id = data.id;
+          app.ports.receiveArticles.send([article]);
+        });
+      } else {
+        database.ref('/articles').once('value').then(function(snapshot) {
+          var values = snapshot.val();
+          var articles = Object.keys(values).map(function(key) {
+            var article = values[key];
+            article.id = key;
+            return article;
+          })
+          app.ports.receiveArticles.send(articles);
+        });
+      }
     });
   </script>
 </html>

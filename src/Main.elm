@@ -8,11 +8,12 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Page.Admin as Admin
 import Page.Article as Article
+import Page.Articles as Articles
 import Page.Design as Design
 import Page.Skeleton as Skeleton
 import Session
 import Url
-import Url.Parser as Parser exposing ((</>), Parser, custom, fragment, map, oneOf, s, top)
+import Url.Parser as Parser exposing ((</>), Parser, custom, fragment, map, oneOf, s, string, top)
 
 
 main =
@@ -34,6 +35,7 @@ type alias Model =
 
 type Page
     = NotFound Session.Data
+    | Articles Articles.Model
     | Article Article.Model
     | Design Design.Model
     | Admin Admin.Model
@@ -49,6 +51,10 @@ subscriptions model =
         Admin adminModel ->
             Admin.subscriptions adminModel
                 |> Sub.map AdminMsg
+
+        Articles articlesModel ->
+            Articles.subscriptions articlesModel
+                |> Sub.map ArticlesMsg
 
         _ ->
             Sub.none
@@ -66,6 +72,9 @@ view model =
                 { title = "SOKOL SOKOL | Not found."
                 , body = [ Html.text "Not found." ]
                 }
+
+        Articles articlesModel ->
+            Skeleton.view ArticlesMsg (Articles.view articlesModel)
 
         Article articleModel ->
             Skeleton.view ArticleMsg (Article.view articleModel)
@@ -97,6 +106,7 @@ type Msg
     = NoOp
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | ArticlesMsg Articles.Msg
     | ArticleMsg Article.Msg
     | DesignMsg Design.Msg
     | AdminMsg Admin.Msg
@@ -123,6 +133,14 @@ update message model =
         UrlChanged url ->
             stepUrl url model
 
+        ArticlesMsg msg ->
+            case model.page of
+                Articles article2Model ->
+                    stepArticles model (Articles.update msg article2Model)
+
+                _ ->
+                    ( model, Cmd.none )
+
         ArticleMsg msg ->
             case model.page of
                 Article articleModel ->
@@ -146,6 +164,13 @@ update message model =
 
                 _ ->
                     ( model, Cmd.none )
+
+
+stepArticles : Model -> ( Articles.Model, Cmd Articles.Msg ) -> ( Model, Cmd Msg )
+stepArticles model ( articlesModel, cmds ) =
+    ( { model | page = Articles articlesModel }
+    , Cmd.map ArticlesMsg cmds
+    )
 
 
 stepArticle : Model -> ( Article.Model, Cmd Article.Msg ) -> ( Model, Cmd Msg )
@@ -179,6 +204,9 @@ exit model =
         NotFound session ->
             session
 
+        Articles m ->
+            m.session
+
         Article m ->
             m.session
 
@@ -202,9 +230,11 @@ stepUrl url model =
         parser =
             oneOf
                 [ route top
-                    (stepArticle model (Article.init session))
+                    (stepArticles model (Articles.init session))
                 , route (s "articles")
-                    (stepArticle model (Article.init session))
+                    (stepArticles model (Articles.init session))
+                , route (s "articles" </> string)
+                    (\id -> stepArticle model (Article.init session))
                 , route (s "designs")
                     (stepDesign model (Design.init session))
                 , route (s "admin")

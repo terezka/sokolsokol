@@ -4379,6 +4379,9 @@ var author$project$Main$exit = function (model) {
 		case 'NotFound':
 			var session = _n0.a;
 			return session;
+		case 'Articles':
+			var m = _n0.a;
+			return m.session;
 		case 'Article':
 			var m = _n0.a;
 			return m.session;
@@ -5017,6 +5020,24 @@ var author$project$Main$stepArticle = F2(
 				}),
 			A2(elm$core$Platform$Cmd$map, author$project$Main$ArticleMsg, cmds));
 	});
+var author$project$Main$Articles = function (a) {
+	return {$: 'Articles', a: a};
+};
+var author$project$Main$ArticlesMsg = function (a) {
+	return {$: 'ArticlesMsg', a: a};
+};
+var author$project$Main$stepArticles = F2(
+	function (model, _n0) {
+		var articlesModel = _n0.a;
+		var cmds = _n0.b;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					page: author$project$Main$Articles(articlesModel)
+				}),
+			A2(elm$core$Platform$Cmd$map, author$project$Main$ArticlesMsg, cmds));
+	});
 var author$project$Main$Design = function (a) {
 	return {$: 'Design', a: a};
 };
@@ -5050,6 +5071,26 @@ var author$project$Page$Article$init = function (session) {
 	return _Utils_Tuple2(
 		{session: session},
 		elm$core$Platform$Cmd$none);
+};
+var author$project$Ports$fetchArticles = _Platform_outgoingPort('fetchArticles', elm$core$Basics$identity);
+var elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, obj) {
+					var k = _n0.a;
+					var v = _n0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var author$project$Page$Articles$init = function (session) {
+	return _Utils_Tuple2(
+		{articles: _List_Nil, session: session},
+		author$project$Ports$fetchArticles(
+			elm$json$Json$Encode$object(_List_Nil)));
 };
 var author$project$Page$Design$init = function (session) {
 	return _Utils_Tuple2(
@@ -5740,6 +5781,52 @@ var elm$url$Url$Parser$s = function (str) {
 			}
 		});
 };
+var elm$url$Url$Parser$slash = F2(
+	function (_n0, _n1) {
+		var parseBefore = _n0.a;
+		var parseAfter = _n1.a;
+		return elm$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					elm$core$List$concatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var elm$url$Url$Parser$custom = F2(
+	function (tipe, stringToSomething) {
+		return elm$url$Url$Parser$Parser(
+			function (_n0) {
+				var visited = _n0.visited;
+				var unvisited = _n0.unvisited;
+				var params = _n0.params;
+				var frag = _n0.frag;
+				var value = _n0.value;
+				if (!unvisited.b) {
+					return _List_Nil;
+				} else {
+					var next = unvisited.a;
+					var rest = unvisited.b;
+					var _n2 = stringToSomething(next);
+					if (_n2.$ === 'Just') {
+						var nextValue = _n2.a;
+						return _List_fromArray(
+							[
+								A5(
+								elm$url$Url$Parser$State,
+								A2(elm$core$List$cons, next, visited),
+								rest,
+								params,
+								frag,
+								value(nextValue))
+							]);
+					} else {
+						return _List_Nil;
+					}
+				}
+			});
+	});
+var elm$url$Url$Parser$string = A2(elm$url$Url$Parser$custom, 'STRING', elm$core$Maybe$Just);
 var elm$url$Url$Parser$top = elm$url$Url$Parser$Parser(
 	function (state) {
 		return _List_fromArray(
@@ -5755,16 +5842,28 @@ var author$project$Main$stepUrl = F2(
 					author$project$Main$route,
 					elm$url$Url$Parser$top,
 					A2(
-						author$project$Main$stepArticle,
+						author$project$Main$stepArticles,
 						model,
-						author$project$Page$Article$init(session))),
+						author$project$Page$Articles$init(session))),
 					A2(
 					author$project$Main$route,
 					elm$url$Url$Parser$s('articles'),
 					A2(
-						author$project$Main$stepArticle,
+						author$project$Main$stepArticles,
 						model,
-						author$project$Page$Article$init(session))),
+						author$project$Page$Articles$init(session))),
+					A2(
+					author$project$Main$route,
+					A2(
+						elm$url$Url$Parser$slash,
+						elm$url$Url$Parser$s('articles'),
+						elm$url$Url$Parser$string),
+					function (id) {
+						return A2(
+							author$project$Main$stepArticle,
+							model,
+							author$project$Page$Article$init(session));
+					}),
 					A2(
 					author$project$Main$route,
 					elm$url$Url$Parser$s('designs'),
@@ -5813,19 +5912,33 @@ var author$project$Page$Admin$authenticateResponse = _Platform_incomingPort('aut
 var author$project$Page$Admin$subscriptions = function (model) {
 	return author$project$Page$Admin$authenticateResponse(author$project$Page$Admin$GotError);
 };
+var author$project$Page$Articles$GotArticles = function (a) {
+	return {$: 'GotArticles', a: a};
+};
+var author$project$Ports$receiveArticles = _Platform_incomingPort('receiveArticles', elm$json$Json$Decode$value);
+var author$project$Page$Articles$subscriptions = function (model) {
+	return author$project$Ports$receiveArticles(author$project$Page$Articles$GotArticles);
+};
 var elm$core$Platform$Sub$map = _Platform_map;
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
 	var _n0 = model.page;
-	if (_n0.$ === 'Admin') {
-		var adminModel = _n0.a;
-		return A2(
-			elm$core$Platform$Sub$map,
-			author$project$Main$AdminMsg,
-			author$project$Page$Admin$subscriptions(adminModel));
-	} else {
-		return elm$core$Platform$Sub$none;
+	switch (_n0.$) {
+		case 'Admin':
+			var adminModel = _n0.a;
+			return A2(
+				elm$core$Platform$Sub$map,
+				author$project$Main$AdminMsg,
+				author$project$Page$Admin$subscriptions(adminModel));
+		case 'Articles':
+			var articlesModel = _n0.a;
+			return A2(
+				elm$core$Platform$Sub$map,
+				author$project$Main$ArticlesMsg,
+				author$project$Page$Articles$subscriptions(articlesModel));
+		default:
+			return elm$core$Platform$Sub$none;
 	}
 };
 var author$project$Page$Admin$authenticate = _Platform_outgoingPort('authenticate', elm$core$Basics$identity);
@@ -5852,19 +5965,6 @@ var author$project$Page$Admin$decodeResponse = elm$json$Json$Decode$oneOf(
 			A2(elm$json$Json$Decode$field, 'code', elm$json$Json$Decode$string),
 			A2(elm$json$Json$Decode$field, 'message', elm$json$Json$Decode$string))
 		]));
-var elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			elm$core$List$foldl,
-			F2(
-				function (_n0, obj) {
-					var k = _n0.a;
-					var v = _n0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
 var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Admin$encodeUser = F2(
 	function (email, password) {
@@ -5940,6 +6040,32 @@ var author$project$Page$Admin$update = F2(
 var author$project$Page$Article$update = F2(
 	function (msg, model) {
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+	});
+var author$project$Data$Article$Article = F2(
+	function (title, body) {
+		return {body: body, title: title};
+	});
+var author$project$Data$Article$decodeOne = A3(
+	elm$json$Json$Decode$map2,
+	author$project$Data$Article$Article,
+	A2(elm$json$Json$Decode$field, 'title', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'body', elm$json$Json$Decode$string));
+var elm$json$Json$Decode$list = _Json_decodeList;
+var author$project$Data$Article$decodeMany = elm$json$Json$Decode$list(author$project$Data$Article$decodeOne);
+var author$project$Page$Articles$update = F2(
+	function (msg, model) {
+		var value = msg.a;
+		var _n1 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeMany, value);
+		if (_n1.$ === 'Ok') {
+			var articles = _n1.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{articles: articles}),
+				elm$core$Platform$Cmd$none);
+		} else {
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		}
 	});
 var author$project$Page$Design$update = F2(
 	function (msg, model) {
@@ -6254,11 +6380,23 @@ var author$project$Main$update = F2(
 			case 'UrlChanged':
 				var url = message.a;
 				return A2(author$project$Main$stepUrl, url, model);
-			case 'ArticleMsg':
+			case 'ArticlesMsg':
 				var msg = message.a;
 				var _n2 = model.page;
-				if (_n2.$ === 'Article') {
-					var articleModel = _n2.a;
+				if (_n2.$ === 'Articles') {
+					var article2Model = _n2.a;
+					return A2(
+						author$project$Main$stepArticles,
+						model,
+						A2(author$project$Page$Articles$update, msg, article2Model));
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
+			case 'ArticleMsg':
+				var msg = message.a;
+				var _n3 = model.page;
+				if (_n3.$ === 'Article') {
+					var articleModel = _n3.a;
 					return A2(
 						author$project$Main$stepArticle,
 						model,
@@ -6268,9 +6406,9 @@ var author$project$Main$update = F2(
 				}
 			case 'DesignMsg':
 				var msg = message.a;
-				var _n3 = model.page;
-				if (_n3.$ === 'Design') {
-					var designModel = _n3.a;
+				var _n4 = model.page;
+				if (_n4.$ === 'Design') {
+					var designModel = _n4.a;
 					return A2(
 						author$project$Main$stepDesign,
 						model,
@@ -6280,9 +6418,9 @@ var author$project$Main$update = F2(
 				}
 			default:
 				var msg = message.a;
-				var _n4 = model.page;
-				if (_n4.$ === 'Admin') {
-					var designModel = _n4.a;
+				var _n5 = model.page;
+				if (_n5.$ === 'Admin') {
+					var designModel = _n5.a;
 					return A2(
 						author$project$Main$stepAdmin,
 						model,
@@ -8396,6 +8534,50 @@ var author$project$Page$Article$view = function (model) {
 		title: 'SOKOL SOKOL | Kafka, Civilization, and Bureaucracy'
 	};
 };
+var author$project$Page$Articles$viewArticle = function (article) {
+	return A2(
+		rtfeldman$elm_css$Html$Styled$article,
+		_List_fromArray(
+			[
+				rtfeldman$elm_css$Html$Styled$Attributes$css(
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Css$maxWidth(
+						rtfeldman$elm_css$Css$px(1080)),
+						A2(rtfeldman$elm_css$Css$property, 'column-count', '3')
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				rtfeldman$elm_css$Html$Styled$h1,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$Attributes$css(
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline)
+							]))
+					]),
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text(article.title)
+					])),
+				A2(
+				rtfeldman$elm_css$Html$Styled$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rtfeldman$elm_css$Html$Styled$text(article.body)
+					]))
+			]));
+};
+var author$project$Page$Articles$view = function (model) {
+	return {
+		body: A2(elm$core$List$map, author$project$Page$Articles$viewArticle, model.articles),
+		title: 'SOKOL SOKOL | Articles'
+	};
+};
 var author$project$Page$Design$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -9775,6 +9957,12 @@ var author$project$Main$view = function (model) {
 						]),
 					title: 'SOKOL SOKOL | Not found.'
 				});
+		case 'Articles':
+			var articlesModel = _n0.a;
+			return A2(
+				author$project$Page$Skeleton$view,
+				author$project$Main$ArticlesMsg,
+				author$project$Page$Articles$view(articlesModel));
 		case 'Article':
 			var articleModel = _n0.a;
 			return A2(
