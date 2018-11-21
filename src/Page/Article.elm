@@ -98,6 +98,13 @@ viewArticle article =
 
 viewArticleEditable : Article.Article -> Html.Html Msg
 viewArticleEditable article =
+    let
+        paragraphs =
+            article.body
+                |> String.split "\n"
+                |> List.map (List.singleton << Html.text)
+                |> List.map (Html.p [])
+    in
     Html.div
         [ Attr.css
             [ Css.border3 (Css.px 1) Css.dotted Color.black
@@ -132,7 +139,7 @@ viewArticleEditable article =
                 , Attr.contenteditable True
                 , Attr.id "body"
                 ]
-                [ Html.text article.body ]
+                paragraphs
             ]
         , Html.button
             [ Attr.css

@@ -8986,6 +8986,13 @@ var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
 var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
 var author$project$Page$Article$viewArticleEditable = function (article) {
+	var paragraphs = A2(
+		elm$core$List$map,
+		rtfeldman$elm_css$Html$Styled$p(_List_Nil),
+		A2(
+			elm$core$List$map,
+			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
+			A2(elm$core$String$split, '\n', article.body)));
 	return A2(
 		rtfeldman$elm_css$Html$Styled$div,
 		_List_fromArray(
@@ -9060,10 +9067,7 @@ var author$project$Page$Article$viewArticleEditable = function (article) {
 								rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
 								rtfeldman$elm_css$Html$Styled$Attributes$id('body')
 							]),
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Html$Styled$text(article.body)
-							]))
+						paragraphs)
 					])),
 				A2(
 				rtfeldman$elm_css$Html$Styled$button,
