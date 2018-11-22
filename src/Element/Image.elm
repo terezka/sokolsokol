@@ -49,12 +49,12 @@ editable msg maybeUrl =
         layover =
             case maybeUrl of
                 Just url ->
-                    [ Button.button msg.remove "Remove"
-                    , Button.button msg.select "Change"
+                    [ Button.basic msg.remove "Remove"
+                    , Button.basic msg.select "Change"
                     ]
 
                 Nothing ->
-                    [ Button.button msg.select "Add cover"
+                    [ Button.basic msg.select "Add cover"
                     ]
     in
     Html.div

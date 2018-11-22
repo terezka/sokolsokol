@@ -6262,6 +6262,7 @@ var author$project$Page$Article$GotFiles = F2(
 	function (a, b) {
 		return {$: 'GotFiles', a: a, b: b};
 	});
+var author$project$Ports$deleteEditedArticle = _Platform_outgoingPort('deleteEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$getEditedArticle = _Platform_outgoingPort('getEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$saveEditedArticle = _Platform_outgoingPort('saveEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$uploadImage = _Platform_outgoingPort('uploadImage', elm$core$Basics$identity);
@@ -6270,11 +6271,11 @@ var author$project$Session$getArticle = F2(
 		return A2(elm$core$Dict$get, id, data.articles);
 	});
 var author$project$Session$removeArticle = F2(
-	function (article, data) {
+	function (id, data) {
 		return _Utils_update(
 			data,
 			{
-				articles: A2(elm$core$Dict$remove, article.id, data.articles)
+				articles: A2(elm$core$Dict$remove, id, data.articles)
 			});
 	});
 var author$project$Session$setArticle = F2(
@@ -6560,7 +6561,7 @@ var author$project$Page$Article$update = F4(
 						{imageLoaded: true}),
 					elm$core$Platform$Cmd$none,
 					session);
-			case 'Pick':
+			case 'PickImage':
 				return _Utils_Tuple3(
 					model,
 					A2(
@@ -6569,20 +6570,39 @@ var author$project$Page$Article$update = F4(
 							['image/*']),
 						author$project$Page$Article$GotFiles),
 					session);
-			case 'Remove':
-				var _n1 = A2(author$project$Session$getArticle, model.id, session);
+			case 'RemoveImage':
+				var _n1 = model.editing;
 				if (_n1.$ === 'Just') {
 					var article = _n1.a;
 					return _Utils_Tuple3(
-						model,
+						_Utils_update(
+							model,
+							{
+								editing: elm$core$Maybe$Just(
+									A2(author$project$Data$Article$setCover, elm$core$Maybe$Nothing, article))
+							}),
 						elm$core$Platform$Cmd$none,
-						A2(
-							author$project$Session$setArticle,
-							A2(author$project$Data$Article$setCover, elm$core$Maybe$Nothing, article),
-							session));
+						session);
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
+			case 'DeleteArticle':
+				return _Utils_Tuple3(
+					model,
+					elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								author$project$Ports$deleteEditedArticle(
+								elm$json$Json$Encode$object(
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											'id',
+											elm$json$Json$Encode$string(model.id))
+										]))),
+								A2(elm$browser$Browser$Navigation$pushUrl, key, '/articles')
+							])),
+					A2(author$project$Session$removeArticle, model.id, session));
 			case 'GotFiles':
 				var file = msg.a;
 				var files = msg.b;
@@ -6623,7 +6643,15 @@ var author$project$Page$Article$update = F4(
 					if (_n3.$ === 'Ok') {
 						var url = _n3.a;
 						return _Utils_Tuple3(
-							model,
+							_Utils_update(
+								model,
+								{
+									editing: elm$core$Maybe$Just(
+										A2(
+											author$project$Data$Article$setCover,
+											elm$core$Maybe$Just(url),
+											article))
+								}),
 							author$project$Ports$saveEditedArticle(
 								author$project$Data$Article$encodeOne(
 									A2(
@@ -6645,7 +6673,7 @@ var author$project$Page$Article$update = F4(
 						model,
 						author$project$Ports$getEditedArticle(
 							author$project$Data$Article$encodeOne(article)),
-						A2(author$project$Session$removeArticle, article, session));
+						A2(author$project$Session$removeArticle, article.id, session));
 				} else {
 					return _Utils_Tuple3(
 						_Utils_update(
@@ -9706,7 +9734,7 @@ var rtfeldman$elm_css$Css$marginRight = rtfeldman$elm_css$Css$prop1('margin-righ
 var rtfeldman$elm_css$Css$padding2 = rtfeldman$elm_css$Css$prop2('padding');
 var rtfeldman$elm_css$Css$solid = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'solid'};
 var rtfeldman$elm_css$Html$Styled$button = rtfeldman$elm_css$Html$Styled$node('button');
-var author$project$Element$Button$button = F2(
+var author$project$Element$Button$basic = F2(
 	function (onClick, content) {
 		return A2(
 			rtfeldman$elm_css$Html$Styled$button,
@@ -9754,6 +9782,56 @@ var author$project$Element$Button$button = F2(
 					rtfeldman$elm_css$Html$Styled$text(content)
 				]));
 	});
+var author$project$Element$Color$red = rtfeldman$elm_css$Css$hex('b12f2f');
+var author$project$Element$Button$warning = F2(
+	function (onClick, content) {
+		return A2(
+			rtfeldman$elm_css$Html$Styled$button,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$white),
+							A3(
+							rtfeldman$elm_css$Css$border3,
+							rtfeldman$elm_css$Css$px(1),
+							rtfeldman$elm_css$Css$solid,
+							author$project$Element$Color$black),
+							A2(
+							rtfeldman$elm_css$Css$padding2,
+							rtfeldman$elm_css$Css$px(4),
+							rtfeldman$elm_css$Css$px(8)),
+							rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none),
+							A2(
+							rtfeldman$elm_css$Css$margin2,
+							rtfeldman$elm_css$Css$px(0),
+							rtfeldman$elm_css$Css$px(8)),
+							rtfeldman$elm_css$Css$firstChild(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$marginLeft(rtfeldman$elm_css$Css$zero)
+								])),
+							rtfeldman$elm_css$Css$lastChild(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$marginRight(rtfeldman$elm_css$Css$zero)
+								])),
+							rtfeldman$elm_css$Css$hover(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$red),
+									rtfeldman$elm_css$Css$color(author$project$Element$Color$white)
+								]))
+						])),
+					rtfeldman$elm_css$Html$Styled$Events$onClick(onClick)
+				]),
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$text(content)
+				]));
+	});
+var author$project$Page$Article$DeleteArticle = {$: 'DeleteArticle'};
 var author$project$Page$Article$Toggle = {$: 'Toggle'};
 var author$project$Page$Article$viewArticleEditable = F2(
 	function (model, article) {
@@ -9780,7 +9858,8 @@ var author$project$Page$Article$viewArticleEditable = F2(
 					rtfeldman$elm_css$Html$Styled$div,
 					_List_Nil,
 					author$project$Page$Article$paragraphs(article)),
-					A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Edit')
+					A2(author$project$Element$Button$warning, author$project$Page$Article$DeleteArticle, 'Delete'),
+					A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Edit')
 				]));
 	});
 var author$project$Element$Color$gray = rtfeldman$elm_css$Css$hex('f5f5f5');
@@ -9898,13 +9977,13 @@ var author$project$Element$Image$editable = F2(
 				var url = maybeUrl.a;
 				return _List_fromArray(
 					[
-						A2(author$project$Element$Button$button, msg.remove, 'Remove'),
-						A2(author$project$Element$Button$button, msg.select, 'Change')
+						A2(author$project$Element$Button$basic, msg.remove, 'Remove'),
+						A2(author$project$Element$Button$basic, msg.select, 'Change')
 					]);
 			} else {
 				return _List_fromArray(
 					[
-						A2(author$project$Element$Button$button, msg.select, 'Add cover')
+						A2(author$project$Element$Button$basic, msg.select, 'Add cover')
 					]);
 			}
 		}();
@@ -9992,8 +10071,8 @@ var author$project$Element$Text$body = F2(
 			attrs,
 			content);
 	});
-var author$project$Page$Article$Pick = {$: 'Pick'};
-var author$project$Page$Article$Remove = {$: 'Remove'};
+var author$project$Page$Article$PickImage = {$: 'PickImage'};
+var author$project$Page$Article$RemoveImage = {$: 'RemoveImage'};
 var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
 var rtfeldman$elm_css$Css$pct = A2(rtfeldman$elm_css$Css$Internal$lengthConverter, rtfeldman$elm_css$Css$PercentageUnits, '%');
 var rtfeldman$elm_css$Css$right = rtfeldman$elm_css$Css$prop1('right');
@@ -10022,7 +10101,7 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 			[
 				A2(
 				author$project$Element$Image$editable,
-				{remove: author$project$Page$Article$Remove, select: author$project$Page$Article$Pick},
+				{remove: author$project$Page$Article$RemoveImage, select: author$project$Page$Article$PickImage},
 				article.cover),
 				A2(
 				rtfeldman$elm_css$Html$Styled$article,
@@ -10069,7 +10148,7 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 					]),
 				_List_fromArray(
 					[
-						A2(author$project$Element$Button$button, author$project$Page$Article$Toggle, 'Save')
+						A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Save')
 					]))
 			]));
 };
@@ -10374,7 +10453,7 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 				A2(rtfeldman$elm_css$Css$property, 'width', 'calc(100vw - 120px)'),
 				rtfeldman$elm_css$Css$margin(rtfeldman$elm_css$Css$zero),
 				rtfeldman$elm_css$Css$marginTop(
-				rtfeldman$elm_css$Css$px(100)),
+				rtfeldman$elm_css$Css$px(38)),
 				rtfeldman$elm_css$Css$marginBottom(
 				rtfeldman$elm_css$Css$px(100)),
 				rtfeldman$elm_css$Css$marginLeft(

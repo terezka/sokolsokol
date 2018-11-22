@@ -38,9 +38,10 @@ init session id =
 
 type Msg
     = ImageLoaded String
+    | PickImage
+    | RemoveImage
+    | DeleteArticle
     | Toggle
-    | Pick
-    | Remove
     | GotFiles File.File (List File.File)
     | GotFileUrl String String
     | GotFileDownloadUrl Encode.Value
@@ -53,19 +54,28 @@ update key session msg model =
         ImageLoaded _ ->
             ( { model | imageLoaded = True }, Cmd.none, session )
 
-        Pick ->
+        PickImage ->
             ( model, Select.files [ "image/*" ] GotFiles, session )
 
-        Remove ->
-            case Session.getArticle model.id session of
+        RemoveImage ->
+            case model.editing of
                 Just article ->
-                    ( model
+                    ( { model | editing = Just (Article.setCover Nothing article) }
                     , Cmd.none
-                    , Session.setArticle (Article.setCover Nothing article) session
+                    , session
                     )
 
                 Nothing ->
                     ( model, Cmd.none, session )
+
+        DeleteArticle ->
+            ( model
+            , Cmd.batch
+                [ Ports.deleteEditedArticle (Encode.object [ ( "id", Encode.string model.id ) ])
+                , Nav.pushUrl key "/articles"
+                ]
+            , Session.removeArticle model.id session
+            )
 
         GotFiles file files ->
             ( model
@@ -88,7 +98,7 @@ update key session msg model =
                 Just article ->
                     case Decode.decodeValue (Decode.field "url" Decode.string) value of
                         Ok url ->
-                            ( model
+                            ( { model | editing = Just (Article.setCover (Just url) article) }
                             , Ports.saveEditedArticle (Article.encodeOne (Article.setCover (Just url) article))
                             , session
                             )
@@ -104,7 +114,7 @@ update key session msg model =
                 Just article ->
                     ( model
                     , Ports.getEditedArticle (Article.encodeOne article)
-                    , Session.removeArticle article session
+                    , Session.removeArticle article.id session
                     )
 
                 Nothing ->
@@ -179,7 +189,8 @@ viewArticleEditable model article =
         [ Util.maybe article.cover (Image.single ImageLoaded model.imageLoaded)
         , Text.h1 [] article.title
         , Html.div [] (paragraphs article)
-        , Button.button Toggle "Edit"
+        , Button.warning DeleteArticle "Delete"
+        , Button.basic Toggle "Edit"
         ]
 
 
@@ -192,7 +203,7 @@ viewArticleEditing : Article.Article -> Html.Html Msg
 viewArticleEditing article =
     Html.div
         []
-        [ Image.editable { select = Pick, remove = Remove } article.cover
+        [ Image.editable { select = PickImage, remove = RemoveImage } article.cover
         , Html.article
             [ Attr.css
                 [ Css.width (Css.px 780)
@@ -216,7 +227,8 @@ viewArticleEditing article =
                 , Css.textAlign Css.right
                 ]
             ]
-            [ Button.button Toggle "Save" ]
+            [ Button.basic Toggle "Save"
+            ]
         ]
 
 

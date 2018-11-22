@@ -5,8 +5,8 @@ module Session exposing
     , empty
     , getArticle
     , getArticles
-    , setArticle
     , removeArticle
+    , setArticle
     , setArticles
     , setUser
     , toggleEditing
@@ -68,11 +68,9 @@ setArticle article data =
     { data | articles = Dict.insert article.id article data.articles }
 
 
-
-removeArticle : Article.Article -> Data -> Data
-removeArticle article data =
-    { data | articles = Dict.remove article.id data.articles }
-
+removeArticle : Article.Id -> Data -> Data
+removeArticle id data =
+    { data | articles = Dict.remove id data.articles }
 
 
 getArticles : Data -> List Article.Article

@@ -1,5 +1,6 @@
 port module Ports exposing
     ( authenticationState
+    , deleteEditedArticle
     , fetchArticles
     , getEditedArticle
     , receiveArticle
@@ -40,3 +41,6 @@ port getEditedArticle : Encode.Value -> Cmd msg
 
 
 port receiveEditedArticle : (Encode.Value -> msg) -> Sub msg
+
+
+port deleteEditedArticle : Encode.Value -> Cmd msg

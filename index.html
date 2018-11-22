@@ -98,6 +98,10 @@
       });
     });
 
+    app.ports.deleteEditedArticle.subscribe(function(data) {
+      database.ref('articles/' + data.id).remove();
+    });
+
     app.ports.uploadImage.subscribe(function(data) {
       var articleRef = storageRef.child("images/" + data.name);
       articleRef.putString(data.url, 'data_url').then(function(snapshot) {

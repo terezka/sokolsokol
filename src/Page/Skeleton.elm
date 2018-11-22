@@ -85,7 +85,7 @@ styles =
         , Css.flexDirection Css.column
         , Css.property "width" "calc(100vw - 120px)"
         , Css.margin Css.zero
-        , Css.marginTop (Css.px 100)
+        , Css.marginTop (Css.px 38)
         , Css.marginBottom (Css.px 100)
         , Css.marginLeft (Css.px 120)
         ]
