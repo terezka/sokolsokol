@@ -2,9 +2,9 @@ module Page.Articles exposing (Model, Msg, init, subscriptions, update, view)
 
 import Css
 import Data.Article as Article
-import Html.Styled as Html
-import Element.Text as Text
 import Element.Color as Color
+import Element.Text as Text
+import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -39,7 +39,7 @@ view session model =
     { title = "SOKOL SOKOL | Articles"
     , body =
         [ Html.div
-            [ Attr.css [ Css.maxWidth (Css.px 1100), Css.width (Css.pct 100) ] ]
+            [ Attr.css [ Css.marginTop (Css.px 120), Css.maxWidth (Css.px 1100), Css.width (Css.pct 100) ] ]
             [ Html.h2
                 [ Attr.css [ Css.maxWidth (Css.px 700) ] ]
                 [ Html.text "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque." ]
@@ -47,11 +47,11 @@ view session model =
                 [ Attr.css []
                 ]
                 (case session.user of
-                        Session.LoggedIn _ ->
-                            viewPlaceholder :: List.map viewArticle (Session.getArticles session)
+                    Session.LoggedIn _ ->
+                        viewPlaceholder :: List.map viewArticle (Session.getArticles session)
 
-                        Session.Anonymous ->
-                            List.map viewArticle (Session.getArticles session)
+                    Session.Anonymous ->
+                        List.map viewArticle (Session.getArticles session)
                 )
             ]
         ]

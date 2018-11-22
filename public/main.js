@@ -10326,6 +10326,8 @@ var author$project$Page$Articles$view = F2(
 							rtfeldman$elm_css$Html$Styled$Attributes$css(
 							_List_fromArray(
 								[
+									rtfeldman$elm_css$Css$marginTop(
+									rtfeldman$elm_css$Css$px(120)),
 									rtfeldman$elm_css$Css$maxWidth(
 									rtfeldman$elm_css$Css$px(1100)),
 									rtfeldman$elm_css$Css$width(
