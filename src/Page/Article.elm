@@ -41,6 +41,7 @@ type Msg
     | PickImage
     | RemoveImage
     | DeleteArticle
+    | Cancel
     | Toggle
     | GotFiles File.File (List File.File)
     | GotFileUrl String String
@@ -75,6 +76,12 @@ update key session msg model =
                 , Nav.pushUrl key "/articles"
                 ]
             , Session.removeArticle model.id session
+            )
+
+        Cancel ->
+            ( { model | editing = Nothing }
+            , Cmd.none
+            , session
             )
 
         GotFiles file files ->
@@ -227,7 +234,8 @@ viewArticleEditing article =
                 , Css.textAlign Css.right
                 ]
             ]
-            [ Button.basic Toggle "Save"
+            [ Button.warning Cancel "Cancel"
+            , Button.basic Toggle "Save"
             ]
         ]
 

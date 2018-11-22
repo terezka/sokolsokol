@@ -6603,6 +6603,13 @@ var author$project$Page$Article$update = F4(
 								A2(elm$browser$Browser$Navigation$pushUrl, key, '/articles')
 							])),
 					A2(author$project$Session$removeArticle, model.id, session));
+			case 'Cancel':
+				return _Utils_Tuple3(
+					_Utils_update(
+						model,
+						{editing: elm$core$Maybe$Nothing}),
+					elm$core$Platform$Cmd$none,
+					session);
 			case 'GotFiles':
 				var file = msg.a;
 				var files = msg.b;
@@ -10071,6 +10078,7 @@ var author$project$Element$Text$body = F2(
 			attrs,
 			content);
 	});
+var author$project$Page$Article$Cancel = {$: 'Cancel'};
 var author$project$Page$Article$PickImage = {$: 'PickImage'};
 var author$project$Page$Article$RemoveImage = {$: 'RemoveImage'};
 var rtfeldman$elm_css$Css$PercentageUnits = {$: 'PercentageUnits'};
@@ -10148,6 +10156,7 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 					]),
 				_List_fromArray(
 					[
+						A2(author$project$Element$Button$warning, author$project$Page$Article$Cancel, 'Cancel'),
 						A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Save')
 					]))
 			]));
