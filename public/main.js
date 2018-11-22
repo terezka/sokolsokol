@@ -10292,24 +10292,24 @@ var author$project$Page$Articles$viewPlaceholder = A2(
 					rtfeldman$elm_css$Css$px(24)),
 					A3(
 					rtfeldman$elm_css$Css$border3,
-					rtfeldman$elm_css$Css$px(1),
+					rtfeldman$elm_css$Css$px(3),
 					rtfeldman$elm_css$Css$dotted,
 					author$project$Element$Color$black),
 					rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineFlex),
 					rtfeldman$elm_css$Css$justifyContent(rtfeldman$elm_css$Css$center),
-					rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center)
+					rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center),
+					rtfeldman$elm_css$Css$hover(
+					_List_fromArray(
+						[
+							A3(
+							rtfeldman$elm_css$Css$border3,
+							rtfeldman$elm_css$Css$px(3),
+							rtfeldman$elm_css$Css$solid,
+							author$project$Element$Color$black)
+						]))
 				]))
 		]),
-	_List_fromArray(
-		[
-			A2(
-			author$project$Element$Text$body,
-			_List_Nil,
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Html$Styled$text('Add new?')
-				]))
-		]));
+	_List_Nil);
 var elm$core$Dict$values = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,
@@ -10400,7 +10400,21 @@ var author$project$Page$Skeleton$logo = A2(
 					rtfeldman$elm_css$Css$px(8)),
 					rtfeldman$elm_css$Css$padding(
 					rtfeldman$elm_css$Css$px(8)),
-					rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$white)
+					rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$white),
+					A3(
+					rtfeldman$elm_css$Css$border3,
+					rtfeldman$elm_css$Css$px(4),
+					rtfeldman$elm_css$Css$solid,
+					author$project$Element$Color$white),
+					rtfeldman$elm_css$Css$hover(
+					_List_fromArray(
+						[
+							A3(
+							rtfeldman$elm_css$Css$border3,
+							rtfeldman$elm_css$Css$px(4),
+							rtfeldman$elm_css$Css$solid,
+							author$project$Element$Color$black)
+						]))
 				]))
 		]),
 	_List_fromArray(
@@ -11138,7 +11152,16 @@ var author$project$Page$Skeleton$view = F3(
 								rtfeldman$elm_css$Html$Styled$a,
 								_List_fromArray(
 									[
-										rtfeldman$elm_css$Html$Styled$Attributes$href('/')
+										rtfeldman$elm_css$Html$Styled$Attributes$href('/'),
+										rtfeldman$elm_css$Html$Styled$Attributes$css(
+										_List_fromArray(
+											[
+												rtfeldman$elm_css$Css$hover(
+												_List_fromArray(
+													[
+														rtfeldman$elm_css$Css$color(author$project$Element$Color$black)
+													]))
+											]))
 									]),
 								_List_fromArray(
 									[author$project$Page$Skeleton$logo]))

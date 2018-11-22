@@ -27,7 +27,12 @@ view toMsg session document =
                     , Css.top Css.zero
                     ]
                 ]
-                [ Html.a [ Attr.href "/" ] [ logo ] ]
+                [ Html.a
+                    [ Attr.href "/"
+                    , Attr.css [ Css.hover [ Css.color Color.black ] ]
+                    ]
+                    [ logo ]
+                ]
             , Html.main_ [] (List.map (Html.map toMsg) document.body)
             ]
     }
@@ -40,6 +45,9 @@ logo =
             [ Css.marginBottom (Css.px 8)
             , Css.padding (Css.px 8)
             , Css.backgroundColor Color.white
+            , Css.border3 (Css.px 4) Css.solid Color.white
+            , Css.hover
+                [ Css.border3 (Css.px 4) Css.solid Color.black ]
             ]
         ]
         [ Html.text "SOKOL SOKOL" ]

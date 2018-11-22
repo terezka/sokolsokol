@@ -69,14 +69,14 @@ viewPlaceholder =
             , Css.verticalAlign Css.top
             , Css.marginTop (Css.px 24)
             , Css.marginRight (Css.px 24)
-            , Css.border3 (Css.px 1) Css.dotted Color.black
+            , Css.border3 (Css.px 3) Css.dotted Color.black
             , Css.display Css.inlineFlex
             , Css.justifyContent Css.center
             , Css.alignItems Css.center
+            , Css.hover [ Css.border3 (Css.px 3) Css.solid Color.black ]
             ]
         ]
-        [ Text.body [] [ Html.text "Add new?" ]
-        ]
+        []
 
 
 viewArticle : Article.Article -> Html.Html Msg
