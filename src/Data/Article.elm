@@ -1,4 +1,4 @@
-module Data.Article exposing (Article, Id, decodeMany, decodeOne, encodeId, encodeOne, placeholder, setCover)
+module Data.Article exposing (Article, Id, decodeMany, decodeOne, encodeId, encodeOne, placeholder, setBody, setCover, setTitle)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -19,6 +19,16 @@ type alias Id =
 setCover : Maybe String -> Article -> Article
 setCover url article =
     { article | cover = url }
+
+
+setBody : String -> Article -> Article
+setBody body article =
+    { article | body = body }
+
+
+setTitle : String -> Article -> Article
+setTitle title article =
+    { article | title = title }
 
 
 placeholder : Article

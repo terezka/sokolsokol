@@ -6268,11 +6268,23 @@ var author$project$Data$Article$encodeOne = function (article) {
 				elm$json$Json$Encode$string(article.body))
 			]));
 };
+var author$project$Data$Article$setBody = F2(
+	function (body, article) {
+		return _Utils_update(
+			article,
+			{body: body});
+	});
 var author$project$Data$Article$setCover = F2(
 	function (url, article) {
 		return _Utils_update(
 			article,
 			{cover: url});
+	});
+var author$project$Data$Article$setTitle = F2(
+	function (title, article) {
+		return _Utils_update(
+			article,
+			{title: title});
 	});
 var author$project$Element$Image$decodeUrl = A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string);
 var author$project$Element$Image$encodeUrl = F2(
@@ -6731,7 +6743,7 @@ var author$project$Page$Article$update = F4(
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
-			default:
+			case 'GotArticle':
 				var value = msg.a;
 				var _n7 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
 				if (_n7.$ === 'Ok') {
@@ -6748,6 +6760,40 @@ var author$project$Page$Article$update = F4(
 									author$project$Data$Article$encodeOne(article))
 								])),
 						A2(author$project$Session$setArticle, article, session));
+				} else {
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+				}
+			case 'UpdateTitle':
+				var title = msg.a;
+				var _n8 = model.editing;
+				if (_n8.$ === 'Just') {
+					var article = _n8.a;
+					return _Utils_Tuple3(
+						_Utils_update(
+							model,
+							{
+								editing: elm$core$Maybe$Just(
+									A2(author$project$Data$Article$setTitle, title, article))
+							}),
+						elm$core$Platform$Cmd$none,
+						session);
+				} else {
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+				}
+			default:
+				var body = msg.a;
+				var _n9 = model.editing;
+				if (_n9.$ === 'Just') {
+					var article = _n9.a;
+					return _Utils_Tuple3(
+						_Utils_update(
+							model,
+							{
+								editing: elm$core$Maybe$Just(
+									A2(author$project$Data$Article$setBody, body, article))
+							}),
+						elm$core$Platform$Cmd$none,
+						session);
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
@@ -9943,7 +9989,10 @@ var author$project$Page$Article$paragraphs = function (article) {
 		A2(
 			elm$core$List$map,
 			A2(elm$core$Basics$composeL, elm$core$List$singleton, rtfeldman$elm_css$Html$Styled$text),
-			A2(elm$core$String$split, '\n', article.body)));
+			A2(
+				elm$core$List$filter,
+				A2(elm$core$Basics$composeL, elm$core$Basics$not, elm$core$String$isEmpty),
+				A2(elm$core$String$split, '\n', article.body))));
 };
 var rtfeldman$elm_css$Html$Styled$article = rtfeldman$elm_css$Html$Styled$node('article');
 var author$project$Page$Article$threeColumn = rtfeldman$elm_css$Html$Styled$article(
@@ -9974,6 +10023,7 @@ var author$project$Page$Article$viewArticle = F3(
 					author$project$Page$Article$menu(buttons)
 				]));
 	});
+var author$project$Element$Color$grayDark = rtfeldman$elm_css$Css$hex('b5b5b5');
 var author$project$Element$Color$gray = rtfeldman$elm_css$Css$hex('f5f5f5');
 var rtfeldman$elm_css$Css$alignItems = function (fn) {
 	return A3(
@@ -10098,12 +10148,11 @@ var author$project$Element$Image$editable = F2(
 					layover)
 				]));
 	});
-var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
 var author$project$Element$Text$body = F2(
 	function (attrs, content) {
 		return A4(
 			rtfeldman$elm_css$Html$Styled$styled,
-			rtfeldman$elm_css$Html$Styled$h2,
+			rtfeldman$elm_css$Html$Styled$div,
 			_List_fromArray(
 				[
 					rtfeldman$elm_css$Css$border(
@@ -10120,6 +10169,12 @@ var author$project$Element$Text$body = F2(
 var author$project$Page$Article$ArticleCancel = {$: 'ArticleCancel'};
 var author$project$Page$Article$ImageRemove = {$: 'ImageRemove'};
 var author$project$Page$Article$ImageSelect = {$: 'ImageSelect'};
+var author$project$Page$Article$UpdateBody = function (a) {
+	return {$: 'UpdateBody', a: a};
+};
+var author$project$Page$Article$UpdateTitle = function (a) {
+	return {$: 'UpdateTitle', a: a};
+};
 var author$project$Page$Article$singleColumn = rtfeldman$elm_css$Html$Styled$div(
 	_List_fromArray(
 		[
@@ -10145,6 +10200,24 @@ var author$project$Page$Article$editable = function (_n0) {
 				author$project$Page$Article$menu(actions)
 			]));
 };
+var author$project$Page$Article$getTextContent = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'outerText']),
+	elm$json$Json$Decode$string);
+var rtfeldman$elm_css$Css$Preprocess$WithPseudoElement = F2(
+	function (a, b) {
+		return {$: 'WithPseudoElement', a: a, b: b};
+	});
+var rtfeldman$elm_css$Css$Structure$PseudoElement = function (a) {
+	return {$: 'PseudoElement', a: a};
+};
+var rtfeldman$elm_css$Css$pseudoElement = function (element) {
+	return rtfeldman$elm_css$Css$Preprocess$WithPseudoElement(
+		rtfeldman$elm_css$Css$Structure$PseudoElement(element));
+};
+var rtfeldman$elm_css$Css$before = rtfeldman$elm_css$Css$pseudoElement('before');
+var rtfeldman$elm_css$Css$empty = rtfeldman$elm_css$Css$pseudoClass('empty');
 var elm$json$Json$Encode$bool = _Json_wrap;
 var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -10154,7 +10227,6 @@ var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
 			elm$json$Json$Encode$bool(bool));
 	});
 var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
-var rtfeldman$elm_css$Html$Styled$Attributes$id = rtfeldman$elm_css$Html$Styled$Attributes$stringProperty('id');
 var author$project$Page$Article$viewArticleEditing = function (article) {
 	return author$project$Page$Article$editable(
 		{
@@ -10174,7 +10246,24 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 					_List_fromArray(
 						[
 							rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
-							rtfeldman$elm_css$Html$Styled$Attributes$id('title')
+							rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$empty(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$before(
+											_List_fromArray(
+												[
+													A2(rtfeldman$elm_css$Css$property, 'content', '\'Title\''),
+													rtfeldman$elm_css$Css$color(author$project$Element$Color$grayDark)
+												]))
+										]))
+								])),
+							A2(
+							rtfeldman$elm_css$Html$Styled$Events$on,
+							'blur',
+							A2(elm$json$Json$Decode$map, author$project$Page$Article$UpdateTitle, author$project$Page$Article$getTextContent))
 						]),
 					article.title),
 					A2(
@@ -10182,7 +10271,24 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 					_List_fromArray(
 						[
 							rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
-							rtfeldman$elm_css$Html$Styled$Attributes$id('body')
+							rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$empty(
+									_List_fromArray(
+										[
+											rtfeldman$elm_css$Css$before(
+											_List_fromArray(
+												[
+													A2(rtfeldman$elm_css$Css$property, 'content', '\'Body\''),
+													rtfeldman$elm_css$Css$color(author$project$Element$Color$grayDark)
+												]))
+										]))
+								])),
+							A2(
+							rtfeldman$elm_css$Html$Styled$Events$on,
+							'blur',
+							A2(elm$json$Json$Decode$map, author$project$Page$Article$UpdateBody, author$project$Page$Article$getTextContent))
 						]),
 					author$project$Page$Article$paragraphs(article))
 				])
@@ -10423,6 +10529,7 @@ var author$project$Session$getArticles = function (data) {
 		_List_Nil,
 		A2(author$project$Data$Status$map, elm$core$Dict$values, data.articles));
 };
+var rtfeldman$elm_css$Html$Styled$h2 = rtfeldman$elm_css$Html$Styled$node('h2');
 var author$project$Page$Articles$view = F2(
 	function (session, model) {
 		return {

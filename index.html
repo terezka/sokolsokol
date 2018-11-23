@@ -76,16 +76,13 @@
 
     app.ports.getEditedArticle.subscribe(function(data) {
       database.ref('articles/' + data.id).remove();
-
-      var titleEl = document.getElementById("title");
-      var bodyEl = document.getElementById("body");
-      var id = titleEl.outerText.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+      var id = data.title.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
 
       app.ports.receiveEditedArticle.send({
         id: id,
         cover: data.cover,
-        title: titleEl ? titleEl.outerText : data.title,
-        body: bodyEl ? bodyEl.outerText : data.body
+        title: data.title,
+        body: data.body
       });
     });
 

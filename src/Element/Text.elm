@@ -36,7 +36,7 @@ h2 attrs content =
 
 body : List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
 body attrs content =
-    Html.styled Html.h2
+    Html.styled Html.div
         [ Css.border (Css.px 0)
         , Css.fontWeight (Css.int 400)
         , Css.fontSize (Css.px 16)

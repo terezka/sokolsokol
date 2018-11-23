@@ -59,6 +59,8 @@ type Msg
     | GotFileUrl String String
     | GotFileDownloadUrl Encode.Value
     | GotArticle Encode.Value
+    | UpdateTitle String
+    | UpdateBody String
 
 
 update : Nav.Key -> Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Data )
@@ -184,6 +186,34 @@ update key session msg model =
                     , session
                     )
 
+        UpdateTitle title ->
+            case model.editing of
+                Just article ->
+                    ( { model | editing = Just (Article.setTitle title article) }
+                    , Cmd.none
+                    , session
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    , session
+                    )
+
+        UpdateBody body ->
+            case model.editing of
+                Just article ->
+                    ( { model | editing = Just (Article.setBody body article) }
+                    , Cmd.none
+                    , session
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    , session
+                    )
+
 
 view : Session.Data -> Model -> Skeleton.Document Msg
 view session model =
@@ -258,12 +288,18 @@ viewArticleEditing article =
         , content =
             [ Text.h1
                 [ Attr.contenteditable True
-                , Attr.id "title"
+                , Attr.css
+                    [ Css.empty [ Css.before [ Css.property "content" "'Title'", Css.color Color.grayDark ] ]
+                    ]
+                , Events.on "blur" (Decode.map UpdateTitle getTextContent)
                 ]
                 article.title
             , Text.body
                 [ Attr.contenteditable True
-                , Attr.id "body"
+                , Attr.css
+                    [ Css.empty [ Css.before [ Css.property "content" "'Body'", Css.color Color.grayDark ] ]
+                    ]
+                , Events.on "blur" (Decode.map UpdateBody getTextContent)
                 ]
                 (paragraphs article)
             ]
@@ -272,6 +308,11 @@ viewArticleEditing article =
             , Button.basic ArticleToggle "Save"
             ]
         }
+
+
+getTextContent : Decode.Decoder String
+getTextContent =
+    Decode.at [ "target", "outerText" ] Decode.string
 
 
 
@@ -322,6 +363,7 @@ paragraphs : Article.Article -> List (Html.Html msg)
 paragraphs article =
     article.body
         |> String.split "\n"
+        |> List.filter (not << String.isEmpty)
         |> List.map (List.singleton << Html.text)
         |> List.map (Html.p [])
 
