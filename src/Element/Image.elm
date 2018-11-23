@@ -50,7 +50,7 @@ editable msg maybeUrl =
         layover =
             case maybeUrl of
                 Just url ->
-                    [ Button.basic msg.remove "Remove"
+                    [ Button.warning msg.remove "Remove"
                     , Button.basic msg.select "Change"
                     ]
 

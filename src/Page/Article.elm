@@ -20,6 +20,7 @@ import Page.Skeleton as Skeleton
 import Ports
 import Session
 import Task
+import Markdown
 
 
 type alias Model =
@@ -281,7 +282,7 @@ viewArticle model article buttons =
     threeColumn
         [ Util.maybe article.cover (Image.single ImageLoaded model.imageLoaded)
         , Text.h1 [] article.title
-        , Html.div [] (paragraphs article)
+        , Html.div [] [ Html.fromUnstyled <| Markdown.toHtml [] article.body ]
         , menu buttons
         ]
 
