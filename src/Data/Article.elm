@@ -1,4 +1,4 @@
-module Data.Article exposing (Article, Id, decodeMany, decodeOne, encodeOne, placeholder, setCover)
+module Data.Article exposing (Article, Id, decodeMany, decodeOne, encodeId, encodeOne, placeholder, setCover)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -59,3 +59,8 @@ encodeOne article =
         , ( "title", Encode.string article.title )
         , ( "body", Encode.string article.body )
         ]
+
+
+encodeId : Id -> Encode.Value
+encodeId id =
+    Encode.object [ ( "id", Encode.string id ) ]

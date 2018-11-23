@@ -93,7 +93,7 @@ update key session msg model =
         ArticleRemove ->
             ( model
             , Cmd.batch
-                [ Ports.deleteEditedArticle (Encode.object [ ( "id", Encode.string model.id ) ])
+                [ Ports.deleteEditedArticle (Article.encodeId model.id)
                 , Nav.pushUrl key "/articles"
                 ]
             , Session.removeArticle model.id session
@@ -104,44 +104,6 @@ update key session msg model =
             , Cmd.none
             , session
             )
-
-        GotFiles file files ->
-            ( model
-            , Task.perform (GotFileUrl (File.name file)) (File.toUrl file)
-            , session
-            )
-
-        GotFileUrl name url ->
-            ( model
-            , Ports.uploadImage <|
-                Encode.object
-                    [ ( "name", Encode.string name )
-                    , ( "url", Encode.string url )
-                    ]
-            , session
-            )
-
-        GotFileDownloadUrl value ->
-            case model.editing of
-                Just article ->
-                    case Decode.decodeValue (Decode.field "url" Decode.string) value of
-                        Ok url ->
-                            ( { model | editing = Just (Article.setCover (Just url) article) }
-                            , Ports.saveEditedArticle (Article.encodeOne (Article.setCover (Just url) article))
-                            , session
-                            )
-
-                        Err _ ->
-                            ( model
-                            , Cmd.none
-                            , session
-                            )
-
-                Nothing ->
-                    ( model
-                    , Cmd.none
-                    , session
-                    )
 
         ArticleToggle ->
             case model.editing of
@@ -170,6 +132,40 @@ update key session msg model =
                             , Cmd.none
                             , session
                             )
+
+        GotFiles file files ->
+            ( model
+            , Task.perform (GotFileUrl (File.name file)) (File.toUrl file)
+            , session
+            )
+
+        GotFileUrl name url ->
+            ( model
+            , Ports.uploadImage (Image.encodeUrl name url)
+            , session
+            )
+
+        GotFileDownloadUrl value ->
+            case model.editing of
+                Just article ->
+                    case Decode.decodeValue Image.decodeUrl value of
+                        Ok url ->
+                            ( { model | editing = Just (Article.setCover (Just url) article) }
+                            , Ports.saveEditedArticle (Article.encodeOne (Article.setCover (Just url) article))
+                            , session
+                            )
+
+                        Err _ ->
+                            ( model
+                            , Cmd.none
+                            , session
+                            )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    , session
+                    )
 
         GotArticle value ->
             case Decode.decodeValue Article.decodeOne value of

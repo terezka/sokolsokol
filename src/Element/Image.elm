@@ -1,4 +1,4 @@
-module Element.Image exposing (editable, single, thumbnail)
+module Element.Image exposing (decodeUrl, editable, encodeUrl, single, thumbnail)
 
 import Css
 import Css.Animations
@@ -9,6 +9,7 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
 import Json.Decode as Decode
+import Json.Encode as Encode
 
 
 thumbnail : String -> Html.Html msg
@@ -109,4 +110,21 @@ fadeInKeyframes =
     Css.Animations.keyframes
         [ ( 0, [ Css.Animations.opacity Css.zero ] )
         , ( 100, [ Css.Animations.opacity (Css.num 1) ] )
+        ]
+
+
+
+-- FILE UPLOAD
+
+
+decodeUrl : Decode.Decoder String
+decodeUrl =
+    Decode.field "url" Decode.string
+
+
+encodeUrl : String -> String -> Encode.Value
+encodeUrl name url =
+    Encode.object
+        [ ( "name", Encode.string name )
+        , ( "url", Encode.string url )
         ]

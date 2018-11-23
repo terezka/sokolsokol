@@ -6233,6 +6233,15 @@ var author$project$Page$Admin$update = F3(
 				}
 		}
 	});
+var author$project$Data$Article$encodeId = function (id) {
+	return elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'id',
+				elm$json$Json$Encode$string(id))
+			]));
+};
 var author$project$Data$Article$encodeOne = function (article) {
 	return elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -6264,6 +6273,20 @@ var author$project$Data$Article$setCover = F2(
 		return _Utils_update(
 			article,
 			{cover: url});
+	});
+var author$project$Element$Image$decodeUrl = A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string);
+var author$project$Element$Image$encodeUrl = F2(
+	function (name, url) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'name',
+					elm$json$Json$Encode$string(name)),
+					_Utils_Tuple2(
+					'url',
+					elm$json$Json$Encode$string(url))
+				]));
 	});
 var author$project$Page$Article$GotFileUrl = F2(
 	function (a, b) {
@@ -6585,7 +6608,7 @@ var author$project$Page$Article$update = F4(
 						{imageLoaded: true}),
 					elm$core$Platform$Cmd$none,
 					session);
-			case 'PickImage':
+			case 'ImageSelect':
 				return _Utils_Tuple3(
 					model,
 					A2(
@@ -6594,7 +6617,7 @@ var author$project$Page$Article$update = F4(
 							['image/*']),
 						author$project$Page$Article$GotFiles),
 					session);
-			case 'RemoveImage':
+			case 'ImageRemove':
 				var _n1 = model.editing;
 				if (_n1.$ === 'Just') {
 					var article = _n1.a;
@@ -6610,30 +6633,54 @@ var author$project$Page$Article$update = F4(
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
 				}
-			case 'DeleteArticle':
+			case 'ArticleRemove':
 				return _Utils_Tuple3(
 					model,
 					elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
 								author$project$Ports$deleteEditedArticle(
-								elm$json$Json$Encode$object(
-									_List_fromArray(
-										[
-											_Utils_Tuple2(
-											'id',
-											elm$json$Json$Encode$string(model.id))
-										]))),
+								author$project$Data$Article$encodeId(model.id)),
 								A2(elm$browser$Browser$Navigation$pushUrl, key, '/articles')
 							])),
 					A2(author$project$Session$removeArticle, model.id, session));
-			case 'Cancel':
+			case 'ArticleCancel':
 				return _Utils_Tuple3(
 					_Utils_update(
 						model,
 						{editing: elm$core$Maybe$Nothing}),
 					elm$core$Platform$Cmd$none,
 					session);
+			case 'ArticleToggle':
+				var _n2 = model.editing;
+				if (_n2.$ === 'Just') {
+					var article = _n2.a;
+					return _Utils_Tuple3(
+						model,
+						author$project$Ports$getEditedArticle(
+							author$project$Data$Article$encodeOne(article)),
+						A2(author$project$Session$removeArticle, article.id, session));
+				} else {
+					var _n3 = A2(author$project$Session$getArticle, model.id, session);
+					if (_n3.$ === 'Success') {
+						if (_n3.a.$ === 'Just') {
+							var article = _n3.a.a;
+							return _Utils_Tuple3(
+								_Utils_update(
+									model,
+									{
+										editing: elm$core$Maybe$Just(article)
+									}),
+								elm$core$Platform$Cmd$none,
+								session);
+						} else {
+							var _n4 = _n3.a;
+							return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+						}
+					} else {
+						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+					}
+				}
 			case 'GotFiles':
 				var file = msg.a;
 				var files = msg.b;
@@ -6651,28 +6698,16 @@ var author$project$Page$Article$update = F4(
 				return _Utils_Tuple3(
 					model,
 					author$project$Ports$uploadImage(
-						elm$json$Json$Encode$object(
-							_List_fromArray(
-								[
-									_Utils_Tuple2(
-									'name',
-									elm$json$Json$Encode$string(name)),
-									_Utils_Tuple2(
-									'url',
-									elm$json$Json$Encode$string(url))
-								]))),
+						A2(author$project$Element$Image$encodeUrl, name, url)),
 					session);
 			case 'GotFileDownloadUrl':
 				var value = msg.a;
-				var _n2 = model.editing;
-				if (_n2.$ === 'Just') {
-					var article = _n2.a;
-					var _n3 = A2(
-						elm$json$Json$Decode$decodeValue,
-						A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string),
-						value);
-					if (_n3.$ === 'Ok') {
-						var url = _n3.a;
+				var _n5 = model.editing;
+				if (_n5.$ === 'Just') {
+					var article = _n5.a;
+					var _n6 = A2(elm$json$Json$Decode$decodeValue, author$project$Element$Image$decodeUrl, value);
+					if (_n6.$ === 'Ok') {
+						var url = _n6.a;
 						return _Utils_Tuple3(
 							_Utils_update(
 								model,
@@ -6695,36 +6730,6 @@ var author$project$Page$Article$update = F4(
 					}
 				} else {
 					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-				}
-			case 'Toggle':
-				var _n4 = model.editing;
-				if (_n4.$ === 'Just') {
-					var article = _n4.a;
-					return _Utils_Tuple3(
-						model,
-						author$project$Ports$getEditedArticle(
-							author$project$Data$Article$encodeOne(article)),
-						A2(author$project$Session$removeArticle, article.id, session));
-				} else {
-					var _n5 = A2(author$project$Session$getArticle, model.id, session);
-					if (_n5.$ === 'Success') {
-						if (_n5.a.$ === 'Just') {
-							var article = _n5.a.a;
-							return _Utils_Tuple3(
-								_Utils_update(
-									model,
-									{
-										editing: elm$core$Maybe$Just(article)
-									}),
-								elm$core$Platform$Cmd$none,
-								session);
-						} else {
-							var _n6 = _n5.a;
-							return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-						}
-					} else {
-						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
-					}
 				}
 			default:
 				var value = msg.a;
@@ -9461,8 +9466,8 @@ var author$project$Element$Button$warning = F2(
 					rtfeldman$elm_css$Html$Styled$text(content)
 				]));
 	});
-var author$project$Page$Article$DeleteArticle = {$: 'DeleteArticle'};
-var author$project$Page$Article$Toggle = {$: 'Toggle'};
+var author$project$Page$Article$ArticleRemove = {$: 'ArticleRemove'};
+var author$project$Page$Article$ArticleToggle = {$: 'ArticleToggle'};
 var rtfeldman$elm_css$Css$int = function (val) {
 	return {
 		fontWeight: rtfeldman$elm_css$Css$Structure$Compatible,
@@ -10112,9 +10117,9 @@ var author$project$Element$Text$body = F2(
 			attrs,
 			content);
 	});
-var author$project$Page$Article$Cancel = {$: 'Cancel'};
-var author$project$Page$Article$PickImage = {$: 'PickImage'};
-var author$project$Page$Article$RemoveImage = {$: 'RemoveImage'};
+var author$project$Page$Article$ArticleCancel = {$: 'ArticleCancel'};
+var author$project$Page$Article$ImageRemove = {$: 'ImageRemove'};
+var author$project$Page$Article$ImageSelect = {$: 'ImageSelect'};
 var author$project$Page$Article$singleColumn = rtfeldman$elm_css$Html$Styled$div(
 	_List_fromArray(
 		[
@@ -10155,12 +10160,12 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 		{
 			actions: _List_fromArray(
 				[
-					A2(author$project$Element$Button$warning, author$project$Page$Article$Cancel, 'Cancel'),
-					A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Save')
+					A2(author$project$Element$Button$warning, author$project$Page$Article$ArticleCancel, 'Cancel'),
+					A2(author$project$Element$Button$basic, author$project$Page$Article$ArticleToggle, 'Save')
 				]),
 			aside: A2(
 				author$project$Element$Image$editable,
-				{remove: author$project$Page$Article$RemoveImage, select: author$project$Page$Article$PickImage},
+				{remove: author$project$Page$Article$ImageRemove, select: author$project$Page$Article$ImageSelect},
 				article.cover),
 			content: _List_fromArray(
 				[
@@ -10212,8 +10217,8 @@ var author$project$Page$Article$view = F2(
 									article,
 									_List_fromArray(
 										[
-											A2(author$project$Element$Button$warning, author$project$Page$Article$DeleteArticle, 'Delete'),
-											A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Edit')
+											A2(author$project$Element$Button$warning, author$project$Page$Article$ArticleRemove, 'Delete'),
+											A2(author$project$Element$Button$basic, author$project$Page$Article$ArticleToggle, 'Edit')
 										]))
 								]),
 							title: 'SOKOL SOKOL | ' + article.title
