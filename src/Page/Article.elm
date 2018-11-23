@@ -50,11 +50,11 @@ init session id =
 
 type Msg
     = ImageLoaded String
-    | PickImage
-    | RemoveImage
-    | DeleteArticle
-    | Cancel
-    | Toggle
+    | ImageSelect
+    | ImageRemove
+    | ArticleRemove
+    | ArticleCancel
+    | ArticleToggle
     | GotFiles File.File (List File.File)
     | GotFileUrl String String
     | GotFileDownloadUrl Encode.Value
@@ -65,12 +65,18 @@ update : Nav.Key -> Session.Data -> Msg -> Model -> ( Model, Cmd Msg, Session.Da
 update key session msg model =
     case msg of
         ImageLoaded _ ->
-            ( { model | imageLoaded = True }, Cmd.none, session )
+            ( { model | imageLoaded = True }
+            , Cmd.none
+            , session
+            )
 
-        PickImage ->
-            ( model, Select.files [ "image/*" ] GotFiles, session )
+        ImageSelect ->
+            ( model
+            , Select.files [ "image/*" ] GotFiles
+            , session
+            )
 
-        RemoveImage ->
+        ImageRemove ->
             case model.editing of
                 Just article ->
                     ( { model | editing = Just (Article.setCover Nothing article) }
@@ -79,9 +85,12 @@ update key session msg model =
                     )
 
                 Nothing ->
-                    ( model, Cmd.none, session )
+                    ( model
+                    , Cmd.none
+                    , session
+                    )
 
-        DeleteArticle ->
+        ArticleRemove ->
             ( model
             , Cmd.batch
                 [ Ports.deleteEditedArticle (Encode.object [ ( "id", Encode.string model.id ) ])
@@ -90,7 +99,7 @@ update key session msg model =
             , Session.removeArticle model.id session
             )
 
-        Cancel ->
+        ArticleCancel ->
             ( { model | editing = Nothing }
             , Cmd.none
             , session
@@ -123,12 +132,18 @@ update key session msg model =
                             )
 
                         Err _ ->
-                            ( model, Cmd.none, session )
+                            ( model
+                            , Cmd.none
+                            , session
+                            )
 
                 Nothing ->
-                    ( model, Cmd.none, session )
+                    ( model
+                    , Cmd.none
+                    , session
+                    )
 
-        Toggle ->
+        ArticleToggle ->
             case model.editing of
                 Just article ->
                     ( model
@@ -145,10 +160,16 @@ update key session msg model =
                             )
 
                         Status.Success Nothing ->
-                            ( model, Cmd.none, session )
+                            ( model
+                            , Cmd.none
+                            , session
+                            )
 
                         Status.Loading ->
-                            ( model, Cmd.none, session )
+                            ( model
+                            , Cmd.none
+                            , session
+                            )
 
         GotArticle value ->
             case Decode.decodeValue Article.decodeOne value of
@@ -162,7 +183,10 @@ update key session msg model =
                     )
 
                 Err _ ->
-                    ( model, Cmd.none, session )
+                    ( model
+                    , Cmd.none
+                    , session
+                    )
 
 
 view : Session.Data -> Model -> Skeleton.Document Msg
@@ -182,8 +206,8 @@ view session model =
                             , body =
                                 [ viewArticle model
                                     article
-                                    [ Button.warning DeleteArticle "Delete"
-                                    , Button.basic Toggle "Edit"
+                                    [ Button.warning ArticleRemove "Delete"
+                                    , Button.basic ArticleToggle "Edit"
                                     ]
                                 ]
                             }
@@ -234,7 +258,7 @@ filesDecoder =
 viewArticleEditing : Article.Article -> Html.Html Msg
 viewArticleEditing article =
     editable
-        { aside = Image.editable { select = PickImage, remove = RemoveImage } article.cover
+        { aside = Image.editable { select = ImageSelect, remove = ImageRemove } article.cover
         , content =
             [ Text.h1
                 [ Attr.contenteditable True
@@ -248,8 +272,8 @@ viewArticleEditing article =
                 (paragraphs article)
             ]
         , actions =
-            [ Button.warning Cancel "Cancel"
-            , Button.basic Toggle "Save"
+            [ Button.warning ArticleCancel "Cancel"
+            , Button.basic ArticleToggle "Save"
             ]
         }
 
