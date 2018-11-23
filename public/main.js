@@ -5979,8 +5979,9 @@ var author$project$Main$stepUrl = F2(
 		}
 	});
 var author$project$Ports$fetchArticles = _Platform_outgoingPort('fetchArticles', elm$core$Basics$identity);
+var author$project$Data$Status$Loading = {$: 'Loading'};
 var author$project$Session$Anonymous = {$: 'Anonymous'};
-var author$project$Session$empty = {articles: elm$core$Dict$empty, user: author$project$Session$Anonymous};
+var author$project$Session$empty = {articles: author$project$Data$Status$Loading, user: author$project$Session$Anonymous};
 var elm$json$Json$Encode$null = _Json_encodeNull;
 var author$project$Main$init = F3(
 	function (_n0, url, key) {
@@ -6254,6 +6255,28 @@ var author$project$Data$Article$setCover = F2(
 			article,
 			{cover: url});
 	});
+var author$project$Data$Status$Success = function (a) {
+	return {$: 'Success', a: a};
+};
+var author$project$Data$Status$map = F2(
+	function (f, status) {
+		if (status.$ === 'Loading') {
+			return author$project$Data$Status$Loading;
+		} else {
+			var a = status.a;
+			return author$project$Data$Status$Success(
+				f(a));
+		}
+	});
+var author$project$Data$Status$withDefault = F2(
+	function (_default, status) {
+		if (status.$ === 'Loading') {
+			return _default;
+		} else {
+			var a = status.a;
+			return a;
+		}
+	});
 var author$project$Page$Article$GotFileUrl = F2(
 	function (a, b) {
 		return {$: 'GotFileUrl', a: a, b: b};
@@ -6268,14 +6291,20 @@ var author$project$Ports$saveEditedArticle = _Platform_outgoingPort('saveEditedA
 var author$project$Ports$uploadImage = _Platform_outgoingPort('uploadImage', elm$core$Basics$identity);
 var author$project$Session$getArticle = F2(
 	function (id, data) {
-		return A2(elm$core$Dict$get, id, data.articles);
+		return A2(
+			author$project$Data$Status$map,
+			elm$core$Dict$get(id),
+			data.articles);
 	});
 var author$project$Session$removeArticle = F2(
 	function (id, data) {
 		return _Utils_update(
 			data,
 			{
-				articles: A2(elm$core$Dict$remove, id, data.articles)
+				articles: A2(
+					author$project$Data$Status$map,
+					elm$core$Dict$remove(id),
+					data.articles)
 			});
 	});
 var author$project$Session$setArticle = F2(
@@ -6283,7 +6312,10 @@ var author$project$Session$setArticle = F2(
 		return _Utils_update(
 			data,
 			{
-				articles: A3(elm$core$Dict$insert, article.id, article, data.articles)
+				articles: A2(
+					author$project$Data$Status$map,
+					A2(elm$core$Dict$insert, article.id, article),
+					data.articles)
 			});
 	});
 var elm$browser$Browser$External = function (a) {
@@ -6688,9 +6720,12 @@ var author$project$Page$Article$update = F4(
 							{
 								editing: elm$core$Maybe$Just(
 									A2(
-										elm$core$Maybe$withDefault,
+										author$project$Data$Status$withDefault,
 										author$project$Data$Article$placeholder,
-										A2(author$project$Session$getArticle, model.id, session)))
+										A2(
+											author$project$Data$Status$map,
+											elm$core$Maybe$withDefault(author$project$Data$Article$placeholder),
+											A2(author$project$Session$getArticle, model.id, session))))
 							}),
 						elm$core$Platform$Cmd$none,
 						session);
@@ -6738,13 +6773,14 @@ var author$project$Session$setArticles = F2(
 		return _Utils_update(
 			data,
 			{
-				articles: elm$core$Dict$fromList(
-					A2(
-						elm$core$List$map,
-						function (a) {
-							return _Utils_Tuple2(a.id, a);
-						},
-						articles))
+				articles: author$project$Data$Status$Success(
+					elm$core$Dict$fromList(
+						A2(
+							elm$core$List$map,
+							function (a) {
+								return _Utils_Tuple2(a.id, a);
+							},
+							articles)))
 			});
 	});
 var author$project$Session$LoggedIn = function (a) {
@@ -10153,26 +10189,36 @@ var author$project$Page$Article$viewBody = F2(
 				return author$project$Page$Article$viewArticleEditing(article);
 			} else {
 				var _n2 = A2(author$project$Session$getArticle, model.id, session);
-				if (_n2.$ === 'Just') {
-					var article = _n2.a;
-					return A3(
-						author$project$Page$Article$viewArticle,
-						model,
-						article,
-						_List_fromArray(
-							[
-								A2(author$project$Element$Button$warning, author$project$Page$Article$DeleteArticle, 'Delete'),
-								A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Edit')
-							]));
+				if (_n2.$ === 'Success') {
+					if (_n2.a.$ === 'Just') {
+						var article = _n2.a.a;
+						return A3(
+							author$project$Page$Article$viewArticle,
+							model,
+							article,
+							_List_fromArray(
+								[
+									A2(author$project$Element$Button$warning, author$project$Page$Article$DeleteArticle, 'Delete'),
+									A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Edit')
+								]));
+					} else {
+						var _n3 = _n2.a;
+						return author$project$Page$Article$viewArticleEditing(author$project$Data$Article$placeholder);
+					}
 				} else {
-					return author$project$Page$Article$viewArticleEditing(author$project$Data$Article$placeholder);
+					return rtfeldman$elm_css$Html$Styled$text('Loading...');
 				}
 			}
 		} else {
-			var _n3 = A2(author$project$Session$getArticle, model.id, session);
-			if (_n3.$ === 'Just') {
-				var article = _n3.a;
-				return A3(author$project$Page$Article$viewArticle, model, article, _List_Nil);
+			var _n4 = A2(author$project$Session$getArticle, model.id, session);
+			if (_n4.$ === 'Success') {
+				if (_n4.a.$ === 'Just') {
+					var article = _n4.a.a;
+					return A3(author$project$Page$Article$viewArticle, model, article, _List_Nil);
+				} else {
+					var _n5 = _n4.a;
+					return rtfeldman$elm_css$Html$Styled$text('Article not found.');
+				}
 			} else {
 				return rtfeldman$elm_css$Html$Styled$text('Loading...');
 			}
@@ -10300,7 +10346,10 @@ var elm$core$Dict$values = function (dict) {
 		dict);
 };
 var author$project$Session$getArticles = function (data) {
-	return elm$core$Dict$values(data.articles);
+	return A2(
+		author$project$Data$Status$withDefault,
+		_List_Nil,
+		A2(author$project$Data$Status$map, elm$core$Dict$values, data.articles));
 };
 var author$project$Page$Articles$view = F2(
 	function (session, model) {

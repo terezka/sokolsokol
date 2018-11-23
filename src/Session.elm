@@ -14,13 +14,14 @@ module Session exposing
     )
 
 import Data.Article as Article
+import Data.Status as Status
 import Data.User as User
 import Dict
 import Html.Styled as Html
 
 
 type alias Data =
-    { articles : Dict.Dict Article.Id Article.Article
+    { articles : Status.Status (Dict.Dict Article.Id Article.Article)
     , user : User
     }
 
@@ -38,7 +39,7 @@ type alias State =
 
 empty : Data
 empty =
-    { articles = Dict.empty
+    { articles = Status.Loading
     , user = Anonymous
     }
 
@@ -60,27 +61,30 @@ setArticles articles data =
             articles
                 |> List.map (\a -> ( a.id, a ))
                 |> Dict.fromList
+                |> Status.Success
     }
 
 
 setArticle : Article.Article -> Data -> Data
 setArticle article data =
-    { data | articles = Dict.insert article.id article data.articles }
+    { data | articles = Status.map (Dict.insert article.id article) data.articles }
 
 
 removeArticle : Article.Id -> Data -> Data
 removeArticle id data =
-    { data | articles = Dict.remove id data.articles }
+    { data | articles = Status.map (Dict.remove id) data.articles }
 
 
 getArticles : Data -> List Article.Article
 getArticles data =
-    Dict.values data.articles
+    data.articles
+        |> Status.map Dict.values
+        |> Status.withDefault []
 
 
-getArticle : Article.Id -> Data -> Maybe Article.Article
+getArticle : Article.Id -> Data -> Status.Status (Maybe Article.Article)
 getArticle id data =
-    Dict.get id data.articles
+    Status.map (Dict.get id) data.articles
 
 
 setUser : Maybe User.User -> Data -> Data

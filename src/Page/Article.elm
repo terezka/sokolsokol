@@ -3,6 +3,7 @@ module Page.Article exposing (Model, Msg, init, subscriptions, update, view)
 import Browser.Navigation as Nav
 import Css
 import Data.Article as Article
+import Data.Status as Status
 import Element.Button as Button
 import Element.Color as Color
 import Element.Image as Image
@@ -30,7 +31,10 @@ type alias Model =
 
 init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { id = id, editing = Nothing, imageLoaded = False }
+    ( { id = id
+      , editing = Nothing
+      , imageLoaded = False
+      }
     , Cmd.none
     , session
     )
@@ -129,7 +133,8 @@ update key session msg model =
                         | editing =
                             session
                                 |> Session.getArticle model.id
-                                |> Maybe.withDefault Article.placeholder
+                                |> Status.map (Maybe.withDefault Article.placeholder)
+                                |> Status.withDefault Article.placeholder
                                 |> Just
                       }
                     , Cmd.none
@@ -168,22 +173,28 @@ viewBody session model =
 
                 Nothing ->
                     case Session.getArticle model.id session of
-                        Just article ->
+                        Status.Success (Just article) ->
                             viewArticle model
                                 article
                                 [ Button.warning DeleteArticle "Delete"
                                 , Button.basic Toggle "Edit"
                                 ]
 
-                        Nothing ->
+                        Status.Success Nothing ->
                             viewArticleEditing Article.placeholder
+
+                        Status.Loading ->
+                            Html.text "Loading..."
 
         Session.Anonymous ->
             case Session.getArticle model.id session of
-                Just article ->
+                Status.Success (Just article) ->
                     viewArticle model article []
 
-                Nothing ->
+                Status.Success Nothing ->
+                    Html.text "Article not found."
+
+                Status.Loading ->
                     Html.text "Loading..."
 
 
