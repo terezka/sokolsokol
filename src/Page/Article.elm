@@ -306,7 +306,6 @@ viewArticleEditing model article =
                 , Events.onInput UpdateTitle
                 , Attr.value article.title
                 , Attr.attribute "data-placeholder" "Title"
-                , Attr.attribute "data-autoresize" "true"
                 , Attr.attribute "data-value" article.title
                 ]
                 []
@@ -318,7 +317,6 @@ viewArticleEditing model article =
                 , Events.onInput UpdateBody
                 , Attr.value article.body
                 , Attr.attribute "data-placeholder" "Body"
-                , Attr.attribute "data-autoresize" "true"
                 , Attr.attribute "data-value" article.body
                 ]
                 []

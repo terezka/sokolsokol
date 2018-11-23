@@ -10370,7 +10370,6 @@ var author$project$Page$Article$viewArticleEditing = F2(
 								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Article$UpdateTitle),
 								rtfeldman$elm_css$Html$Styled$Attributes$value(article.title),
 								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-placeholder', 'Title'),
-								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-autoresize', 'true'),
 								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-value', article.title)
 							]),
 						_List_Nil),
@@ -10390,7 +10389,6 @@ var author$project$Page$Article$viewArticleEditing = F2(
 								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Article$UpdateBody),
 								rtfeldman$elm_css$Html$Styled$Attributes$value(article.body),
 								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-placeholder', 'Body'),
-								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-autoresize', 'true'),
 								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-value', article.body)
 							]),
 						_List_Nil)
