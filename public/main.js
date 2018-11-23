@@ -5187,11 +5187,12 @@ var author$project$Page$Article$init = F2(
 				if (id === 'new') {
 					return {
 						editing: elm$core$Maybe$Just(author$project$Data$Article$placeholder),
+						errors: _List_Nil,
 						id: id,
 						imageLoaded: false
 					};
 				} else {
-					return {editing: elm$core$Maybe$Nothing, id: id, imageLoaded: false};
+					return {editing: elm$core$Maybe$Nothing, errors: _List_Nil, id: id, imageLoaded: false};
 				}
 			}(),
 			elm$core$Platform$Cmd$none,
@@ -6667,7 +6668,15 @@ var author$project$Page$Article$update = F4(
 				var _n2 = model.editing;
 				if (_n2.$ === 'Just') {
 					var article = _n2.a;
-					return _Utils_Tuple3(
+					return elm$core$String$isEmpty(article.title) ? _Utils_Tuple3(
+						_Utils_update(
+							model,
+							{
+								errors: _List_fromArray(
+									['Title must not be empty.'])
+							}),
+						elm$core$Platform$Cmd$none,
+						session) : _Utils_Tuple3(
 						model,
 						author$project$Ports$getEditedArticle(
 							author$project$Data$Article$encodeOne(article)),
@@ -6773,7 +6782,8 @@ var author$project$Page$Article$update = F4(
 							model,
 							{
 								editing: elm$core$Maybe$Just(
-									A2(author$project$Data$Article$setTitle, title, article))
+									A2(author$project$Data$Article$setTitle, title, article)),
+								errors: _List_Nil
 							}),
 						elm$core$Platform$Cmd$none,
 						session);
@@ -10023,7 +10033,6 @@ var author$project$Page$Article$viewArticle = F3(
 					author$project$Page$Article$menu(buttons)
 				]));
 	});
-var author$project$Element$Color$grayDark = rtfeldman$elm_css$Css$hex('b5b5b5');
 var author$project$Element$Color$gray = rtfeldman$elm_css$Css$hex('f5f5f5');
 var rtfeldman$elm_css$Css$alignItems = function (fn) {
 	return A3(
@@ -10148,24 +10157,6 @@ var author$project$Element$Image$editable = F2(
 					layover)
 				]));
 	});
-var author$project$Element$Text$body = F2(
-	function (attrs, content) {
-		return A4(
-			rtfeldman$elm_css$Html$Styled$styled,
-			rtfeldman$elm_css$Html$Styled$div,
-			_List_fromArray(
-				[
-					rtfeldman$elm_css$Css$border(
-					rtfeldman$elm_css$Css$px(0)),
-					rtfeldman$elm_css$Css$fontWeight(
-					rtfeldman$elm_css$Css$int(400)),
-					rtfeldman$elm_css$Css$fontSize(
-					rtfeldman$elm_css$Css$px(16)),
-					rtfeldman$elm_css$Css$outline(rtfeldman$elm_css$Css$none)
-				]),
-			attrs,
-			content);
-	});
 var author$project$Page$Article$ArticleCancel = {$: 'ArticleCancel'};
 var author$project$Page$Article$ImageRemove = {$: 'ImageRemove'};
 var author$project$Page$Article$ImageSelect = {$: 'ImageSelect'};
@@ -10200,100 +10191,103 @@ var author$project$Page$Article$editable = function (_n0) {
 				author$project$Page$Article$menu(actions)
 			]));
 };
-var author$project$Page$Article$getTextContent = A2(
-	elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'outerText']),
-	elm$json$Json$Decode$string);
-var rtfeldman$elm_css$Css$Preprocess$WithPseudoElement = F2(
-	function (a, b) {
-		return {$: 'WithPseudoElement', a: a, b: b};
-	});
-var rtfeldman$elm_css$Css$Structure$PseudoElement = function (a) {
-	return {$: 'PseudoElement', a: a};
-};
-var rtfeldman$elm_css$Css$pseudoElement = function (element) {
-	return rtfeldman$elm_css$Css$Preprocess$WithPseudoElement(
-		rtfeldman$elm_css$Css$Structure$PseudoElement(element));
-};
-var rtfeldman$elm_css$Css$before = rtfeldman$elm_css$Css$pseudoElement('before');
-var rtfeldman$elm_css$Css$empty = rtfeldman$elm_css$Css$pseudoClass('empty');
-var elm$json$Json$Encode$bool = _Json_wrap;
-var rtfeldman$elm_css$Html$Styled$Attributes$boolProperty = F2(
-	function (key, bool) {
+var elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
 		return A2(
-			rtfeldman$elm_css$VirtualDom$Styled$property,
-			key,
-			elm$json$Json$Encode$bool(bool));
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
-var rtfeldman$elm_css$Html$Styled$Attributes$contenteditable = rtfeldman$elm_css$Html$Styled$Attributes$boolProperty('contentEditable');
-var author$project$Page$Article$viewArticleEditing = function (article) {
-	return author$project$Page$Article$editable(
-		{
-			actions: _List_fromArray(
-				[
-					A2(author$project$Element$Button$warning, author$project$Page$Article$ArticleCancel, 'Cancel'),
-					A2(author$project$Element$Button$basic, author$project$Page$Article$ArticleToggle, 'Save')
-				]),
-			aside: A2(
-				author$project$Element$Image$editable,
-				{remove: author$project$Page$Article$ImageRemove, select: author$project$Page$Article$ImageSelect},
-				article.cover),
-			content: _List_fromArray(
-				[
-					A2(
-					author$project$Element$Text$h1,
-					_List_fromArray(
-						[
-							rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
-							rtfeldman$elm_css$Html$Styled$Attributes$css(
-							_List_fromArray(
-								[
-									rtfeldman$elm_css$Css$empty(
+var rtfeldman$elm_css$VirtualDom$Styled$attribute = F2(
+	function (key, value) {
+		return A3(
+			rtfeldman$elm_css$VirtualDom$Styled$Attribute,
+			A2(elm$virtual_dom$VirtualDom$attribute, key, value),
+			_List_Nil,
+			'');
+	});
+var rtfeldman$elm_css$Html$Styled$Attributes$attribute = rtfeldman$elm_css$VirtualDom$Styled$attribute;
+var author$project$Page$Article$viewArticleEditing = F2(
+	function (model, article) {
+		return author$project$Page$Article$editable(
+			{
+				actions: _List_fromArray(
+					[
+						A2(author$project$Element$Button$warning, author$project$Page$Article$ArticleCancel, 'Cancel'),
+						A2(author$project$Element$Button$basic, author$project$Page$Article$ArticleToggle, 'Save'),
+						A2(
+						rtfeldman$elm_css$Html$Styled$div,
+						_List_Nil,
+						A2(
+							elm$core$List$map,
+							function (error) {
+								return A2(
+									rtfeldman$elm_css$Html$Styled$p,
 									_List_fromArray(
 										[
-											rtfeldman$elm_css$Css$before(
+											rtfeldman$elm_css$Html$Styled$Attributes$css(
 											_List_fromArray(
 												[
-													A2(rtfeldman$elm_css$Css$property, 'content', '\'Title\''),
-													rtfeldman$elm_css$Css$color(author$project$Element$Color$grayDark)
+													rtfeldman$elm_css$Css$color(author$project$Element$Color$red)
 												]))
-										]))
-								])),
-							A2(
-							rtfeldman$elm_css$Html$Styled$Events$on,
-							'blur',
-							A2(elm$json$Json$Decode$map, author$project$Page$Article$UpdateTitle, author$project$Page$Article$getTextContent))
-						]),
-					article.title),
-					A2(
-					author$project$Element$Text$body,
-					_List_fromArray(
-						[
-							rtfeldman$elm_css$Html$Styled$Attributes$contenteditable(true),
-							rtfeldman$elm_css$Html$Styled$Attributes$css(
-							_List_fromArray(
-								[
-									rtfeldman$elm_css$Css$empty(
+										]),
 									_List_fromArray(
 										[
-											rtfeldman$elm_css$Css$before(
-											_List_fromArray(
-												[
-													A2(rtfeldman$elm_css$Css$property, 'content', '\'Body\''),
-													rtfeldman$elm_css$Css$color(author$project$Element$Color$grayDark)
-												]))
-										]))
-								])),
-							A2(
-							rtfeldman$elm_css$Html$Styled$Events$on,
-							'blur',
-							A2(elm$json$Json$Decode$map, author$project$Page$Article$UpdateBody, author$project$Page$Article$getTextContent))
-						]),
-					author$project$Page$Article$paragraphs(article))
-				])
-		});
-};
+											rtfeldman$elm_css$Html$Styled$text(error)
+										]));
+							},
+							model.errors))
+					]),
+				aside: A2(
+					author$project$Element$Image$editable,
+					{remove: author$project$Page$Article$ImageRemove, select: author$project$Page$Article$ImageSelect},
+					article.cover),
+				content: _List_fromArray(
+					[
+						A3(
+						rtfeldman$elm_css$Html$Styled$node,
+						'autoresize-textarea',
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$overline),
+										rtfeldman$elm_css$Css$fontWeight(
+										rtfeldman$elm_css$Css$int(500)),
+										rtfeldman$elm_css$Css$fontSize(
+										rtfeldman$elm_css$Css$px(32))
+									])),
+								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Article$UpdateTitle),
+								rtfeldman$elm_css$Html$Styled$Attributes$value(article.title),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-placeholder', 'Title'),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-autoresize', 'true'),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-value', article.title)
+							]),
+						_List_Nil),
+						A3(
+						rtfeldman$elm_css$Html$Styled$node,
+						'autoresize-textarea',
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$Attributes$css(
+								_List_fromArray(
+									[
+										rtfeldman$elm_css$Css$fontWeight(
+										rtfeldman$elm_css$Css$int(400)),
+										rtfeldman$elm_css$Css$fontSize(
+										rtfeldman$elm_css$Css$px(16))
+									])),
+								rtfeldman$elm_css$Html$Styled$Events$onInput(author$project$Page$Article$UpdateBody),
+								rtfeldman$elm_css$Html$Styled$Attributes$value(article.body),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-placeholder', 'Body'),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-autoresize', 'true'),
+								A2(rtfeldman$elm_css$Html$Styled$Attributes$attribute, 'data-value', article.body)
+							]),
+						_List_Nil)
+					])
+			});
+	});
 var author$project$Page$Article$view = F2(
 	function (session, model) {
 		var _n0 = session.user;
@@ -10305,7 +10299,7 @@ var author$project$Page$Article$view = F2(
 				return {
 					body: _List_fromArray(
 						[
-							author$project$Page$Article$viewArticleEditing(article)
+							A2(author$project$Page$Article$viewArticleEditing, model, article)
 						]),
 					title: 'SOKOL SOKOL | ' + article.title
 				};
@@ -10334,7 +10328,7 @@ var author$project$Page$Article$view = F2(
 						return {
 							body: _List_fromArray(
 								[
-									author$project$Page$Article$viewArticleEditing(author$project$Data$Article$placeholder)
+									A2(author$project$Page$Article$viewArticleEditing, model, author$project$Data$Article$placeholder)
 								]),
 							title: 'SOKOL SOKOL | New article'
 						};

@@ -25,6 +25,7 @@ import Task
 type alias Model =
     { id : Article.Id
     , editing : Maybe Article.Article
+    , errors : List String
     , imageLoaded : Bool
     }
 
@@ -36,12 +37,14 @@ init session id =
             { id = id
             , editing = Just Article.placeholder
             , imageLoaded = False
+            , errors = []
             }
 
         _ ->
             { id = id
             , editing = Nothing
             , imageLoaded = False
+            , errors = []
             }
     , Cmd.none
     , session
@@ -110,10 +113,17 @@ update key session msg model =
         ArticleToggle ->
             case model.editing of
                 Just article ->
-                    ( model
-                    , Ports.getEditedArticle (Article.encodeOne article)
-                    , Session.removeArticle article.id session
-                    )
+                    if String.isEmpty article.title then
+                        ( { model | errors = [ "Title must not be empty." ] }
+                        , Cmd.none
+                        , session
+                        )
+
+                    else
+                        ( model
+                        , Ports.getEditedArticle (Article.encodeOne article)
+                        , Session.removeArticle article.id session
+                        )
 
                 Nothing ->
                     case Session.getArticle model.id session of
@@ -189,7 +199,7 @@ update key session msg model =
         UpdateTitle title ->
             case model.editing of
                 Just article ->
-                    ( { model | editing = Just (Article.setTitle title article) }
+                    ( { model | editing = Just (Article.setTitle title article), errors = [] }
                     , Cmd.none
                     , session
                     )
@@ -222,7 +232,7 @@ view session model =
             case model.editing of
                 Just article ->
                     { title = "SOKOL SOKOL | " ++ article.title
-                    , body = [ viewArticleEditing article ]
+                    , body = [ viewArticleEditing model article ]
                     }
 
                 Nothing ->
@@ -240,7 +250,7 @@ view session model =
 
                         Status.Success Nothing ->
                             { title = "SOKOL SOKOL | New article"
-                            , body = [ viewArticleEditing Article.placeholder ]
+                            , body = [ viewArticleEditing model Article.placeholder ]
                             }
 
                         Status.Loading ->
@@ -281,31 +291,41 @@ filesDecoder =
     Decode.at [ "target", "files" ] (Decode.list File.decoder)
 
 
-viewArticleEditing : Article.Article -> Html.Html Msg
-viewArticleEditing article =
+viewArticleEditing : Model -> Article.Article -> Html.Html Msg
+viewArticleEditing model article =
     editable
         { aside = Image.editable { select = ImageSelect, remove = ImageRemove } article.cover
         , content =
-            [ Text.h1
-                [ Attr.contenteditable True
-                , Attr.css
-                    [ Css.empty [ Css.before [ Css.property "content" "'Title'", Css.color Color.grayDark ] ]
+            [ Html.node "autoresize-textarea"
+                [ Attr.css
+                    [ Css.textDecoration Css.overline
+                    , Css.fontWeight (Css.int 500)
+                    , Css.fontSize (Css.px 32)
                     ]
-                , Events.on "blur" (Decode.map UpdateTitle getTextContent)
+                , Events.onInput UpdateTitle
+                , Attr.value article.title
+                , Attr.attribute "data-placeholder" "Title"
+                , Attr.attribute "data-autoresize" "true"
+                , Attr.attribute "data-value" article.title
                 ]
-                article.title
-            , Text.body
-                [ Attr.contenteditable True
-                , Attr.css
-                    [ Css.empty [ Css.before [ Css.property "content" "'Body'", Css.color Color.grayDark ] ]
+                []
+            , Html.node "autoresize-textarea"
+                [ Attr.css
+                    [ Css.fontWeight (Css.int 400)
+                    , Css.fontSize (Css.px 16)
                     ]
-                , Events.on "blur" (Decode.map UpdateBody getTextContent)
+                , Events.onInput UpdateBody
+                , Attr.value article.body
+                , Attr.attribute "data-placeholder" "Body"
+                , Attr.attribute "data-autoresize" "true"
+                , Attr.attribute "data-value" article.body
                 ]
-                (paragraphs article)
+                []
             ]
         , actions =
             [ Button.warning ArticleCancel "Cancel"
             , Button.basic ArticleToggle "Save"
+            , Html.div [] <| List.map (\error -> Html.p [ Attr.css [ Css.color Color.red ] ] [ Html.text error ]) (model.errors)
             ]
         }
 
