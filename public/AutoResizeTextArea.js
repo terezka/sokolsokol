@@ -1,7 +1,7 @@
 
 
 class AutoResizeTextArea extends HTMLElement {
-  static get observedAttributes() { return ["data-autoresize", "data-value", "data-placeholder"]; }
+  static get observedAttributes() { return ["data-autoresize", "data-value"]; }
 
   constructor() {
     super();
