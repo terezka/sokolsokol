@@ -5179,10 +5179,21 @@ var author$project$Page$Admin$init = function (session) {
 		elm$core$Platform$Cmd$none,
 		session);
 };
+var author$project$Data$Article$placeholder = {body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.', cover: elm$core$Maybe$Nothing, id: 'placeholder', title: 'Placeholder'};
 var author$project$Page$Article$init = F2(
 	function (session, id) {
 		return _Utils_Tuple3(
-			{editing: elm$core$Maybe$Nothing, id: id, imageLoaded: false},
+			function () {
+				if (id === 'new') {
+					return {
+						editing: elm$core$Maybe$Just(author$project$Data$Article$placeholder),
+						id: id,
+						imageLoaded: false
+					};
+				} else {
+					return {editing: elm$core$Maybe$Nothing, id: id, imageLoaded: false};
+				}
+			}(),
 			elm$core$Platform$Cmd$none,
 			session);
 	});
@@ -6248,34 +6259,11 @@ var author$project$Data$Article$encodeOne = function (article) {
 				elm$json$Json$Encode$string(article.body))
 			]));
 };
-var author$project$Data$Article$placeholder = {body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque.', cover: elm$core$Maybe$Nothing, id: 'placeholder', title: 'Placeholder'};
 var author$project$Data$Article$setCover = F2(
 	function (url, article) {
 		return _Utils_update(
 			article,
 			{cover: url});
-	});
-var author$project$Data$Status$Success = function (a) {
-	return {$: 'Success', a: a};
-};
-var author$project$Data$Status$map = F2(
-	function (f, status) {
-		if (status.$ === 'Loading') {
-			return author$project$Data$Status$Loading;
-		} else {
-			var a = status.a;
-			return author$project$Data$Status$Success(
-				f(a));
-		}
-	});
-var author$project$Data$Status$withDefault = F2(
-	function (_default, status) {
-		if (status.$ === 'Loading') {
-			return _default;
-		} else {
-			var a = status.a;
-			return a;
-		}
 	});
 var author$project$Page$Article$GotFileUrl = F2(
 	function (a, b) {
@@ -6289,6 +6277,19 @@ var author$project$Ports$deleteEditedArticle = _Platform_outgoingPort('deleteEdi
 var author$project$Ports$getEditedArticle = _Platform_outgoingPort('getEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$saveEditedArticle = _Platform_outgoingPort('saveEditedArticle', elm$core$Basics$identity);
 var author$project$Ports$uploadImage = _Platform_outgoingPort('uploadImage', elm$core$Basics$identity);
+var author$project$Data$Status$Success = function (a) {
+	return {$: 'Success', a: a};
+};
+var author$project$Data$Status$map = F2(
+	function (f, status) {
+		if (status.$ === 'Loading') {
+			return author$project$Data$Status$Loading;
+		} else {
+			var a = status.a;
+			return author$project$Data$Status$Success(
+				f(a));
+		}
+	});
 var author$project$Session$getArticle = F2(
 	function (id, data) {
 		return A2(
@@ -6557,15 +6558,6 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
 };
@@ -6714,27 +6706,31 @@ var author$project$Page$Article$update = F4(
 							author$project$Data$Article$encodeOne(article)),
 						A2(author$project$Session$removeArticle, article.id, session));
 				} else {
-					return _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{
-								editing: elm$core$Maybe$Just(
-									A2(
-										author$project$Data$Status$withDefault,
-										author$project$Data$Article$placeholder,
-										A2(
-											author$project$Data$Status$map,
-											elm$core$Maybe$withDefault(author$project$Data$Article$placeholder),
-											A2(author$project$Session$getArticle, model.id, session))))
-							}),
-						elm$core$Platform$Cmd$none,
-						session);
+					var _n5 = A2(author$project$Session$getArticle, model.id, session);
+					if (_n5.$ === 'Success') {
+						if (_n5.a.$ === 'Just') {
+							var article = _n5.a.a;
+							return _Utils_Tuple3(
+								_Utils_update(
+									model,
+									{
+										editing: elm$core$Maybe$Just(article)
+									}),
+								elm$core$Platform$Cmd$none,
+								session);
+						} else {
+							var _n6 = _n5.a;
+							return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+						}
+					} else {
+						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, session);
+					}
 				}
 			default:
 				var value = msg.a;
-				var _n5 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
-				if (_n5.$ === 'Ok') {
-					var article = _n5.a;
+				var _n7 = A2(elm$json$Json$Decode$decodeValue, author$project$Data$Article$decodeOne, value);
+				if (_n7.$ === 'Ok') {
+					var article = _n7.a;
 					return _Utils_Tuple3(
 						_Utils_update(
 							model,
@@ -7287,6 +7283,15 @@ var elm$core$Maybe$map = F2(
 				f(value));
 		} else {
 			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
 		}
 	});
 var rtfeldman$elm_css$Css$Preprocess$Resolve$collectSelectors = function (declarations) {
@@ -10356,6 +10361,15 @@ var author$project$Page$Articles$viewPlaceholder = A2(
 				]),
 			_List_Nil)
 		]));
+var author$project$Data$Status$withDefault = F2(
+	function (_default, status) {
+		if (status.$ === 'Loading') {
+			return _default;
+		} else {
+			var a = status.a;
+			return a;
+		}
+	});
 var elm$core$Dict$values = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,

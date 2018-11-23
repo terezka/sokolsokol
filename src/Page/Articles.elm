@@ -76,8 +76,9 @@ viewPlaceholder =
             , Css.paddingBottom (Css.px 16)
             , Css.hover
                 [ Css.Global.children
-                    [Css.Global.everything
-                        [ Css.border3 (Css.px 3) Css.dotted Color.white ]]
+                    [ Css.Global.everything
+                        [ Css.border3 (Css.px 3) Css.dotted Color.white ]
+                    ]
                 ]
             ]
         ]

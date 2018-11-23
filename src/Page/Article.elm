@@ -31,10 +31,18 @@ type alias Model =
 
 init : Session.Data -> String -> ( Model, Cmd Msg, Session.Data )
 init session id =
-    ( { id = id
-      , editing = Nothing
-      , imageLoaded = False
-      }
+    ( case id of
+        "new" ->
+            { id = id
+            , editing = Just Article.placeholder
+            , imageLoaded = False
+            }
+
+        _ ->
+            { id = id
+            , editing = Nothing
+            , imageLoaded = False
+            }
     , Cmd.none
     , session
     )
@@ -129,17 +137,18 @@ update key session msg model =
                     )
 
                 Nothing ->
-                    ( { model
-                        | editing =
-                            session
-                                |> Session.getArticle model.id
-                                |> Status.map (Maybe.withDefault Article.placeholder)
-                                |> Status.withDefault Article.placeholder
-                                |> Just
-                      }
-                    , Cmd.none
-                    , session
-                    )
+                    case Session.getArticle model.id session of
+                        Status.Success (Just article) ->
+                            ( { model | editing = Just article }
+                            , Cmd.none
+                            , session
+                            )
+
+                        Status.Success Nothing ->
+                            ( model, Cmd.none, session )
+
+                        Status.Loading ->
+                            ( model, Cmd.none, session )
 
         GotArticle value ->
             case Decode.decodeValue Article.decodeOne value of
