@@ -10183,7 +10183,7 @@ var author$project$Page$Article$viewArticleEditing = function (article) {
 				])
 		});
 };
-var author$project$Page$Article$viewBody = F2(
+var author$project$Page$Article$view = F2(
 	function (session, model) {
 		var _n0 = session.user;
 		if (_n0.$ === 'LoggedIn') {
@@ -10191,27 +10191,51 @@ var author$project$Page$Article$viewBody = F2(
 			var _n1 = model.editing;
 			if (_n1.$ === 'Just') {
 				var article = _n1.a;
-				return author$project$Page$Article$viewArticleEditing(article);
+				return {
+					body: _List_fromArray(
+						[
+							author$project$Page$Article$viewArticleEditing(article)
+						]),
+					title: 'SOKOL SOKOL | ' + article.title
+				};
 			} else {
 				var _n2 = A2(author$project$Session$getArticle, model.id, session);
 				if (_n2.$ === 'Success') {
 					if (_n2.a.$ === 'Just') {
 						var article = _n2.a.a;
-						return A3(
-							author$project$Page$Article$viewArticle,
-							model,
-							article,
-							_List_fromArray(
+						return {
+							body: _List_fromArray(
 								[
-									A2(author$project$Element$Button$warning, author$project$Page$Article$DeleteArticle, 'Delete'),
-									A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Edit')
-								]));
+									A3(
+									author$project$Page$Article$viewArticle,
+									model,
+									article,
+									_List_fromArray(
+										[
+											A2(author$project$Element$Button$warning, author$project$Page$Article$DeleteArticle, 'Delete'),
+											A2(author$project$Element$Button$basic, author$project$Page$Article$Toggle, 'Edit')
+										]))
+								]),
+							title: 'SOKOL SOKOL | ' + article.title
+						};
 					} else {
 						var _n3 = _n2.a;
-						return author$project$Page$Article$viewArticleEditing(author$project$Data$Article$placeholder);
+						return {
+							body: _List_fromArray(
+								[
+									author$project$Page$Article$viewArticleEditing(author$project$Data$Article$placeholder)
+								]),
+							title: 'SOKOL SOKOL | New article'
+						};
 					}
 				} else {
-					return rtfeldman$elm_css$Html$Styled$text('Loading...');
+					return {
+						body: _List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Loading...')
+							]),
+						title: 'SOKOL SOKOL | Loading'
+					};
 				}
 			}
 		} else {
@@ -10219,25 +10243,33 @@ var author$project$Page$Article$viewBody = F2(
 			if (_n4.$ === 'Success') {
 				if (_n4.a.$ === 'Just') {
 					var article = _n4.a.a;
-					return A3(author$project$Page$Article$viewArticle, model, article, _List_Nil);
+					return {
+						body: _List_fromArray(
+							[
+								A3(author$project$Page$Article$viewArticle, model, article, _List_Nil)
+							]),
+						title: 'SOKOL SOKOL | ' + article.title
+					};
 				} else {
 					var _n5 = _n4.a;
-					return rtfeldman$elm_css$Html$Styled$text('Article not found.');
+					return {
+						body: _List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text('Article not found.')
+							]),
+						title: 'SOKOL SOKOL | Not found.'
+					};
 				}
 			} else {
-				return rtfeldman$elm_css$Html$Styled$text('Loading...');
+				return {
+					body: _List_fromArray(
+						[
+							rtfeldman$elm_css$Html$Styled$text('Loading...')
+						]),
+					title: 'SOKOL SOKOL | Loading'
+				};
 			}
 		}
-	});
-var author$project$Page$Article$view = F2(
-	function (session, model) {
-		return {
-			body: _List_fromArray(
-				[
-					A2(author$project$Page$Article$viewBody, session, model)
-				]),
-			title: 'SOKOL SOKOL | Articles'
-		};
 	});
 var rtfeldman$elm_css$Css$paddingBottom = rtfeldman$elm_css$Css$prop1('padding-bottom');
 var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');

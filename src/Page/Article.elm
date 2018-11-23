@@ -167,44 +167,53 @@ update key session msg model =
 
 view : Session.Data -> Model -> Skeleton.Document Msg
 view session model =
-    { title = "SOKOL SOKOL | Articles"
-    , body = [ viewBody session model ]
-    }
-
-
-viewBody : Session.Data -> Model -> Html.Html Msg
-viewBody session model =
     case session.user of
         Session.LoggedIn state ->
             case model.editing of
                 Just article ->
-                    viewArticleEditing article
+                    { title = "SOKOL SOKOL | " ++ article.title
+                    , body = [ viewArticleEditing article ]
+                    }
 
                 Nothing ->
                     case Session.getArticle model.id session of
                         Status.Success (Just article) ->
-                            viewArticle model
-                                article
-                                [ Button.warning DeleteArticle "Delete"
-                                , Button.basic Toggle "Edit"
+                            { title = "SOKOL SOKOL | " ++ article.title
+                            , body =
+                                [ viewArticle model
+                                    article
+                                    [ Button.warning DeleteArticle "Delete"
+                                    , Button.basic Toggle "Edit"
+                                    ]
                                 ]
+                            }
 
                         Status.Success Nothing ->
-                            viewArticleEditing Article.placeholder
+                            { title = "SOKOL SOKOL | New article"
+                            , body = [ viewArticleEditing Article.placeholder ]
+                            }
 
                         Status.Loading ->
-                            Html.text "Loading..."
+                            { title = "SOKOL SOKOL | Loading"
+                            , body = [ Html.text "Loading..." ]
+                            }
 
         Session.Anonymous ->
             case Session.getArticle model.id session of
                 Status.Success (Just article) ->
-                    viewArticle model article []
+                    { title = "SOKOL SOKOL | " ++ article.title
+                    , body = [ viewArticle model article [] ]
+                    }
 
                 Status.Success Nothing ->
-                    Html.text "Article not found."
+                    { title = "SOKOL SOKOL | Not found."
+                    , body = [ Html.text "Article not found." ]
+                    }
 
                 Status.Loading ->
-                    Html.text "Loading..."
+                    { title = "SOKOL SOKOL | Loading"
+                    , body = [ Html.text "Loading..." ]
+                    }
 
 
 viewArticle : Model -> Article.Article -> List (Html.Html Msg) -> Html.Html Msg
