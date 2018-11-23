@@ -154,50 +154,46 @@ update key session msg model =
 view : Session.Data -> Model -> Skeleton.Document Msg
 view session model =
     { title = "SOKOL SOKOL | Articles"
-    , body =
-        case session.user of
-            Session.LoggedIn state ->
-                case model.editing of
-                    Just article ->
-                        [ viewArticleEditing article ]
-
-                    Nothing ->
-                        case Session.getArticle model.id session of
-                            Just article ->
-                                [ viewArticleEditable model article ]
-
-                            Nothing ->
-                                [ viewArticleEditing Article.placeholder ]
-
-            Session.Anonymous ->
-                case Session.getArticle model.id session of
-                    Just article ->
-                        [ viewArticle model article ]
-
-                    Nothing ->
-                        [ Html.text "Loading..." ]
+    , body = [ viewBody session model ]
     }
 
 
-viewArticle : Model -> Article.Article -> Html.Html Msg
-viewArticle model article =
-    Html.article
-        [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
+viewBody : Session.Data -> Model -> Html.Html Msg
+viewBody session model =
+    case session.user of
+        Session.LoggedIn state ->
+            case model.editing of
+                Just article ->
+                    viewArticleEditing article
+
+                Nothing ->
+                    case Session.getArticle model.id session of
+                        Just article ->
+                            viewArticle model
+                                article
+                                [ Button.warning DeleteArticle "Delete"
+                                , Button.basic Toggle "Edit"
+                                ]
+
+                        Nothing ->
+                            viewArticleEditing Article.placeholder
+
+        Session.Anonymous ->
+            case Session.getArticle model.id session of
+                Just article ->
+                    viewArticle model article []
+
+                Nothing ->
+                    Html.text "Loading..."
+
+
+viewArticle : Model -> Article.Article -> List (Html.Html Msg) -> Html.Html Msg
+viewArticle model article buttons =
+    threeColumn
         [ Util.maybe article.cover (Image.single ImageLoaded model.imageLoaded)
         , Text.h1 [] article.title
         , Html.div [] (paragraphs article)
-        ]
-
-
-viewArticleEditable : Model -> Article.Article -> Html.Html Msg
-viewArticleEditable model article =
-    Html.article
-        [ Attr.css [ Css.maxWidth (Css.px 1080), Css.property "column-count" "3" ] ]
-        [ Util.maybe article.cover (Image.single ImageLoaded model.imageLoaded)
-        , Text.h1 [] article.title
-        , Html.div [] (paragraphs article)
-        , Button.warning DeleteArticle "Delete"
-        , Button.basic Toggle "Edit"
+        , menu buttons
         ]
 
 
@@ -208,15 +204,9 @@ filesDecoder =
 
 viewArticleEditing : Article.Article -> Html.Html Msg
 viewArticleEditing article =
-    Html.div
-        []
-        [ Image.editable { select = PickImage, remove = RemoveImage } article.cover
-        , Html.article
-            [ Attr.css
-                [ Css.width (Css.px 780)
-                , Css.display Css.inlineBlock
-                ]
-            ]
+    editable
+        { aside = Image.editable { select = PickImage, remove = RemoveImage } article.cover
+        , content =
             [ Text.h1
                 [ Attr.contenteditable True
                 , Attr.id "title"
@@ -228,14 +218,53 @@ viewArticleEditing article =
                 ]
                 (paragraphs article)
             ]
-        , Html.div
-            [ Attr.css
-                [ Css.width (Css.pct 100)
-                , Css.textAlign Css.right
-                ]
-            ]
+        , actions =
             [ Button.warning Cancel "Cancel"
             , Button.basic Toggle "Save"
+            ]
+        }
+
+
+
+-- ELEMENTS
+
+
+threeColumn : List (Html.Html msg) -> Html.Html msg
+threeColumn =
+    Html.article
+        [ Attr.css
+            [ Css.maxWidth (Css.px 1080)
+            , Css.property "column-count" "3"
+            ]
+        ]
+
+
+editable : { aside : Html.Html msg, content : List (Html.Html msg), actions : List (Html.Html msg) } -> Html.Html msg
+editable { aside, content, actions } =
+    Html.article
+        []
+        [ aside
+        , singleColumn content
+        , menu actions
+        ]
+
+
+singleColumn : List (Html.Html msg) -> Html.Html msg
+singleColumn =
+    Html.div
+        [ Attr.css
+            [ Css.width (Css.px 780)
+            , Css.display Css.inlineBlock
+            ]
+        ]
+
+
+menu : List (Html.Html msg) -> Html.Html msg
+menu =
+    Html.div
+        [ Attr.css
+            [ Css.width (Css.pct 100)
+            , Css.textAlign Css.right
             ]
         ]
 
@@ -246,6 +275,10 @@ paragraphs article =
         |> String.split "\n"
         |> List.map (List.singleton << Html.text)
         |> List.map (Html.p [])
+
+
+
+-- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
