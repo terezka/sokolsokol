@@ -10234,40 +10234,33 @@ var author$project$Page$Article$view = F2(
 			title: 'SOKOL SOKOL | Articles'
 		};
 	});
+var rtfeldman$elm_css$Css$paddingBottom = rtfeldman$elm_css$Css$prop1('padding-bottom');
 var rtfeldman$elm_css$Html$Styled$a = rtfeldman$elm_css$Html$Styled$node('a');
 var rtfeldman$elm_css$Html$Styled$Attributes$href = function (url) {
 	return A2(rtfeldman$elm_css$Html$Styled$Attributes$stringProperty, 'href', url);
 };
 var author$project$Page$Articles$viewArticle = function (article) {
 	return A2(
-		rtfeldman$elm_css$Html$Styled$article,
+		rtfeldman$elm_css$Html$Styled$a,
 		_List_fromArray(
 			[
+				rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id),
 				rtfeldman$elm_css$Html$Styled$Attributes$css(
 				_List_fromArray(
 					[
-						rtfeldman$elm_css$Css$width(
-						rtfeldman$elm_css$Css$pct(32)),
-						rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock),
-						rtfeldman$elm_css$Css$verticalAlign(rtfeldman$elm_css$Css$top),
-						rtfeldman$elm_css$Css$marginRight(
-						rtfeldman$elm_css$Css$px(8)),
-						rtfeldman$elm_css$Css$lastChild(
-						_List_fromArray(
-							[
-								rtfeldman$elm_css$Css$marginRight(
-								rtfeldman$elm_css$Css$pct(0))
-							]))
+						A2(
+						rtfeldman$elm_css$Css$padding2,
+						rtfeldman$elm_css$Css$px(0),
+						rtfeldman$elm_css$Css$px(16)),
+						rtfeldman$elm_css$Css$paddingBottom(
+						rtfeldman$elm_css$Css$px(16))
 					]))
 			]),
 		_List_fromArray(
 			[
 				A2(
-				rtfeldman$elm_css$Html$Styled$a,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$Attributes$href('/articles/' + article.id)
-					]),
+				rtfeldman$elm_css$Html$Styled$article,
+				_List_Nil,
 				_List_fromArray(
 					[
 						A2(
@@ -10283,20 +10276,31 @@ var author$project$Page$Articles$viewArticle = function (article) {
 						_List_fromArray(
 							[
 								rtfeldman$elm_css$Html$Styled$text(article.title)
+							])),
+						A2(
+						rtfeldman$elm_css$Html$Styled$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								rtfeldman$elm_css$Html$Styled$text(
+								A2(elm$core$String$left, 300, article.body) + '...')
 							]))
-					])),
-				A2(
-				rtfeldman$elm_css$Html$Styled$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						rtfeldman$elm_css$Html$Styled$text(
-						A2(elm$core$String$left, 300, article.body) + '...')
 					]))
 			]));
 };
 var rtfeldman$elm_css$Css$dotted = {borderStyle: rtfeldman$elm_css$Css$Structure$Compatible, textDecorationStyle: rtfeldman$elm_css$Css$Structure$Compatible, value: 'dotted'};
-var rtfeldman$elm_css$Css$inlineFlex = {display: rtfeldman$elm_css$Css$Structure$Compatible, value: 'inline-flex'};
+var rtfeldman$elm_css$Css$Preprocess$NestSnippet = F2(
+	function (a, b) {
+		return {$: 'NestSnippet', a: a, b: b};
+	});
+var rtfeldman$elm_css$Css$Structure$Child = {$: 'Child'};
+var rtfeldman$elm_css$Css$Global$children = rtfeldman$elm_css$Css$Preprocess$NestSnippet(rtfeldman$elm_css$Css$Structure$Child);
+var rtfeldman$elm_css$Css$Global$everything = function (styles) {
+	return A2(
+		rtfeldman$elm_css$VirtualDom$Styled$makeSnippet,
+		styles,
+		rtfeldman$elm_css$Css$Structure$UniversalSelectorSequence(_List_Nil));
+};
 var author$project$Page$Articles$viewPlaceholder = A2(
 	rtfeldman$elm_css$Html$Styled$a,
 	_List_fromArray(
@@ -10305,36 +10309,53 @@ var author$project$Page$Articles$viewPlaceholder = A2(
 			rtfeldman$elm_css$Html$Styled$Attributes$css(
 			_List_fromArray(
 				[
-					rtfeldman$elm_css$Css$width(
-					rtfeldman$elm_css$Css$pct(30)),
-					rtfeldman$elm_css$Css$height(
-					rtfeldman$elm_css$Css$px(200)),
-					rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineBlock),
-					rtfeldman$elm_css$Css$verticalAlign(rtfeldman$elm_css$Css$top),
-					rtfeldman$elm_css$Css$marginTop(
-					rtfeldman$elm_css$Css$px(24)),
-					rtfeldman$elm_css$Css$marginRight(
-					rtfeldman$elm_css$Css$px(24)),
-					A3(
-					rtfeldman$elm_css$Css$border3,
-					rtfeldman$elm_css$Css$px(3),
-					rtfeldman$elm_css$Css$dotted,
-					author$project$Element$Color$black),
-					rtfeldman$elm_css$Css$display(rtfeldman$elm_css$Css$inlineFlex),
-					rtfeldman$elm_css$Css$justifyContent(rtfeldman$elm_css$Css$center),
-					rtfeldman$elm_css$Css$alignItems(rtfeldman$elm_css$Css$center),
+					A2(
+					rtfeldman$elm_css$Css$padding2,
+					rtfeldman$elm_css$Css$px(0),
+					rtfeldman$elm_css$Css$px(16)),
+					rtfeldman$elm_css$Css$paddingBottom(
+					rtfeldman$elm_css$Css$px(16)),
 					rtfeldman$elm_css$Css$hover(
 					_List_fromArray(
 						[
-							A3(
-							rtfeldman$elm_css$Css$border3,
-							rtfeldman$elm_css$Css$px(3),
-							rtfeldman$elm_css$Css$solid,
-							author$project$Element$Color$black)
+							rtfeldman$elm_css$Css$Global$children(
+							_List_fromArray(
+								[
+									rtfeldman$elm_css$Css$Global$everything(
+									_List_fromArray(
+										[
+											A3(
+											rtfeldman$elm_css$Css$border3,
+											rtfeldman$elm_css$Css$px(3),
+											rtfeldman$elm_css$Css$dotted,
+											author$project$Element$Color$white)
+										]))
+								]))
 						]))
 				]))
 		]),
-	_List_Nil);
+	_List_fromArray(
+		[
+			A2(
+			rtfeldman$elm_css$Html$Styled$div,
+			_List_fromArray(
+				[
+					rtfeldman$elm_css$Html$Styled$Attributes$css(
+					_List_fromArray(
+						[
+							rtfeldman$elm_css$Css$height(
+							rtfeldman$elm_css$Css$px(200)),
+							rtfeldman$elm_css$Css$marginTop(
+							rtfeldman$elm_css$Css$px(24)),
+							A3(
+							rtfeldman$elm_css$Css$border3,
+							rtfeldman$elm_css$Css$px(3),
+							rtfeldman$elm_css$Css$dotted,
+							author$project$Element$Color$black)
+						]))
+				]),
+			_List_Nil)
+		]));
 var elm$core$Dict$values = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,
@@ -10392,7 +10413,12 @@ var author$project$Page$Articles$view = F2(
 							rtfeldman$elm_css$Html$Styled$div,
 							_List_fromArray(
 								[
-									rtfeldman$elm_css$Html$Styled$Attributes$css(_List_Nil)
+									rtfeldman$elm_css$Html$Styled$Attributes$css(
+									_List_fromArray(
+										[
+											A2(rtfeldman$elm_css$Css$property, 'display', 'grid'),
+											A2(rtfeldman$elm_css$Css$property, 'grid-template-columns', '33% 33% 33%')
+										]))
 								]),
 							function () {
 								var _n0 = session.user;
@@ -10449,7 +10475,6 @@ var author$project$Page$Skeleton$logo = A2(
 		[
 			rtfeldman$elm_css$Html$Styled$text('SOKOL SOKOL')
 		]));
-var author$project$Element$Color$blue = rtfeldman$elm_css$Css$hex('97d4ff');
 var rtfeldman$elm_css$Css$row = {flexDirection: rtfeldman$elm_css$Css$Structure$Compatible, flexDirectionOrWrap: rtfeldman$elm_css$Css$Structure$Compatible, value: 'row'};
 var rtfeldman$elm_css$Css$column = _Utils_update(
 	rtfeldman$elm_css$Css$row,
@@ -10531,17 +10556,14 @@ var author$project$Page$Skeleton$styles = _List_fromArray(
 		rtfeldman$elm_css$Css$Global$a(
 		_List_fromArray(
 			[
-				rtfeldman$elm_css$Css$fontWeight(
-				rtfeldman$elm_css$Css$int(300)),
-				rtfeldman$elm_css$Css$fontSize(
-				rtfeldman$elm_css$Css$px(12)),
 				rtfeldman$elm_css$Css$cursor(rtfeldman$elm_css$Css$pointer),
 				rtfeldman$elm_css$Css$textDecoration(rtfeldman$elm_css$Css$none),
 				rtfeldman$elm_css$Css$color(author$project$Element$Color$black),
 				rtfeldman$elm_css$Css$hover(
 				_List_fromArray(
 					[
-						rtfeldman$elm_css$Css$color(author$project$Element$Color$blue)
+						rtfeldman$elm_css$Css$color(author$project$Element$Color$white),
+						rtfeldman$elm_css$Css$backgroundColor(author$project$Element$Color$black)
 					]))
 			]))
 	]);

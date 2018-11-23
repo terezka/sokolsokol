@@ -1,6 +1,7 @@
 module Page.Articles exposing (Model, Msg, init, subscriptions, update, view)
 
 import Css
+import Css.Global
 import Data.Article as Article
 import Element.Color as Color
 import Element.Text as Text
@@ -39,12 +40,20 @@ view session model =
     { title = "SOKOL SOKOL | Articles"
     , body =
         [ Html.div
-            [ Attr.css [ Css.marginTop (Css.px 120), Css.maxWidth (Css.px 1100), Css.width (Css.pct 100) ] ]
+            [ Attr.css
+                [ Css.marginTop (Css.px 120)
+                , Css.maxWidth (Css.px 1100)
+                , Css.width (Css.pct 100)
+                ]
+            ]
             [ Html.h2
                 [ Attr.css [ Css.maxWidth (Css.px 700) ] ]
                 [ Html.text "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et fermentum massa. Proin rutrum suscipit finibus. Sed consequat, est at blandit accumsan, neque turpis gravida nulla, ac cursus arcu lorem a eros. Integer purus libero, imperdiet ac ligula quis, porttitor mattis leo. Vivamus laoreet elit at ante iaculis fringilla. Mauris nec imperdiet magna. Maecenas finibus urna in ex sodales, vitae porta turpis scelerisque." ]
             , Html.div
-                [ Attr.css []
+                [ Attr.css
+                    [ Css.property "display" "grid"
+                    , Css.property "grid-template-columns" "33% 33% 33%"
+                    ]
                 ]
                 (case session.user of
                     Session.LoggedIn _ ->
@@ -63,39 +72,42 @@ viewPlaceholder =
     Html.a
         [ Attr.href "/articles/new"
         , Attr.css
-            [ Css.width (Css.pct 30)
-            , Css.height (Css.px 200)
-            , Css.display Css.inlineBlock
-            , Css.verticalAlign Css.top
-            , Css.marginTop (Css.px 24)
-            , Css.marginRight (Css.px 24)
-            , Css.border3 (Css.px 3) Css.dotted Color.black
-            , Css.display Css.inlineFlex
-            , Css.justifyContent Css.center
-            , Css.alignItems Css.center
-            , Css.hover [ Css.border3 (Css.px 3) Css.solid Color.black ]
+            [ Css.padding2 (Css.px 0) (Css.px 16)
+            , Css.paddingBottom (Css.px 16)
+            , Css.hover
+                [ Css.Global.children
+                    [Css.Global.everything
+                        [ Css.border3 (Css.px 3) Css.dotted Color.white ]]
+                ]
             ]
         ]
-        []
+        [ Html.div
+            [ Attr.css
+                [ Css.height (Css.px 200)
+                , Css.marginTop (Css.px 24)
+                , Css.border3 (Css.px 3) Css.dotted Color.black
+                ]
+            ]
+            []
+        ]
 
 
 viewArticle : Article.Article -> Html.Html Msg
 viewArticle article =
-    Html.article
-        [ Attr.css
-            [ Css.width (Css.pct 32)
-            , Css.display Css.inlineBlock
-            , Css.verticalAlign Css.top
-            , Css.marginRight (Css.px 8)
-            , Css.lastChild [ Css.marginRight (Css.pct 0) ]
+    Html.a
+        [ Attr.href ("/articles/" ++ article.id)
+        , Attr.css
+            [ Css.padding2 (Css.px 0) (Css.px 16)
+            , Css.paddingBottom (Css.px 16)
             ]
         ]
-        [ Html.a [ Attr.href ("/articles/" ++ article.id) ]
+        [ Html.article
+            []
             [ Html.h1
                 [ Attr.css [ Css.textDecoration Css.overline ] ]
                 [ Html.text article.title ]
+            , Html.p [] [ Html.text <| String.left 300 article.body ++ "..." ]
             ]
-        , Html.p [] [ Html.text <| String.left 300 article.body ++ "..." ]
         ]
 
 

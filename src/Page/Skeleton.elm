@@ -106,12 +106,12 @@ styles =
         , Css.fontSize (Css.px 16)
         ]
     , Css.Global.a
-        [ Css.fontWeight (Css.int 300)
-        , Css.fontSize (Css.px 12)
-        , Css.cursor Css.pointer
+        [ Css.cursor Css.pointer
         , Css.textDecoration Css.none
         , Css.color Color.black
         , Css.hover
-            [ Css.color Color.blue ]
+            [ Css.color Color.white
+            , Css.backgroundColor Color.black
+            ]
         ]
     ]
